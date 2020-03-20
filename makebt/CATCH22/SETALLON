@@ -1,0 +1,11 @@
+TYPE CURRENT.TXT
+SET
+SET AllowWildCards = TRUE
+SET AllowAllPaths = TRUE
+SET AllowRemovableMedia = TRUE
+SET NoCopyPrompt = TRUE
+TYPE AFTER.TXT
+SET
+TYPE DRIVES.TXT
+map
+map arc

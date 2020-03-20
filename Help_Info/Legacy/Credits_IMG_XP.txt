@@ -1,0 +1,317 @@
+===================================================================================================
+
+ ***** Credits - April 17, 2014 - IMG_XP package
+
+ - JFX for making WinNTSetup3 to Install Windows 2k/XP/2003/Vista/7/8 x86/x64 - http://www.msfn.org/board/topic/149612-winntsetup-v30/
+ - chenall, tinybit and Bean for making Grub4dos - http://code.google.com/p/grub4dos-chenall/downloads/list
+ - karyonix for making FiraDisk driver- http://reboot.pro/topic/8804-firadisk-latest-00130/
+ - Sha0 for making WinVBlock driver and waitbt - http://reboot.pro/topic/8168-winvblock/ and http://reboot.pro/topic/14427-waitbt-for-usb-booting/
+ - Olof Lagerkvist for ImDisk virtual disk driver - http://www.ltr-data.se/opencode.html#ImDisk and http://reboot.pro/index.php?showforum=59
+ - Uwe Sieber for making ListUsbDrives - http://www.uwe-sieber.de/english.html
+ - Dariusz Stanislawek for the DS File Ops Kit (DSFOK) - http://members.ozemail.com.au/~nulifetv/freezip/freeware/
+ - cdob and maanu to Fix Win7 for booting from USB - http://reboot.pro/topic/14186-usb-hdd-boot-and-windows-7-sp1/
+ - Tutorial of sara-pmedia http://reboot.pro/13731/
+ - Roger Layton for making MBRwizard - http://mbrwizard.com/ and http://firesage.com/mbrwizard.php
+
+ More Info on booting Win 7 VHD from grub4dos menu by using FiraDisk Or WinVBlock driver:
+ http://reboot.pro/topic/9830-universal-hdd-image-files-for-xp-and-windows-7/ Or http://www.911cd.net/forums//index.php?showtopic=23553
+ Boot Windows 7 from USB - http://reboot.pro/index.php?showforum=77
+ Boot Windows 7 from USB - karyonix - http://reboot.pro/index.php?showtopic=9196
+ 
+ The program are released "as is" and are free for redistribution, use or changes as long as original author, 
+ credits part and link to the reboot.pro and 911cd support forum are clearly mentioned
+ http://reboot.pro/topic/9830-universal-hdd-image-files-for-xp-and-windows-7/ and http://www.911cd.net/forums//index.php?showtopic=23553
+
+ Author does not take any responsibility for use or misuse of the programs.
+
+ Programs of IMG_XP package
+ - VHD_XP_Create.exe - Make VHD file and Install XP in VHD by using Grub4dos Boot Menu on HDD
+ - IMG_XP_Compact.exe - Make Portable and Mini XP Windows VHD Image files booting with Grub4dos Menu on HDD or USB
+ - IMG_XP_Update.exe - to Update XP Image file after booting from full XP e.g. running from FiraDisk RAMDISK.
+ - Win_Restore.exe - to Restore XP as OS on other Partition of HDD or USB-HDD drive using Windows VHD Image File as Source
+ - USB_XP_Fix.exe - to Update XP HDD Image file on USB with tweaks and UsbBootWatcher including usb_xp_init.cmd
+ - USB_W7_Fix.exe - to Update Win7 VHD Image file on USB with tweaks and UsbBootWatcher
+ - VHD_W7_Compact.exe - to Copy Win7 VHD content to New VHD file of Reduced Size and make it suitable for Booting from USB-drive
+
+ - BOOT_USB.exe can be used to make USB-drive bootable with Grub4dos Menu and using Boot Image files (VHD IMG or ISO)
+ - BOOT_IMG.exe can be used to make Grub4dos Boot Menu for Boot Image files (VHD IMG or ISO) on existing bootable drives (HDD or USB)
+
+ - VHD_W8_Compact.exe - to Copy Windows 8 folders and files to New VHD file of Reduced Size and using Full registry of Installed Windows 8
+ - UEFI_MULTI.exe - Make Multi-Boot USB-Harddisk Booting with Boot Manager Menu and using Boot Image files (VHD IMG or ISO)
+ - UFD_FORMAT.exe - to Format USB-stick with two partitions for Booting with Boot Manager Menu on BIOS or UEFI computer
+ - USB_Part_Flip.exe - to change which primary partition of the USB-stick is visible in Windows
+
+===================================================================================================
+
+
+Thanks to JFX for creating the very handy WinNTSetup3 tool to Install Windows 2k/XP/2003/Vista/7/8 x86/x64
+http://www.msfn.org/board/topic/149612-winntsetup-v30/
+
+Thanks to JFX for creating the very handy Get WAIK Tools
+Info in http://theoven.org/index.php?topic=287.0
+
+Thanks to ChrisR for making Win8.1SE
+http://www.msfn.org/board/topic/170546-win81se/
+
+Thanks to Sha0 for making WinVBlock driver
+http://reboot.pro/topic/8168-winvblock/
+
+Thanks to Sha0 for making waitbt driver
+http://reboot.pro/topic/14427-waitbt-for-usb-booting/
+
+sara-pmedia for her tutorial - http://reboot.pro/13731/
+
+Doodoo for his tutorial
+http://reboot.pro/topic/13856-a-relatively-simple-yet-powerful-way-to-installxp-from-usb/
+http://reboot.pro/topic/14130-bsod-7b-finally-fixed-for-me-maybe-for-you-too/
+
+Thanks to Aye Htay for sharing his filelist of Mini7 , which is used as start info for VHD_W7_Compact.exe
+This list was further improved with the list of Portable 7 PE and used as file copy_7vhd.txt in folder VHD_W7
+http://reboot.pro/9830/page__view__findpost__p__122370
+
+I would like to thank for their valuable programs used by USB_XP_SETUP.exe BOOT_IMG.exe  BOOT_ISO.exe  and Make_USB.exe
+
+ilko_t for his Alternative location of Setup files when installing from HD media
+http://www.msfn.org/board/Alternative-location-of-Setup-files-when-t119742.html
+
+jaclaz for his handy Batch Programs and for his Boot knowledge and useful links
+MBRBatch.cmd http://reboot.pro/?showtopic=3191
+MakeBS.cmd   http://reboot.pro/?showtopic=2362
+
+jaclaz for making use of his CATCH22 folder to unlimit XP Recovery Console for getting access to any folder
+http://www.911cd.net/forums//index.php?showtopic=20983&st=25
+
+Nuno Brito, Peter Schlang - psc - , Galapo, and all other contributors of 
+the reboot.pro Community for making WinBuilder
+http://reboot.pro/
+
+I would like to thank amalux and ispy for their excellent Tutorials
+and amalux for his ready to use Stable Projects of WinBuilder for making LiveXP BootSDI.img files
+http://reboot.pro/?showtopic=4111
+
+PedroLe15 for making MakeScript.exe
+http://pedrole15.boot-land.net/
+
+cdob for making MkMigrateInf.cmd to migrate USB BootDrive Letter to U:
+http://www.msfn.org/board/How-to-boot-install-from-USB-key-t61384.html&st=132
+http://www.msfn.org/board/How-to-boot-install-from-USB-key-t61384.html&st=111
+
+geitonaki and cdob for Crack of setupldr.bin of Windows Server 2003 SP1
+http://www.msfn.org/board/Solution-for-multibooting-Win-XP-2k3-64-t58410.html&st=0
+http://www.msfn.org/board/Solution-for-multibooting-Win-XP-2k3-64-t58410.html&st=68
+
+Jonathan Bennett & AutoIt Team for Creating AutoIt v3 scripting language designed for automating the Windows GUI 
+http://www.autoitscript.com/autoit3/index.shtml
+
+ilko_t for publishing his AutoIt3 Source of WinSetupFromUSB_0-1-1.au3 at MSFN Forum
+http://www.msfn.org/board/index.php?showtopic=120444 
+and SmOke_N and ezzetabi from AutoIt forum for their excellent AutoIt script examples, parts of which were used.
+
+Bart Lagerweij - for mkbt.exe used for Copy of Bootsectors
+Henk de Jong - for Nu2Menu.exe used for WinTools Menu
+http://www.nu2.nu/utilities/
+
+Tormod Tjaberg and Hans Peter Verne - for gsar.exe general search and replace utility 
+http://gnuwin32.sourceforge.net/packages/gsar.htm
+
+Rob van der Woude - for his valuable Batch Scripting Pages
+http://www.robvanderwoude.com/index.html
+
+djbe for Fedit.exe used for editing files
+http://www.msfn.org/board/Fedit-t48200.html
+
+Kåre Smith and Systemintegrasjon AS for MbrFix.exe
+http://www.sysint.no/nedlasting/mbrfix.htm
+
+MBRwizard of Roger Layton
+http://mbrwizard.com/
+http://firesage.com/mbrwizard.php
+
+Daniel B. Sedory for his Handy Pages with MBR info
+http://mirror.href.com/thestarman/asm/mbr/index.html
+
+Lars Hederer for making ERUNT to save registry of running XP system
+http://www.larshederer.homepage.t-online.de/erunt/
+
+karyonix for creating FiraDisk driver
+http://reboot.pro/topic/8804-firadisk-latest-00130/
+
+Olof Lagerkvist for ImDisk virtual disk driver for Windows NT/2000/XP/2003/Vista/2008
+http://www.ltr-data.se/opencode.html#ImDisk
+http://reboot.pro/index.php?showforum=59
+
+Olof Lagerkvist for strarc.exe - A console backup/archive tool for Windows NT/2000/XP/2003
+http://www.ltr-data.se/opencode.html#CmdUtils
+
+marv for making	UsbBootWatcher 
+http://www.911cd.net/forums//index.php?showtopic=22473
+https://github.com/vavrecan/usb-boot-watcher
+
+cdob for usb_xp_init.cmd
+http://www.911cd.net/forums//index.php?showtopic=22473&st=37
+
+cdob for fix_usb30_nec.cmd
+http://www.911cd.net/forums//index.php?showtopic=22473&st=40&p=166765&#entry166765
+
+Ken Kato for Virtual Disk Driver (VDK)
+http://chitchat.at.infoseek.co.jp/vmware/vdk.html
+
+Lancelot for making modified MBRBatch of jaclaz
+http://reboot.pro/index.php?showtopic=5000&st=0&p=45422&#entry45422
+
+Thanks to blue_life and Lancelot for giving Function SystemFileRedirect for x64 Support
+http://reboot.pro/topic/5306-install-xp-from-usb-after-booting-with-pe-from-hdd-or-usb/page-10#entry67709
+
+Rich Burnham - PeToUSB v3.0 to Format USB-Drive as Harddisk with MBR and Partition
+http://gocoding.com/page.php?al=petousb
+
+Markus Stephany - mirkes - for TinyHexer
+http://fileforum.betanews.com/detail/tiny_hexer_small_edition/1111703686/2
+
+Cody Batt for making BeeblebroxNT
+http://students.cs.byu.edu/~codyb/
+
+Hewlett-Packard - Makers of HPUSBFW.EXE
+HP USB Disk Storage Format Tool V2.0.6
+
+Tinybit and Bean for making GRUB4DOS
+http://sites.google.com/site/grubdos/
+http://reboot.pro/forum/66-grub4dos/
+
+chenall for making GRUB4DOS
+http://code.google.com/p/grub4dos-chenall/downloads/list
+
+sratlf for making RUN for Grub4dos
+http://bbs.wuyou.com/viewthread.php?tid=191301&extra=page%3D1&page=1
+
+diddy for his Guides for GRUB4DOS and for MultiBoot from USB   
+http://diddy.boot-land.net/grub4dos/Grub4dos.htm
+http://www.911cd.net/forums//index.php?showtopic=18846
+
+Pauly for making BOOTICE
+http://reboot.pro/8986/
+
+Elmar Hanlhofer for making PLoP Boot Manager giving USB 2.0 boot support
+http://www.plop.at
+
+Joerg Schilling for mkisofs (modified for PE Builder and BCDW)
+http://cdrecord.berlios.de/private/man/mkisofs-2.0.html
+
+Microsoft for BootSect.exe to convert bootmgr BootSector in NTLDR BootSector
+Microsoft for MSFN Forum as Important Source of Knowledge
+http://www.msfn.org/board/forums.html
+
+Intel for Intel(R) Matrix Storage Manager - iaStor.sys - AHCI support
+http://downloadcenter.intel.com/Product_Filter.aspx?ProductID=2101&lang=eng
+
+Dariusz Stanislawek for the DS File Ops Kit (DSFOK)  
+http://members.ozemail.com.au/~nulifetv/freezip/freeware/
+Used for making the Bootsector Files:
+dsfo.exe - save a block of data of any size from any location within a file
+dsfi.exe - overwrite a block of data of any size at any location within a file
+
+Anton Bassov for developing dummydisk.sys and adapting to rdummy.sys
+http://www.codeproject.com/KB/system/soviet_direct_hooking.aspx
+
+Hitachi for their Hitachi Microdrive Filter (cfadisk.sys)
+http://xpefiles.com/cs/files/folders/hardware/entry616.aspx
+
+H. Peter Anvin - for SYSLINUX
+http://syslinux.zytor.com/download.php
+
+Uwe Sieber for UMBPCI UMB-driver for DOS and Win9x and Handy Info on USB-sticks
+http://www.uwe-sieber.de/english.html
+
+Jim Hall for FREEDOS
+http://www.freedos.org/
+
+Thanks for the handy site of Bootdisk.com
+http://www.bootdisk.com/ 
+
+Erwin Veermans - for the UBCD BootFloppy Images
+http://www.veder.com/nwdsk/
+
+Nikolay Avrionov - for ExplorerXP
+http://www.explorerxp.com/
+
+Gabriel Topala - for SIW
+http://www.gtopala.com/
+
+PEGTOP Software - for PStart
+http://www.pegtop.de/start/
+
+kickarse of MSFN forum for making DriverForge v4.5.3
+http://www.msfn.org/board/index.php?showtopic=110783
+Download from http://sourceforge.net/projects/driverforge
+
+Jaque of CD Forum for making Smart Driver Backup 2.12
+http://www.911cd.net/forums//index.php?showtopic=20555
+
+erwan.l - clonedisk
+http://reboot.pro/8480/
+
+Siginet and RyanVM for their Support Forums and for making RyanVM Integrator
+http://www.siginetsoftware.com/forum/
+http://www.ryanvm.net/forum/
+
+HJW for making XP Post-SP3 UpdatePack Dutch
+http://www.ryanvm.net/forum/viewforum.php?f=10
+
+gryffin53 for making MS Office HotPack-NLD for Office Integrator
+http://www.ryanvm.net/forum/viewtopic.php?t=6676
+
+Siginet for making SetupSourceChanger and ConversionFilesFinder
+http://www.msfn.org/board/index.php?showtopic=129049
+
+Siginet and benners for making Office Integrator
+http://www.siginetsoftware.com/forum/
+
+Wim Leers aka Bâshrat the Sneaky and The DriverPacks Team for making DriverPacks
+http://driverpacks.net/DriverPacks/
+
+Derek McCabe and Mark Ritter and Troy Taylor - Kelsenellenelvian - and others for making WPI
+http://wpiw.net/
+http://www.msfn.org/board/index.php?&showforum=93
+
+Thanks to Patrick Verner and Icecube for creating Parted Magic 4.0
+http://partedmagic.com/documentation/124-grub4dos-iso-booting.html
+
+Thanks to developers of Ultimate Boot CD - UBCD
+http://www.ultimatebootcd.com/index.html
+
+Thanks to Icecube for work on UBCD 5.0 beta 12 with Extra grub4dos Menu
+http://reboot.pro/index.php?showtopic=7312
+http://www.ultimatebootcd.com/forums/viewtopic.php?p=6663#6663
+http://linuxfreedom.com/
+
+NightMan of reboot.pro forum for making VistaPE
+http://reboot.pro/index.php?showforum=51
+
+Thanks to allanf for making WinBuilder Project to make Windows PE 2.1 ISO having GUI interface
+http://reboot.pro/index.php?showtopic=7053
+
+Booting in 40 sec with pe21.iso loaded by GRUB4DOS from HD into RAMDISK 
+allows then to Launch Vista or Windows 7 Setup.exe from USB-stick
+http://reboot.pro/topic/6800-install-windows-7vista-from-usb-drive/page-2#entry60169
+
+Thanks to Akeo - Pete Batard for making Rufus - USB Format Utility
+http://rufus.akeo.ie/
+http://reboot.pro/16374/
+
+Microsoft for VhdTool (free to install, use, copy and distribute)
+http://archive.msdn.microsoft.com/vhdtool
+
+MSSTMake.exe - Thanks to Andrew Bendus aka Mr.dUSHA
+Download here the latest http://dl.dropbox.com/u/9882253/MSSTMake.7z
+Info http://www.911cd.net/forums//index.php?showtopic=22313
+
+Thanks for making Registry Backup
+http://www.tweaking.com/content/page/registry_backup.html
+
+Tal Aloni - for making IntegrateDrv and Wait4UFD driver -
+http://reboot.pro/topic/18107-integratedrv-install-xp-2003-to-a-usb-30-disk-and-boot-from-it/
+http://reboot.pro/topic/18119-integratedrv/
+
+
+===================================================================================================
+

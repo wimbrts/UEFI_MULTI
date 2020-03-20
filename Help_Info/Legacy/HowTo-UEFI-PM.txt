@@ -1,0 +1,158 @@
+UEFI Multiboot USB - Windows 8 and Linux Parted Magic 
+
+Booting involves two steps:
+For UEFI Multiboot we use the refind EFI Boot Manager instead of the normal UEFI bootfile EFI\Boot\bootx64.efi
+In EFI Boot Manager we use Grub2 and select Parted Magic from Grub2 Boot Menu
+
+rEFInd - EFI Boot Manager http://www.rodsbooks.com/refind/
+
+- download the latest binary zip file e.g. refind-bin-0.6.6.zip from http://www.rodsbooks.com/refind/getting.html
+- copy the content of refind folder to folder EFI\Boot of your USB FAT32 boot drive for Windows 8
+- rename existng EFI\Boot\bootx64.efi as 8bootx64.efi for booting Windows 8
+- copy file refind_x64.efi as file bootx64.efi -> EFI Boot Manager in folder EFI\Boot
+- add the supplied boot info files refind.conf and grub.cfg and Grub2 file grubx64.efi
+- download latest Parted Magic ISO e.g. pmagic_2012_12_25.iso from http://partedmagic.com/doku.php?id=downloads
+- copy the pmagic folder from the Parted Magic ISO to the root of your USB FAT32 Boot Partition
+- add a menu entry for Parted Magic in EFI\Boot\grub.cfg
+
+Info see http://forums.partedmagic.com/viewtopic.php?f=2&t=1960
+
+Booting Parted Magic from USB goes like
+- Reboot and just after beep press F8 or F12 to get BIOS Boot Menu
+- UEFI USB > EFI Boot Manager file EFI\Boot\bootx64.efi > Grub2 EFI x64 file EFI\Boot\grubx64.efi > Grub2 Boot Menu 
+
+
+rEFInd Boot Manager for UEFI computers - Extra Info
+
+http://www.rodsbooks.com/refind/
+
+Download rEFInd latest binary zip file e.g. refind-bin-0.6.6.zip from http://www.rodsbooks.com/refind/getting.html
+
+http://www.rodsbooks.com/refind/installing.html
+
+More Info http://reboot.pro/topic/17877-uefi-windows-8-bios-grub4dos-multiboot-usb-harddisk/page-2#entry165182
+
+
+refind.conf for refind EFI Boot Manager
+===========================================================================================
+#
+# refind.conf
+# Configuration file for the rEFInd boot menu
+#
+
+# Timeout in seconds for the main menu screen. Setting the timeout to 0
+# disables automatic booting (i.e., no timeout).
+#
+timeout 20
+
+# Which types of boot loaders to search, and in what order to display them:
+#  internal      - internal EFI disk-based boot loaders
+#  external      - external EFI disk-based boot loaders
+#  optical       - EFI optical discs (CD, DVD, etc.)
+#  hdbios        - BIOS disk-based boot loaders
+#  biosexternal  - BIOS external boot loaders (USB, eSATA, etc.)
+#  cd            - BIOS optical-disc boot loaders
+#  manual        - use stanzas later in this configuration file
+# Note that the legacy BIOS options require firmware support, which is
+# not present on all computers.
+# On UEFI PCs, default is internal,external,optical,manual
+# On Macs, default is internal,hdbios,external,biosexternal,optical,cd,manual
+#
+#scanfor internal,external,optical,manual
+
+scanfor manual,optical
+
+# Below are several sample boot stanzas. All are disabled by default.
+# Find one similar to what you need, copy it, remove the "disabled" line,
+# and adjust the entries to suit your needs.
+
+
+menuentry "Windows 8 x64 EFI" {
+	icon \efi\boot\icons\os_win.icns
+	loader \efi\boot\8bootx64.efi
+	#disabled
+}
+
+menuentry "Grub2 EFI x64" {
+	icon efi/boot/icons/os_linux.icns
+	loader /efi/boot/grubx64.efi
+	#disabled
+}
+
+===========================================================================================
+
+
+grub.cfg for grub2 Boot Menu
+===========================================================================================
+set timeout=10
+set default=0
+
+menuentry "Parted Magic 64" --class gnu-linux --class gnu --class os {
+  linux /pmagic/bzImage64
+  initrd /pmagic/initrd.img
+}
+
+menuentry "Parted Magic" --class gnu-linux --class gnu --class os {
+  linux /pmagic/bzImage
+  initrd /pmagic/initrd.img
+}
+
+menuentry "Windows 8 x64 EFI" {
+  chainloader /efi/boot/8bootx64.efi
+}
+
+===========================================================================================
+
+UEFI Secure Boot - Multi-Boot of Fedora-18 + Windows 8 from USB-harddisk
+
+Download Fedora-18-x86_64-Live-Desktop.iso from http://fedoraproject.org/get-fedora
+Download and use liveusb-creator-3.11.7-setup.exe from https://fedorahosted.org/liveusb-creator/
+Info http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media.html
+
+Fedora 18 LIVE USB-stick with files vmlinuz0 and initrd0.img from isolinux copied to folder LiveOS
+and using in grub.cfg the commands linuxefi and initrdefi and root=live:LABEL=LIVE
+
+UEFI Secure Boot - Multi-Boot of Fedora-18 + Windows 8 from USB-harddisk
+Grub2 EFI Boot Manager instead of REFIND  - in UEFI_MAN rename folder efi_fedora18 as efi
+Fedora-18 Secure Boot files efi\boot\BOOTX64.efi and efi\boot\grubx64.efi
+and using Fedora vmlinuz0 and initrd0.img in LiveOS folder of Fedora-18 on 2_BOOT partition
+
+efi\boot\grub.cfg
+[code]
+set timeout=10
+set default=0
+
+menuentry 'Fedora-18 LIVE USB 2_BOOT' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi /LiveOS/vmlinuz0 root=live:LABEL=2_BOOT ro rd.live.image rhgb 
+	initrdefi /LiveOS/initrd0.img
+}
+
+menuentry "Parted Magic 64" --class gnu-linux --class gnu --class os {
+  linuxefi /pmagic/bzImage64
+  initrdefi /pmagic/initrd.img
+}
+
+menuentry "Windows 8 x64 EFI" {
+  chainloader /efi/boot/8bootx64.efi
+}
+[/code]
+
+Windows 8 should NOT be default.
+For booting Parted Magic Linux it is needed to Disable Secure Boot
+
+http://www.911cd.net/forums//index.php?showtopic=25262&view=findpost&p=173226
+
+Booting in BIOS mode with Fedora LiveOS folder on USB partition with LABEL 2_BOOT 
+then we can use Grub4dos with entry in menu.lst
+
+[code]
+title Fedora-18 LIVE USB 2_BOOT
+find --set-root /LiveOS/vmlinuz0
+kernel /LiveOS/vmlinuz0 root=live:LABEL=2_BOOT ro rd.live.image quiet rhgb 
+initrd /LiveOS/initrd0.img
+[/code]
+
+rhgb = redhat graphical boot - This is a GUI mode booting screen with most of the information hidden 
+quiet = hides the majority of boot messages before rhgb starts. These are supposed to make the common user more comfortable. 
+
+===========================================================================================

@@ -1,0 +1,3 @@
+Following are drive mappings,
+please note that if you booted through RAMDISK
+it's drive letter may not be displayed:

@@ -1,0 +1,28 @@
+rem ==
+rem == CreaPartMBR-USB-Disk5.txt ==
+rem ==
+rem == These commands are used with DiskPart to create two partitions
+rem == for a UEFI/MBR-based portable SSD or USB-harddisk
+rem == In DiskPart use list disk to find disk number and adjust partition sizes and label as necessary
+rem ==
+list disk
+select disk 5
+clean
+rem == 1. Boot partition FAT32 20 GB - WinPE 8/10 x64 WIM files UEFI /BIOS booting ===========
+create partition primary size=20480
+format quick fs=fat32 label="U-BOOT"
+assign
+active
+rem == 2. Data partition NTFS - UEFI 8/10 x64 VHD files - BIOS XP/7/8/10 VHD ==================
+rem == partition contains also  7/8/10 ISO files for Install with WinNTSetup ==================
+create partition primary
+format quick fs=ntfs label="U-DATA"
+assign
+list volume
+exit
+rem ==
+rem == Info https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-uefigpt-based-hard-drive-partitions
+rem == Info https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-biosmbr-based-hard-drive-partitions
+rem ==
+rem == In admin command window use: DiskPart /s G:\DiskPart\CreaPartMBR-USB-Disk5.txt
+rem ==

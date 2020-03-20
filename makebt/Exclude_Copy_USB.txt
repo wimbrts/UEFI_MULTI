@@ -1,0 +1,12 @@
+:\Boot\
+:\bootmgr
+:\RECYCLER
+:\$Recycle.Bin
+:\hiberfil.sys
+:\pagefile.sys
+:\PerfLogs
+:\System Volume Information
+\Temp\
+\Temporary Internet Files\
+:\btsec
+:\MSOCache

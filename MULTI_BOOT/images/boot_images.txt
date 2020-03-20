@@ -1,0 +1,9 @@
+
+UEFI_MULTI.exe can be used to Copy the Content of folder MULTI_BOOT to the Root of your Target USB Boot Drive
+
+1. Put your Linux ISO Boot Image files (and other .iso or .img files) in folder MULTI_BOOT\images 
+2. In UEFI_MULTI.exe you can Select MULTI__BOOT as Source Folder for Copy to Boot Drive
+
+Use UEFI_MULTI.exe to add other IMG or ISO Boot Image files to folder images on USB-drive
+
+Or edit grub4dos menu.lst and menu_Linux.lst in root of USB-drive to your needs

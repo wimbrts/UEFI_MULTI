@@ -1,0 +1,236 @@
+====================================================================================================================
+
+ - Install of XP or Windows 7/8 - April 28, 2014
+
+ 1. Boot from USB or from Network with Win8.1SE x64 boot.wim selected in Boot Manager Menu
+ 2. Use portable App WinNTSetup_x64.exe and click tab - Windows XP or Windows 7/8
+ 3. Select Installation files - Use R-mouse to mount XP/7/8 Setup ISO file in ImDisk Virtual Drive
+ 4. Select Boot and Installation (Target) Drive for Install of XP/7/8
+ 5. Quick Format Target Drive via F or via R-mouse menu in My Computer - use NTFS FileSystem
+ 6. WinNTSetup3 - Setup will prepare Target Drive of local harddisk for Install of XP/7/8
+ 7. Reboot from Target Drive and Install XP/7/8
+ 8. Open Device Manager via R-mouse on My Computer
+ 9. Install missing drivers by using extracted DriverPacks
+
+   Win8.1SE        - http://www.msfn.org/board/topic/170546-win81se/
+   UEFI_MULTI      - http://www.911cd.net/forums//index.php?showtopic=25269
+   UEFI_MULTI      - http://reboot.pro/topic/17877-uefi-windows-8-bios-grub4dos-multiboot-usb-harddisk/
+   Tiny PXE Server - http://reboot.pro/files/file/303-tiny-pxe-server/
+   PXE wimboot 8.1 - http://reboot.pro/topic/19015-boot-mini-windows-vhd-from-network-via-ipxe/page-2#entry182393
+   WinNTSetup3     - http://www.msfn.org/board/topic/149612-winntsetup-
+   DriverPacks     - http://driverpacks.net/downloads
+   Win 8.1 Enterprise Evaluation x64 - http://technet.microsoft.com/en-us/evalcenter/hh699156.aspx
+
+For UEFI + BIOS booting from USB then Windows 8.1 x64 need to be used as Source.
+There are now three Universal solutions for booting from USB on UEFI + BIOS computers:
+- Win8.1SE x64 boot.wim of size 400 MB booting from RAMDISK
+- Portable W864USP1.vhd of size 3.5 GB booting as FILEDISK
+- Full Windows 8.1 Pro installed in 15 GB VHD or any Windows 8.1 on USB SYSTEM partition of size 50 GB
+
+====================================================================================================================
+ 
+How to Install Windows 7/8 in VHD and to Make Mini 7/8 VHD for booting from USB ?
+
+- Direct Install Windows 7 Ultimate or 8 Pro in a 15 GB VHD file on local harddisk created by WinNTSetup_x64.exe with Ctrl + Shift + V
+- Boot Drive can be FAT32 or NTFS USB-Stick made with UFD_FORMAT.exe so that normal booting of the internal harddisk is not changed
+
+ 1. Boot from USB or from Network with Win8.1SE x64 boot.wim selected in Boot Manager Menu
+ 2. Use portable App WinNTSetup_x64.exe and click tab Windows 7/8
+ 3. Select Installation files - Use R-mouse to mount 7/8 Setup ISO file in ImDisk Virtual Drive
+ 4. Use WinNTSetup button VHD to Create 15 GB VHD file on local harddisk
+ 5. Select Boot Drive (USB-Stick) and Installation Drive (mounted VHD file) for Install of 7/8
+    In WinNTSetup3 - Tweaks - Select all System Tweaks so that UAC is off etc.
+ 6. WinNTSetup3 - Setup will prepare VHD on local harddisk for Install of 7/8
+ 7. Reboot from Boot Drive and Install 7/8 in VHD
+ 8. Open Device Manager via R-mouse on My Computer
+ 9. Install missing drivers by using extracted DriverPacks
+
+After booting with Windows 7/8 VHD then Check to have Switched Off :
+UAC + Defender + pagefile + System Restore + Hibernate + Windows Update + Action Center settings Disable ALL options
+
+Hibernate OFF is needed via cmd window with
+
+powercfg -h OFF
+
+Install FiraDisk driver with R-mouse on firadisk.inf in makebt\firadisk-driver- folder
+The 64-bit FiraDisk driver requires to boot with testsigning switched on
+
+Open Command Prompt as Administrator:
+
+bcdedit /set testsigning on
+
+Reboot to activate testsigning - Info http://msdn.microsoft.com/en-us/library/ff553484.aspx
+
+- After Install then Copy Windows 7/8 VHD file to USB and use USB_W78_Fix.exe to fix for booting from USB-drive
+
+
+Install 7/8 in VHD and Make Mini 7/8 VHD for booting from USB
+http://reboot.pro/topic/18467-vhd-w8-compact-make-mini-8/
+http://reboot.pro/topic/18593-vhd-w7-compact-make-mini-7/
+
+Install XP in VHD and Make Mini XP VHD for booting from USB
+http://reboot.pro/topic/18547-vhd-xp-setup-install-xp-in-vhd/
+http://reboot.pro/topic/18657-vhd-xp-compact-make-mini-xp/
+
+The XP/7/8 Mini Windows VHD's of 1.2 - 2.5 GB are loaded from USB-Stick into RAMDISK by Grub4dos and using WinVBlock or FiraDisk driver
+Grub4dos booting with VHD loaded into RAMDISK cannot be used on UEFI computers.
+
+For UEFI + BIOS booting then Windows 8.1 x64 need to be used as Source.
+You can make Portable W864USP1.vhd of size 3.5 GB for booting from USB and direct selected in Boot Manager Menu.
+
+====================================================================================================================
+
+How to prepare XP Setup Source ? - Prepare XP Setup ISO file with integrated UpdatePack and DriverPacks
+
+Take care that your XPSOURCE Folder is located on your Harddisk in a simple Path without SPACES.
+Copy the Content of your Windows XP Setup CD to your XPSOURCE Folder on Harddisk 
+
+First Integrate ServicePack SP3 in your XP-SP2 Source (don't use here nLite).
+http://www.helpwithwindows.com/WindowsXP/Slipstreaming_Windows_XP_Service_Pack_3.html
+Download from - http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=24
+
+In Command Window use for English version and XPSOURCE folder on drive E:
+
+[code]WindowsXP-KB936929-SP3-x86-ENU.exe /integrate:E:\XPSOURCE[/code]
+
+Siginet's RyanVM Integrator 1.6 can then be used to Integrate Windows UpdatePacks in the XP-Source. 
+http://integrator.siginetsoftware.com/index.php?download
+Download preferred version RVM Integrator 1.6.1 Beta 2.1
+
+Windows XP UpdatePacks and Addons:
+Onepiece XP Post-SP3 AIO Update Pack FINAL - http://www.ryanvm.net/forum/viewtopic.php?t=6438
+Onepiece XP Post-SP3 AIO International Update Packs FINAL - http://www.ryanvm.net/forum/viewtopic.php?t=10445
+Dutch Update Pack - http://www.ryanvm.net/forum/viewtopic.php?t=8428
+RyanVM Forum - http://www.ryanvm.net/forum/
+
+Work according to Section 2 in - http://www.911cd.net/forums//index.php?showtopic=25345
+
+For Install of XP on a modern system with SATA Drives it is needed to use DPsBase.exe 
+for Integrating in your XPSOURCE DriverPack Massstorage with TXT Mode Enabled.
+http://driverpacks.net/downloads
+In that case a lot of Extra RAID SCSI and SATA Drivers (about 120 extra) are Integrated which appear in the 
+XP Setup BootFolder $WIN_NT$.~BT on Install-Drive and can prevent a lot of XP Install Boot Problems.
+Use DPsBase.exe to Integrate DriverPacks Chipset + Processor + MassStorage + LAN + WLAN DriverPacks
+which will then be located in OEM Folder in your XPSOURCE folder
+Always first use RyanVM Integrator and then use DPsBase to Improve your XP-Source
+DPsBase makes presetup.cmd in folder I386 and changes the I386\winnt.sif file for use of DriverPacks
+
+presetup.cmd in folder I386 will start decompression of DriverPacks located in OEM folder 
+at the beginning of GUI-mode of XP Setup, which does NOT take to much time for the 5 DriverPacks
+
+You should select to Keep The Drivers for Chipset + Processor + MassStorage + LAN
+Then WINDOWS\DriverPacks is about 135 MB which is acceptable and provides a lot of extra driver support 
+which is useful to make XP Universal and adapt easily to very different hardware.
+In that case the DevicePath is set accordingly in key
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion 
+so that XP can automatically make use of these drivers for adjusting to New Hardware
+
+When you don't use nLite, you can copy the supplied $OEM$ folder to your XP Source folder
+Change $OEM$ folder to your needs for UserAccounts and Registry Tweaks and Adding Drivers
+CMDLINES.TXT is used for making UserAccounts and install of Registry Tweaks at T-12
+Info see: http://unattended.msfn.org/unattended.xp/
+
+Use DriverForge.v4.5.4.exe to Install from C:\Drivers at T-9 of GUI XP Setup (just for the last Reboot).
+DriverForge.v4.5.4.exe was made by kickarse http://www.msfn.org/board/index.php?showtopic=110783
+At end of TXT-mode XP Setup the folder $OEM$\$1\Drivers is copied to C:\Drivers
+and $OEM$\$1\Install\DriverForge.v4.5.4.exe is copied to C:\Install
+For Auto Use of DriverForge at T-9 add uncompressed driver folders in $OEM$\$1\Drivers
+and Uncomment two rules by removing ; in winnt.sif file copied from winnt_sif to your I386 folder
+This is very useful for Install of your well known Audio and Video driver during GUI-mode of XP Setup.
+
+[SetupParams]
+UserExecute = "%SystemDrive%\INSTALL\SetupPar.cmd"
+
+Smart Driver Backup 2.12 of Jaque is very useful to Backup your drivers before install of XP
+http://www.911cd.net/forums//index.php?showtopic=20555
+
+====================================================================================================================
+
+How to make XP Setup ISO File ?
+
+- Use BBIE (see below) or Isobuster to Extract Boot Image bootsect.bin from Original bootable XP Setup CD 
+  bbie will make image1.bin that you can copy as bootsect.bin to XP Setup source folder
+- Reduce Size of XP Setup Source folder (if needed to fit on CD then remove folders LANG  WIN9XMIG  WIN9XUPG)
+- Use ImgBurn and bootsect.bin to make Bootable CD
+
+1. Remove 3 folders LANG  WIN9XMIG  WIN9XUPG - reduction in size = 135 MB
+2. Run ImgBurn - Portable Tool in PStart Menu - IMG_XP\MULTI\PStart\Progs\ImgBurn
+   - Select Write files/folders to disc
+   - Output - Select Image File
+   - Browse Source folder and Select your XP Setup Source folder
+   - Browse Destination file - Give Name e.g. XP-Setup.iso
+   - Labels ISO 9660 - Give Name e.g. XP-Setup
+   - Advanced Restrictions - ISO9660 - Select Level X and DOS CharSet with 4x Checkbox On (allow ...)
+   - Bootable Disc - Make Image bootable - Checkbox On - Browse Boot Image - Select bootsect.bin file
+   - Bootable Disc - Emulation Type = None
+                     Load Segment = 07C0
+                     Sectors to Load = 4
+
+
+BOOT_USB\makebt>bbie M:\XP3_1307.iso
+BBIE - Bart's Boot Image Extractor v1.0, (c) 2001, Bart Lagerweij
+http://www.nu2.nu
+will make BOOT_USB\makebt\image1.bin that you can rename as bootsect.bin
+
+====================================================================================================================
+
+PXE wimboot is very handy and fast for booting of Win8.1SE boot.wim from Network. :)
+
+How to make Win8.1SE boot.wim
+http://www.msfn.org/board/topic/170546-win81se/
+
+Download Tiny PXE Server - http://reboot.pro/files/file/303-tiny-pxe-server/
+
+Using iPXE and wimboot, you can boot into Windows PE via HTTP.
+http://ipxe.org/wimboot
+
+In case of Windows 8 then bootmgr.exe must be used instead of bootmgr
+http://blog.devicenull.org/2013/11/14/ipxe-wimboot-and-windows-server-2012r2.html
+
+More Info on how to use Tiny PXE Server for booting WIM and VHD from Network via iPXE
+http://reboot.pro/topic/19015-boot-mini-windows-vhd-from-network-via-ipxe/
+http://reboot.pro/topic/18962-bug-reports-requests-howtos-about-tiny-pxe-server/
+
+I copied folders Boot and sources from Win8.1SE_2014-01-30\ISO\WIM folder to pxesrv\files folder 
+
+XP-W7-Setup\pxesrv\files\wimboot.ipxe is auto used by pxesrv.exe when the given config.INI is used
+
+wimboot.ipxe
+
+#!ipxe
+set boot-url http://${dhcp-server}
+kernel ${boot-url}/wimboot
+initrd ${boot-url}/bootmgr.exe                  bootmgr.exe
+initrd ${boot-url}/Boot/bcd                     bcd
+initrd ${boot-url}/Boot/fonts/segmono_boot.ttf  segmono_boot.ttf
+initrd ${boot-url}/Boot/fonts/segoe_slboot.ttf  segoe_slboot.ttf
+initrd ${boot-url}/Boot/fonts/segoen_slboot.ttf segoen_slboot.ttf
+initrd ${boot-url}/Boot/fonts/wgl4_boot.ttf     wgl4_boot.ttf
+initrd ${boot-url}/Boot/boot.sdi                boot.sdi
+initrd ${boot-url}/sources/boot.wim             boot.wim
+imgstat
+boot
+
+
+Or make Entry in menu.ipxe for PXE wimboot of Win8.1SE boot.wim file
+
+:w81x64_wim
+kernel ${boot-url}/wimboot
+initrd ${boot-url}/bootmgr.exe                  bootmgr.exe
+initrd ${boot-url}/Boot/bcd                     bcd
+initrd ${boot-url}/Boot/fonts/segmono_boot.ttf  segmono_boot.ttf
+initrd ${boot-url}/Boot/fonts/segoe_slboot.ttf  segoe_slboot.ttf
+initrd ${boot-url}/Boot/fonts/segoen_slboot.ttf segoen_slboot.ttf
+initrd ${boot-url}/Boot/fonts/wgl4_boot.ttf     wgl4_boot.ttf
+initrd ${boot-url}/Boot/boot.sdi                boot.sdi
+initrd ${boot-url}/sources/boot.wim             boot.wim
+imgstat
+boot || goto failed
+goto start
+
+F12 hotkey can be used for PXE boot when LAN PXE Boot ROM is enabled in BIOS
+F8 hotkey can be used to select PXE boot in BIOS Boot Menu
+
+http://reboot.pro/topic/18182-uefi-multi-make-multi-boot-usb-drive/page-2#entry179107
+
+====================================================================================================================

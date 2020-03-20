@@ -1,0 +1,77 @@
+Info see:
+http://reboot.pro/topic/16544-create-a-bootable-winpe-40-usb-drive/page-4#entry166946
+
+================================================================================
+
+How to Create Windows 8 x64 Recovery USB-stick
+
+Create Windows 8 Recovery USB-stick for booting with boot.wim from RAMDISK (comparable to WinPE 4.0)
+
+Computer OFF and Disconnect all USB-harddisks and connect USB-stick
+Boot with Windows 8 x64
+UEFI + BIOS bootable USB-stick with Win8 Recovery folder sources\boot.wim
+is made with few mouseclicks in Win 8 Configuration > Recovery menu
+
+For USB-stick everything works fine, but don't apply this to an existing multi-partition USB-harddisk.   
+
+**** WARNING ****  
+In case of USB-harddisk then creating the Win8 Recovery Drive will destroy the entire MBR
+so that all other partitions are gone (the partition entries in the table are simply zeroed)
+**** END WARNING ****  
+
+Copy the content of Win8 Recovery USB-stick to folder UEFI_MULTI\W8_RECOV
+
+I have made TBx64.exe AutoIt3 program and added to system32 in Win8 Recovery boot.wim
+TBx64.exe will search for TBLauncher64.exe found e.g. in in root of USB Boot Drive
+Some x64 Apps can be in root of USB Boot Drive and launched from TBLauncher Menu.
+Modify TBLauncher.ini to your needs for Portable Apps that you want to Launch e.g. Explorer-x64.exe
+On booting from USB then Recovery environment appears auto with TBLauncher Menu.
+One can launch e.g. WinNTSetup2_x64.exe and prepare drive for install of any Windows e.g. XP
+
+Download WinNTSetup2_x64.exe http://www.msfn.org/board/topic/149612-winntsetup-v23/
+
+More Info TeraByte http://www.terabyteunlimited.com/howto/tbwinre_tutorial.htm
+
+***** Procedure to modify boot.wim of Win8 Recovery or WinPE 4.0 *****
+
+Download and use Wim Mounter 3.1 to modify UEFI_MULTI\W8_RECOV\sources\boot.wim
+http://reboot.pro/files/file/272-wim-mounter/
+
+Use Mount > Open > Add TBx64.exe and startnet.cmd - Remove winpeshl.ini > Save
+
+Remove winpeshl.ini and add modified startnet.cmd to launch TBx64.exe and Recovery Environment.
+TBx64.exe and startnet.cmd are supplied in folder add_boot_wim
+
+================================================================================
+
+TBx64.exe will search for TBLauncher64.exe found e.g. in in root of USB-stick.
+All Apps can be in root of USB-stick and launched from TBLauncher Menu.
+
+Modify TBLauncher.ini to your needs for Portable Apps that you want to Launch e.g. Explorer-x64.exe
+
+On booting from USB-stick then Recovery environment appears auto with TBLauncher Menu.
+One can launch e.g. WinNTSetup_x64.exe and prepare drive for install of any Windows e.g. XP
+
+Download WinNTSetup3  http://www.msfn.org/board/topic/149612-winntsetup-v30/
+
+More Info TeraByte http://www.terabyteunlimited.com/howto/tbwinre_tutorial.htm
+
+=================================================================================================
+
+After using Dism to add-package WinPE-HTA.cab of ADK to Win 8 x64 Recovery boot.wim
+then WinSnap x64 is working OK to make ScreenShot
+ 
+amd64\WinPE_OCs\WinPE-HTA.cab
+amd64\WinPE_OCs\en-us\WinPE-HTA_en-us.cab
+
+Download http://www.ntwind.com/software/winsnap/download.html
+More Info http://www.ntwind.com/software/winsnap.html
+
+
+=================================================================================================
+http://www.multibooters.co.uk/system.html
+Microsoft calls the partition with the boot files the System partition, 
+and the partition with the operating system the Boot partition. 
+Everyone else refers to them exactly the other way round. 
+The boot files on the boot partition. The operating system on the system partition.
+=================================================================================================
