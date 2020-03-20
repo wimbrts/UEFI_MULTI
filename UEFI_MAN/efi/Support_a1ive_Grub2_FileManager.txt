@@ -1,0 +1,51 @@
+Support for using a1ive Grub2 File Manager - agFM
+
+Download: grubfm-en_US.7z from https://github.com/a1ive/grub2-filemanager/releases
+
+Copy files grubfm.iso + grubfmx64.efi + grubfmia32.efi from grubfm-en_US to folder .....\UEFI_MAN\efi\boot
+
+Grub4dos Menu file menu.lst supports also file grubfm.iso in root of USB FAT 32 drive for booting in BIOS mode with agFM
+
+iftitle [if exist /grubfm.iso] GrubFM Boot Manager of a1ive - /grubfm.iso
+find --set-root /grubfm.iso
+map --mem /grubfm.iso (0xff)
+map --hook
+chainloader (0xff)
+
+iftitle [if exist /efi/boot/grubfm.iso] GrubFM Boot Manager of a1ive - /efi/boot/grubfm.iso
+find --set-root /efi/boot/grubfm.iso
+map --mem /efi/boot/grubfm.iso (0xff)
+map --hook
+chainloader (0xff)
+
+===============================================================================================
+
+UEFI Secure booting requires to use shim of Super UEFIinSecureBoot Disk v3
+
+Download: Super-UEFIinSecureBoot-Disk_minimal_v3.zip Release from https://github.com/ValdikSS/Super-UEFIinSecureBoot-Disk/releases
+
+The Super-UEFIinSecureBoot-Disk_minimal_v3.zip Release was downloaded and Extracted twice (zip and img) with 7z
+
+Copy files from Super-UEFIinSecureBoot-Disk_minimal to .....\UEFI_MAN
+Overwrite existing files BOOTX64.efi and grubx64.efi in UEFI_MAN\efi\boot but keep existing grub.cfg in UEFI_MAN\grub
+
+After running x64 Program with setting Other EFI Manager then ENROLL_THIS_KEY_IN_MOKMANAGER.cer Certificate should be in USB FAT32 Boot drive U-BOOT
+
+After booting in UEFI Secure mode from USB then use the MokManager to Add ENROLL_THIS_KEY_IN_MOKMANAGER.cer to the firmware
+
+UEFI Grub2 menu is made using EFI\grub\grub.cfg and EFI\grub\grub_Linux.cfg for booting in UEFI mode with agFM
+
+if [ -e "/efi/boot/grubfmx64.efi" ]; then
+menuentry "grubfm x64 EFI Boot Manager of a1ive" {
+  chainloader /efi/boot/grubfmx64.efi
+}
+fi
+
+===============================================================================================
+
+x64 Program with setting Other EFI Manager will Copy .....\UEFI_MAN\efi content to folder EFI on USB FAT32 Boot Drive
+x64 Program with setting Other EFI Manager will Copy .....\UEFI_MAN\ENROLL_THIS_KEY_IN_MOKMANAGER.cer to root of USB FAT32 Boot Drive
+
+In this way the files of a1ive Grub2 File Manager and Super-UEFIinSecureBoot-Disk_minimal_v3 are Added to the USB Multi-Boot Drive
+
+===============================================================================================

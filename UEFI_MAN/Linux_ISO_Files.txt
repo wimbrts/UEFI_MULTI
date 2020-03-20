@@ -1,0 +1,23 @@
+Linux ISO Files - 2020-03-11
+
+UEFI Secure boot support requires Format Drive using Grub2 as EFI Manager
+
+Copy your Linux ISO files to folder images on FAT32 USB Boot drive U-BOOT
+
+Supported filenames for Linux ISO in folder images are:
+
+linuxmint.iso
+runtimelivecd.iso
+knoppix.iso
+ubuntu.iso
+
+linuxmint-19.3-cinnamon-64bit.iso
+runtimelivecd.iso
+ubuntu-19.10-desktop-amd64.iso
+
+Rename your Linux ISO files so that they correspond to supported filenames
+
+Grub4dos is used for booting in BIOS mode using Menu created with menu.lst and menu_Linux.lst
+
+Grub2 is used for booting in UEFI Secure mode using Menu created with \Boot\grub\grub.cfg and \Boot\grub\grub_Linux.cfg
+
