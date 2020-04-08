@@ -23,6 +23,10 @@ map --mem /efi/boot/grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
+iftitle [ls (hd0,0)/EFI/iso] ISO Linux Menu - (hd0,0)/EFI/iso
+set iso_drive=(hd0,0)
+configfile /menu_Linux.lst
+
 iftitle [ls (hd0,0)/images] ISO Linux Menu - (hd0,0)/images
 set iso_drive=(hd0,0)
 configfile /menu_Linux.lst

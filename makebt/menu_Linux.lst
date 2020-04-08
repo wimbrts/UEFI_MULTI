@@ -91,3 +91,91 @@ map --hook
 root (0xff)
 kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
 initrd /boot/syslinux/initrd.xz
+
+iftitle [if exist %iso_drive%/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso] ISO Linux Mint - %iso_drive%/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
+set iso_path=/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
+initrd /casper/initrd.lz
+
+iftitle [if exist %iso_drive%/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso && if exist %iso_drive%/EFI/iso/linuxmint/casper-rw] ISO Linux Mint Persist - %iso_drive%/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
+set iso_path=/EFI/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper persistent persistent-path=/EFI/iso/linuxmint/ iso-scan/filename=%iso_path% quiet splash --
+initrd /casper/initrd.lz
+
+iftitle [if exist %iso_drive%/EFI/iso/linuxmint/linuxmint.iso] ISO Linux Mint - %iso_drive%/EFI/iso/linuxmint/linuxmint.iso
+set iso_path=/EFI/iso/linuxmint/linuxmint.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
+initrd /casper/initrd.lz
+
+iftitle [if exist %iso_drive%/EFI/iso/linuxmint/linuxmint.iso && if exist %iso_drive%/EFI/iso/linuxmint/casper-rw] ISO Linux Mint Persist - %iso_drive%/EFI/iso/linuxmint/linuxmint.iso
+set iso_path=/EFI/iso/linuxmint/linuxmint.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper persistent persistent-path=/EFI/iso/linuxmint/ iso-scan/filename=%iso_path% quiet splash --
+initrd /casper/initrd.lz
+
+iftitle [if exist %iso_drive%/EFI/iso/knoppix/runtimelivecd.iso] ISO Knoppix - %iso_drive%/EFI/iso/knoppix/runtimelivecd.iso
+set iso_path=/EFI/iso/knoppix/runtimelivecd.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
+initrd /boot/isolinux/minirt.gz
+
+iftitle [if exist %iso_drive%/EFI/iso/knoppix/knoppix.iso] ISO Knoppix - %iso_drive%/EFI/iso/knoppix/knoppix.iso
+set iso_path=/EFI/iso/knoppix/knoppix.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
+initrd /boot/isolinux/minirt.gz
+
+iftitle [if exist %iso_drive%/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso] ISO Ubuntu - %iso_drive%/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
+set iso_path=/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
+initrd /casper/initrd
+
+iftitle [if exist %iso_drive%/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso && if exist %iso_drive%/EFI/iso/ubuntu/casper-rw] ISO Ubuntu Persist - %iso_drive%/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
+set iso_path=/EFI/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/EFI/iso/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
+initrd /casper/initrd
+
+iftitle [if exist %iso_drive%/EFI/iso/ubuntu/ubuntu.iso] ISO Ubuntu - %iso_drive%/EFI/iso/ubuntu/ubuntu.iso
+set iso_path=/EFI/iso/ubuntu/ubuntu.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
+initrd /casper/initrd
+
+iftitle [if exist %iso_drive%/EFI/iso/ubuntu/ubuntu.iso && if exist %iso_drive%/EFI/iso/ubuntu/casper-rw] ISO Ubuntu Persist - %iso_drive%/EFI/iso/ubuntu/ubuntu.iso
+set iso_path=/EFI/iso/ubuntu/ubuntu.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/EFI/iso/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
+initrd /casper/initrd
+
+iftitle [if exist %iso_drive%/EFI/iso/Porteus-CINNAMON-v4.0-x86_64.iso] ISO Linux Porteus - %iso_drive%/EFI/iso/Porteus-CINNAMON-v4.0-x86_64.iso
+set iso_path=/EFI/iso/Porteus-CINNAMON-v4.0-x86_64.iso
+map %iso_drive%%iso_path% (0xff)
+map --hook
+root (0xff)
+kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
+initrd /boot/syslinux/initrd.xz

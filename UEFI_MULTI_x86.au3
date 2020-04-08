@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  March 16, 2020
+ Author:        WIMB  -  April 07, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 9.6 in rule 155
+ Program:       UEFI_MULTI_x86.exe - Version 9.8 in rule 155
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -88,8 +88,8 @@ Global $tmpdrive="", $WinDrv, $WinDrvSel, $WinDrvSize, $WinDrvFree, $WinDrvFileS
 
 Global $OS_drive = StringLeft(@WindowsDir, 2)
 
-Global $str = "", $bt_files[11] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", _
-"\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt"]
+Global $str = "", $bt_files[12] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", _
+"\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt", "\makebt\grub.exe"]
 
 If @OSArch <> "X86" Then
    MsgBox(48, "ERROR - Environment", "In x64 environment use UEFI_MULTI_x64.exe ")
@@ -152,7 +152,7 @@ EndIf
 $hGuiParent = GUICreate(" UEFI_MULTI x86 - Make Multi-Boot USB ", 400, 430, -1, -1, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
-GUICtrlCreateGroup("Sources   - Version 9.6 ", 18, 10, 364, 235)
+GUICtrlCreateGroup("Sources   - Version 9.8 ", 18, 10, 364, 235)
 
 $ImageType = GUICtrlCreateLabel( "", 270, 29, 110, 15, $ES_READONLY)
 $ImageSize = GUICtrlCreateLabel( "", 215, 29, 50, 15, $ES_READONLY)
@@ -611,6 +611,27 @@ Func _img_fsel()
 			DisableMenus(0)
 			Return
 		EndIf
+		If StringLeft($btimgfile, 2) <> $WinDrvDrive And StringLeft($btimgfile, 2) <> $TargetDrive Then
+			MsgBox(48,"ERROR - WIM is Not on USB Boot Or System Drive", "WIM File Selection Invalid" & @CRLF & @CRLF & "Selected WIM File = " & $btimgfile & @CRLF & @CRLF _
+			& "Copy WIM to Root Or Folder max 12 chars on " & @CRLF & @CRLF _
+			& "USB Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+			$btimgfile = ""
+			DisableMenus(0)
+			Return
+		EndIf
+		$pos = StringInStr($btimgfile, "\", 0, -1)
+		If $pos <> 3 Then
+			$posfol = StringInStr($btimgfile, "\", 0, -2)
+			If $posfol <> 3 Or $pos > 16 Then
+				MsgBox(48,"ERROR - WIM File Selection Not Valid", "WIM Not in root Or rootfolder max 12 chars" & @CRLF & @CRLF & "Selected WIM File = " & $btimgfile & @CRLF & @CRLF _
+				& "Select WIM in folder max 12 chars on " & @CRLF & @CRLF _
+				& "USB Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+				$btimgfile = ""
+				DisableMenus(0)
+				Return
+			EndIf
+		EndIf
+
 		MsgBox(48, " Info - boot.sdi Ramdisk File is needed ", "Continue with OK and use the FileSelector " & @CRLF & @CRLF _
 		& "Select your boot.sdi Ramdisk File in Boot Or WinPE folder " & @CRLF & @CRLF _
 		& "If Cancel then Windows\Boot\DVD\PCAT\boot.sdi can be used ", 0)
@@ -1111,12 +1132,6 @@ Func _wim_menu()
 	; $img_fext = StringRight($image_file, $len-$pos)
 	$img_fname = StringLeft($image_file, $pos-1)
 
-	If Not FileExists($IMG_Path & "\" & $image_file) And $WimOnSystemDrive = 0 Then
-		; SystemFileRedirect("Off")
-		MsgBox(48, "ERROR - WIM File Not Found ", $IMG_Path & "\" & $image_file & " File Not Found ", 5)
-		; Return
-	EndIf
-
 	If $bootsdi <> "" Then
 		$len = StringLen($bootsdi)
 		$pos = StringInStr($bootsdi, "\", 0, -1)
@@ -1264,9 +1279,9 @@ Func _wim_menu()
 				& $store & " /set {default} bootmenupolicy legacy", $TargetDrive & "\", @SW_HIDE)
 			Else
 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-				& $store & " /set " & $pe_guid & " device ramdisk=[boot]" & StringMid($IMG_Path,3) & "\" & $image_file & "," & $ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
+				& $store & " /set " & $pe_guid & " device ramdisk=[boot]" & StringMid($btimgfile, 3) & "," & $ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-				& $store & " /set " & $pe_guid & " osdevice ramdisk=[boot]" & StringMid($IMG_Path,3) & "\" & $image_file & "," & $ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
+				& $store & " /set " & $pe_guid & " osdevice ramdisk=[boot]" & StringMid($btimgfile, 3) & "," & $ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
 			EndIf
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 			& $store & " /set " & $pe_guid & " systemroot \Windows", $TargetDrive & "\", @SW_HIDE)
@@ -1389,9 +1404,9 @@ Func _wim_menu()
 				& $store & " /set {default} bootmenupolicy legacy", $TargetDrive & "\", @SW_HIDE)
 						Else
 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-				& $store & " /set " & $efi_pe_guid & " device ramdisk=[boot]" & StringMid($IMG_Path,3) & "\" & $image_file & "," & $efi_ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
+				& $store & " /set " & $efi_pe_guid & " device ramdisk=[boot]" & StringMid($btimgfile, 3) & "," & $efi_ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-				& $store & " /set " & $efi_pe_guid & " osdevice ramdisk=[boot]" & StringMid($IMG_Path,3) & "\" & $image_file & "," & $efi_ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
+				& $store & " /set " & $efi_pe_guid & " osdevice ramdisk=[boot]" & StringMid($btimgfile, 3) & "," & $efi_ramdisk_guid, $TargetDrive & "\", @SW_HIDE)
 			EndIf
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 			& $store & " /set " & $efi_pe_guid & " systemroot \Windows", $TargetDrive & "\", @SW_HIDE)
@@ -2138,6 +2153,7 @@ Func _Go()
 			FileCopy($TargetDrive & "\grldr", $TargetDrive & "\grldr_old")
 		EndIf
 		FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
+		FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If FileExists($TargetDrive & "\grldr.mbr") Then FileCopy(@ScriptDir & "\makebt\grldr.mbr", $TargetDrive & "\", 1)
 		If FileExists($TargetDrive & "\menu.lst") Then
 			FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
@@ -2145,6 +2161,7 @@ Func _Go()
 		EndIf
 		FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 	EndIf
 
 	If $g4d Or $g4dmbr <> 0 And $PartStyle = "MBR" Then
@@ -2152,8 +2169,10 @@ Func _Go()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
 	Else
 		If $g4d_vista = 0 And $PartStyle = "MBR" Then
@@ -2189,6 +2208,7 @@ Func _Go()
 				FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 				; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 			EndIf
+			If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 			If FileExists($TargetDrive & "\menu.lst") Then
 				If FileExists($TargetDrive & "\bootmgr")  And FileExists($TargetDrive & "\Boot\BCD") Then
 					FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "title Boot Manager Menu - Win 7/8 VHD")
@@ -2198,6 +2218,7 @@ Func _Go()
 				FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 				FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
 			EndIf
+			If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		Else
 			If FileExists($TargetDrive & "\grldr") And Not FileExists($TargetDrive & "\menu.lst") And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
 				$mk_bcd = 2
@@ -2214,8 +2235,10 @@ Func _Go()
 					FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 					; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 				EndIf
+				If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 				If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 				If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+				If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 			EndIf
 			If @OSVersion <> "WIN_VISTA" And @OSVersion <> "WIN_2003" And @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_XPe" And @OSVersion <> "WIN_2000" And Not FileExists($TargetDrive & "\Boot\BCD") Then
 				If $DriveType="Removable" Or $usbfix Then
@@ -2422,9 +2445,16 @@ Func _Go()
 		EndIf
 		If GUICtrlRead($Combo_EFI) = "Grub 2" Then
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi_mint", $TargetDrive& "\efi", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmx64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmx64.efi", $TargetDrive & "\efi\boot\", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmia32.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmia32.efi", $TargetDrive & "\efi\boot\", 1)
 		Else
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive& "\efi", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub2", $TargetDrive & "\grub2", 1)
+			EndIf
 			If FileExists(@ScriptDir & "\UEFI_MAN\ENROLL_THIS_KEY_IN_MOKMANAGER.cer") Then FileCopy(@ScriptDir & "\UEFI_MAN\ENROLL_THIS_KEY_IN_MOKMANAGER.cer", $TargetDrive & "\", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		EndIf
 		If Not FileExists($TargetDrive & "\boot\grub\grub.cfg") Then
 			If FileExists($TargetDrive & "\AIO\grub\grub.cfg") And Not FileExists($TargetDrive & "\boot\grub\Main.cfg") Then
@@ -2438,8 +2468,8 @@ Func _Go()
 					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub.cfg", $TargetDrive & "\boot\grub\", 8)
 					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
 				Else
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 8)
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
+					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 8)
+					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
 				EndIf
 			EndIf
 		Else
@@ -2451,14 +2481,17 @@ Func _Go()
 					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub.cfg", $TargetDrive & "\boot\grub\", 1)
 					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
 				Else
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 1)
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
+					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 1)
+					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
 				EndIf
 			EndIf
 		EndIf
 		; Add \AIO\grub\grub2win to \Boot\BCD Menu for BIOS support of Grub2
 		If FileExists($TargetDrive & "\AIO\grub\grub2win") Then
 			_bcd_grub2()
+		EndIf
+		If FileExists($TargetDrive & "\grub2\g2bootmgr\gnugrub.kernel.bios") Then
+			_bcd_grub2win()
 		EndIf
 	Else
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
@@ -2481,9 +2514,14 @@ Func _Go()
 			; No Copy of WIM File in case of WIM on System Drive
 			$WimOnSystemDrive = 1
 		Else
-			If $btimgfile <> $IMG_Path & "\" & $image_file Then
-				_GUICtrlStatusBar_SetText($hStatus,"Copying " & $image_file & " to " & $IMG_Path & " - wait ....", 0)
-				FileCopy($btimgfile, $IMG_Path & "\", 1)
+			If GUICtrlRead($ImageType) = "WinPE - WIM" And StringLeft($btimgfile, 2) = $TargetDrive Then
+				; No Copy of WIM File in case of WIM on Target Boot Drive
+				$WimOnSystemDrive = 0
+			Else
+				If $btimgfile <> $IMG_Path & "\" & $image_file Then
+					_GUICtrlStatusBar_SetText($hStatus,"Copying " & $image_file & " to " & $IMG_Path & " - wait ....", 0)
+					FileCopy($btimgfile, $IMG_Path & "\", 1)
+				EndIf
 			EndIf
 		EndIf
 
@@ -2510,8 +2548,10 @@ Func _Go()
 					FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 					; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 				EndIf
+				If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 				If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 				If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+				If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 				_bcd_menu()
 			EndIf
 		Else
@@ -2529,8 +2569,10 @@ Func _Go()
 								FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 								; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 							EndIf
+							If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 							If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 							If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+							If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 							_bcd_menu()
 						EndIf
 					EndIf
@@ -2549,8 +2591,10 @@ Func _Go()
 				FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 				; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 			EndIf
+			If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 			If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 			If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+			If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 			_bcd_menu()
 		Else
 			GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
@@ -2862,8 +2906,10 @@ Func _BT_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_bt_img_menu()
 	Else
 		$mk_bcd = 1
@@ -2882,8 +2928,10 @@ Func _BT_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_bt_img_menu()
 		_bcd_menu()
 	EndIf
@@ -2966,8 +3014,10 @@ Func _RC_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_rc_img_menu()
 	Else
 		$mk_bcd = 1
@@ -2986,8 +3036,10 @@ Func _RC_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_rc_img_menu()
 		_bcd_menu()
 	EndIf
@@ -3042,8 +3094,10 @@ Func _SF_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_sf_img_menu()
 	Else
 		$mk_bcd = 1
@@ -3058,8 +3112,10 @@ Func _SF_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_sf_img_menu()
 		_bcd_menu()
 	EndIf
@@ -3116,8 +3172,10 @@ Func _CD_ISO()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_cd_iso_menu()
 	Else
 		$mk_bcd = 1
@@ -3132,8 +3190,10 @@ Func _CD_ISO()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_cd_iso_menu()
 		_bcd_menu()
 	EndIf
@@ -3189,6 +3249,7 @@ Func _HDD_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If FileExists($TargetDrive & "\menu.lst") Then
 			If FileExists($TargetDrive & "\bootmgr")  And FileExists($TargetDrive & "\Boot\BCD") Then
 				FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "title Boot Manager Menu - Win VHD")
@@ -3198,6 +3259,7 @@ Func _HDD_IMG()
 			FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 			FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_hdd_img_menu()
 	Else
 		$mk_bcd = 1
@@ -3212,8 +3274,10 @@ Func _HDD_IMG()
 			FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
 			; If FileExists(@ScriptDir & "\makebt\RUN") And Not FileExists($TargetDrive & "\RUN") Then FileCopy(@ScriptDir & "\makebt\RUN", $TargetDrive & "\", 1)
 		EndIf
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 		_g4d_hdd_img_menu()
 		_bcd_menu()
 	EndIf
@@ -3766,6 +3830,51 @@ Func _bcd_grub2()
 	SystemFileRedirect("Off")
 
 EndFunc   ;==> _bcd_grub2
+;===================================================================================================
+Func _bcd_grub2win()
+	Local $file, $line, $store, $guid, $pos1, $pos2
+
+	SystemFileRedirect("On")
+
+	If FileExists(@WindowsDir & "\system32\bcdedit.exe") Then
+		$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
+	Else
+		$bcdedit = ""
+	EndIf
+
+	If FileExists($TargetDrive & "\Boot\BCD") And $bcdedit <> "" Then
+		$store = $TargetDrive & "\Boot\BCD"
+
+	;	_GUICtrlStatusBar_SetText($hStatus," Making  Grub2 Entry in Boot Manager Menu - wait ....", 0)
+
+		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+		& $store & " /create /d " & '"' & "Grub 2 for Windows - Linux ISO" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2win.txt", @ScriptDir, @SW_HIDE)
+		$file = FileOpen(@ScriptDir & "\makebt\bs_temp\bcd_grub2win.txt", 0)
+		$line = FileReadLine($file)
+		FileClose($file)
+		$pos1 = StringInStr($line, "{")
+		$pos2 = StringInStr($line, "}")
+		If $pos2-$pos1=37 Then
+			$guid = StringMid($line, $pos1, $pos2-$pos1+1)
+			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+			& $store & " /set " & $guid & " device boot", $TargetDrive & "\", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+			& $store & " /set " & $guid & " path \grub2\g2bootmgr\gnugrub.kernel.bios", $TargetDrive & "\", @SW_HIDE)
+			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+			& $store & " /displayorder " & $guid & " /addlast", $TargetDrive & "\", @SW_HIDE)
+;~ 			If $DriveType="Removable" Or $usbfix Then
+;~ 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+;~ 				& $store & " /default " & $guid, $TargetDrive & "\", @SW_HIDE)
+;~ 			EndIf
+		EndIf
+	Else
+		MsgBox(48, "CONFIG ERROR Or Missing File", "Unable to Add Grub2Win to Boot Manager Menu" & @CRLF & @CRLF _
+			& " Missing bcdedit.exe Or Boot\BCD file ", 5)
+	EndIf
+
+	SystemFileRedirect("Off")
+
+EndFunc   ;==> _bcd_grub2win
 ;===================================================================================================
 Func GetContentSource()
 	Local $pos, $TempLinuxSource
