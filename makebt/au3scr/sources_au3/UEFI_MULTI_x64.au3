@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  April 07, 2020
+ Author:        WIMB  -  April 14, 2020
 
- Program:       UEFI_MULTI_x64.exe - Version 9.8 in rule 155
+ Program:       UEFI_MULTI_x64.exe - Version 4.0 in rule 155
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -152,7 +152,7 @@ EndIf
 $hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, -1, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
-GUICtrlCreateGroup("Sources   - Version 9.8 ", 18, 10, 364, 235)
+GUICtrlCreateGroup("Sources   - Version 4.0 ", 18, 10, 364, 235)
 
 $ImageType = GUICtrlCreateLabel( "", 270, 29, 110, 15, $ES_READONLY)
 $ImageSize = GUICtrlCreateLabel( "", 215, 29, 50, 15, $ES_READONLY)
@@ -237,15 +237,17 @@ GUICtrlCreateLabel( "Add XP  to Boot Manager", 56, 215, 130, 15)
 
 $refind = GUICtrlCreateCheckbox("", 224, 213, 17, 17)
 GUICtrlSetTip($refind, " Add Grub2 needed to boot Linux ISO in UEFI mode" & @CRLF _
-& " UEFI Mult-Boot Linux ISO + Windows 8 / 10 VHD + PE WIM " & @CRLF _
-& " Setting Other is used for support of a1ive Grub2 File Manager " & @CRLF _
+& " Setting Grub2 - Only for some Linux ISO Files in images folder " & @CRLF _
+& " Setting Other - use Addon with a1ive Grub2 File Manager " & @CRLF _
+& " and Grub2 Live ISO Multiboot for All Linux in iso folder " & @CRLF _
 & " *** Applied Only for USB Boot Drive *** ")
 GUICtrlCreateLabel( "EFI Mgr", 328, 215)
 $Combo_EFI = GUICtrlCreateCombo("", 248, 212, 70, 24, $CBS_DROPDOWNLIST)
 GUICtrlSetData($Combo_EFI,"Grub 2|Other", "Grub 2")
 GUICtrlSetTip($Combo_EFI, " Add Grub2 needed to boot Linux ISO in UEFI mode" & @CRLF _
-& " UEFI Mult-Boot Linux ISO + Windows 8 / 10 VHD + PE WIM " & @CRLF _
-& " Setting Other is used for support of a1ive Grub2 File Manager " & @CRLF _
+& " Setting Grub2 - Only for some Linux ISO Files in images folder " & @CRLF _
+& " Setting Other - use Addon with a1ive Grub2 File Manager " & @CRLF _
+& " and Grub2 Live ISO Multiboot for All Linux in iso folder " & @CRLF _
 & " *** Applied Only for USB Boot Drive *** ")
 
 GUICtrlCreateGroup("USB Target", 18, 252, 364, 89)
@@ -1107,7 +1109,7 @@ Func _WinDrv_drive()
 EndFunc   ;==> _WinDrv_drive
 ;===================================================================================================
 Func _wim_menu()
-	Local $val=0, $store, $len, $pos, $img_fname="", $sdi_file = ""
+	Local $val=0, $len, $pos, $img_fname="", $sdi_file = ""
 	Local $guid, $guid_def = "", $pos1, $pos2, $ramdisk_guid = "", $pe_guid = "", $efi_pe_guid = "", $efi_ramdisk_guid = ""
 	Local $file, $line
 
@@ -2426,9 +2428,16 @@ Func _Go()
 		EndIf
 	EndIf
 
+	; Add always Boot\boot.sdi for PE WIM and Boot\bootvhd.dll for booting VHD in BIOS mode
+	If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi") Then
+		FileCopy(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi", $TargetDrive & "\Boot\", 1)
+	EndIf
+	If Not FileExists($TargetDrive & "\Boot\bootvhd.dll") And FileExists(@WindowsDir & "\Boot\PCAT\bootvhd.dll") Then
+		FileCopy(@WindowsDir & "\Boot\PCAT\bootvhd.dll", $TargetDrive & "\Boot\", 1)
+	EndIf
+
 	SystemFileRedirect("Off")
 	If $DriveType="Removable" Or $usbfix And GUICtrlRead($refind) = $GUI_CHECKED Then
-		_GUICtrlStatusBar_SetText($hStatus," Adding Grub2 Boot Manager - wait .... ", 0)
 		If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootx64.efi") Then
 			FileMove($TargetDrive & "\efi\boot\bootx64.efi", $TargetDrive & "\efi\boot\org-bootx64.efi", 1)
 		EndIf
@@ -2444,17 +2453,20 @@ Func _Go()
 			FileMove($TargetDrive & "\efi\boot\grub.cfg", $TargetDrive & "\efi\boot\org-grub.cfg", 1)
 		EndIf
 		If GUICtrlRead($Combo_EFI) = "Grub 2" Then
+			_GUICtrlStatusBar_SetText($hStatus," Adding Grub2 EFI Manager - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi_mint", $TargetDrive& "\efi", 1)
 			If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 			If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmx64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmx64.efi", $TargetDrive & "\efi\boot\", 1)
 			If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmia32.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grubfmia32.efi", $TargetDrive & "\efi\boot\", 1)
 		Else
+			_GUICtrlStatusBar_SetText($hStatus," Adding Other EFI Manager - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive& "\efi", 1)
 			If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
 				DirCopy(@ScriptDir & "\UEFI_MAN\grub2", $TargetDrive & "\grub2", 1)
 			EndIf
 			If FileExists(@ScriptDir & "\UEFI_MAN\ENROLL_THIS_KEY_IN_MOKMANAGER.cer") Then FileCopy(@ScriptDir & "\UEFI_MAN\ENROLL_THIS_KEY_IN_MOKMANAGER.cer", $TargetDrive & "\", 1)
 			If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
+			DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
 		EndIf
 		If Not FileExists($TargetDrive & "\boot\grub\grub.cfg") Then
 			If FileExists($TargetDrive & "\AIO\grub\grub.cfg") And Not FileExists($TargetDrive & "\boot\grub\Main.cfg") Then
@@ -3679,7 +3691,7 @@ Func _g4d_hdd_img_menu()
 EndFunc   ;==> _g4d_hdd_img_menu
 ;===================================================================================================
 Func _bcd_menu()
-	Local $file, $line, $store, $guid, $pos1, $pos2
+	Local $file, $line, $guid, $pos1, $pos2
 
 	; If Not FileExists($TargetDrive & "\bootmgr") Then $mk_bcd = 2
 	If Not FileExists($TargetDrive & "\Boot\BCD") Then $mk_bcd = 2
@@ -3787,7 +3799,7 @@ Func _bcd_menu()
 EndFunc   ;==> _bcd_menu
 ;===================================================================================================
 Func _bcd_grub2()
-	Local $file, $line, $store, $guid, $pos1, $pos2
+	Local $file, $line, $guid, $pos1, $pos2
 
 	SystemFileRedirect("On")
 
@@ -3800,7 +3812,7 @@ Func _bcd_grub2()
 	If FileExists($TargetDrive & "\Boot\BCD") And $bcdedit <> "" Then
 		$store = $TargetDrive & "\Boot\BCD"
 
-	;	_GUICtrlStatusBar_SetText($hStatus," Making  Grub2 Entry in Boot Manager Menu - wait ....", 0)
+		_GUICtrlStatusBar_SetText($hStatus," Making Grub2 - AIO grub2win Entry in Boot Manager Menu - wait ....", 0)
 
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 		& $store & " /create /d " & '"' & "Grub2 - AIO grub2win" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2.txt", @ScriptDir, @SW_HIDE)
@@ -3832,7 +3844,7 @@ Func _bcd_grub2()
 EndFunc   ;==> _bcd_grub2
 ;===================================================================================================
 Func _bcd_grub2win()
-	Local $file, $line, $store, $guid, $pos1, $pos2
+	Local $file, $line, $guid, $pos1, $pos2
 
 	SystemFileRedirect("On")
 
@@ -3845,7 +3857,7 @@ Func _bcd_grub2win()
 	If FileExists($TargetDrive & "\Boot\BCD") And $bcdedit <> "" Then
 		$store = $TargetDrive & "\Boot\BCD"
 
-	;	_GUICtrlStatusBar_SetText($hStatus," Making  Grub2 Entry in Boot Manager Menu - wait ....", 0)
+		_GUICtrlStatusBar_SetText($hStatus," Making  Grub2Win Entry in Boot Manager Menu - wait ....", 0)
 
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 		& $store & " /create /d " & '"' & "Grub 2 for Windows - Linux ISO" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2win.txt", @ScriptDir, @SW_HIDE)

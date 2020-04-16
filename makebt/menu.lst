@@ -11,19 +11,19 @@ iftitle [if exist /vhds.lst] VHDs menu
 find --set-root /vhds.lst
 configfile /vhds.lst
 
-iftitle [if exist /grubfm.iso] GrubFM Boot Manager of a1ive - /grubfm.iso
+iftitle [if exist /grubfm.iso] Grub2 File Manager of a1ive - /grubfm.iso
 find --set-root /grubfm.iso
 map --mem /grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
-iftitle [if exist /efi/boot/grubfm.iso] GrubFM Boot Manager of a1ive - /efi/boot/grubfm.iso
+iftitle [if exist /efi/boot/grubfm.iso] Grub2 File Manager of a1ive - /efi/boot/grubfm.iso
 find --set-root /efi/boot/grubfm.iso
 map --mem /efi/boot/grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
-iftitle [ls (hd0,0)/EFI/iso] ISO Linux Menu - (hd0,0)/EFI/iso
+iftitle [ls (hd0,0)/iso] ISO Linux Menu - (hd0,0)/iso
 set iso_drive=(hd0,0)
 configfile /menu_Linux.lst
 
