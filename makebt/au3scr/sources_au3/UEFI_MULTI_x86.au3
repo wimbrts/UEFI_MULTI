@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  April 14, 2020
+ Author:        WIMB  -  April 17, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 4.0 in rule 155
+ Program:       UEFI_MULTI_x86.exe - Version 4.0 in rule 167
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -77,7 +77,7 @@ Global $OldIMGSize=0, $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $Ima
 Global $DriveType="Fixed", $usbfix=0, $IMG_Path = "", $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = ""
 Global $vhdfolder = "", $vhdfile_name = "", $vhdfile_name_only = ""
 
-Global $driver_flag=3, $vhdmp=0, $SysWOW64=0, $WinFol="\Windows", $winload_flag=0, $PE_flag = 0, $WimOnSystemDrive = 0
+Global $driver_flag=3, $vhdmp=0, $SysWOW64=0, $WinFol="\Windows", $winload_flag=0, $PE_flag = 0, $WinDir_PE="D:\Windows", $WimOnSystemDrive = 0
 Global $bcdedit="", $winload = "winload.exe", $bcd_guid_outfile = "makebt\bs_temp\bcd_boot_vhd.txt", $store = "", $DistLang = "en-US", $WinLang = "en-US", $bcdboot_flag = 0
 
 Global $Combo_EFI, $Combo_Folder, $Upd_MBR, $Boot_w8, $Boot_vhd, $vhd_cnt=0, $dt
@@ -143,6 +143,18 @@ If StringLeft(@SystemDir, 1) = "X" Then
 	$PE_flag = 1
 Else
 	$PE_flag = 0
+EndIf
+
+If $PE_flag = 1 Then
+	If FileExists("C:\Windows\Boot") Then
+		$WinDir_PE = "C:\Windows"
+	ElseIf FileExists("D:\Windows\Boot") Then
+		$WinDir_PE = "D:\Windows"
+	ElseIf FileExists("E:\Windows\Boot") Then
+		$WinDir_PE = "E:\Windows"
+	Else
+		$WinDir_PE = "D:\Windows"
+	EndIf
 EndIf
 
 ; HotKeySet("{PAUSE}", "TogglePause")
@@ -2242,30 +2254,26 @@ Func _Go()
 				If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
 				If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 			EndIf
-			If @OSVersion <> "WIN_VISTA" And @OSVersion <> "WIN_2003" And @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_XPe" And @OSVersion <> "WIN_2000" And Not FileExists($TargetDrive & "\Boot\BCD") Then
-				If $DriveType="Removable" Or $usbfix Then
+			If $DriveType="Removable" Or $usbfix Then
+				If Not FileExists($TargetDrive & "\Boot\BCD") Or Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
 					SystemFileRedirect("On")
-					_WinLang()
-					If FileExists(@WindowsDir & "\system32\bcdboot.exe") And FileExists(@WindowsDir & "\Boot") Then
-						_GUICtrlStatusBar_SetText($hStatus," Adding Boot Manager to TargetDrive " & $TargetDrive & " - wait .... ", 0)
+					If FileExists(@WindowsDir & "\system32\bcdboot.exe") Then
+						_WinLang()
 						$bcdboot_flag = 1
-						; in case of win8 x64 OS
-						If FileExists(@WindowsDir & "\System32\config\DRIVERS") And @OSArch <> "X86" Then
-							If $PartStyle = "MBR" Then
-								$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
-							Else
-								$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f UEFI", @ScriptDir, @SW_HIDE)
-							EndIf
+						If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" And $PE_flag = 0 Then
+							_GUICtrlStatusBar_SetText($hStatus," UEFI x64 - Make Boot Manager Menu on USB " & $TargetDrive & " - wait .... ", 0)
+							$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
 						Else
-							; no efi support ....
-							$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
+							If $PE_flag = 1 Then
+								_GUICtrlStatusBar_SetText($hStatus," PE x64 - Make Boot Manager Menu on USB " & $TargetDrive & " - wait .... ", 0)
+								$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $WinDir_PE & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
+							Else
+								_GUICtrlStatusBar_SetText($hStatus," Make Boot Manager Menu on USB Drive " & $TargetDrive & " - wait .... ", 0)
+								$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
+							EndIf
 						EndIf
-						Sleep(2000)
-						If FileExists($TargetDrive & "\Boot") Then FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
-						If FileExists($TargetDrive & "\bootmgr") Then FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
-						; make bcd menu in rule 2154
-						;	$mk_bcd = 1
-						;	_bcd_menu()
+						FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
+						FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
 					EndIf
 					SystemFileRedirect("Off")
 				EndIf
