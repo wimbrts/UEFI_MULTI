@@ -4,6 +4,9 @@ chainloader /bootmgr
 title Grub4dos Menu
 configfile /menu.lst
 
+title Reboot Main Menu
+chainloader (hd0)+1
+
 iftitle [if exist %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso] ISO Linux Mint - %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso
 set iso_path=/images/linuxmint-19.3-cinnamon-64bit.iso
 map %iso_drive%%iso_path% (0xff)

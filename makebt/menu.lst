@@ -7,21 +7,44 @@ default 0
 iftitle [if exist /bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM
 chainloader /bootmgr
 
+title Win10XPE_x64.ISO - ISO or ISO from RAM - 892 MB
+find --set-root --ignore-floppies /Win10XPE_x64.ISO
+map /Win10XPE_x64.ISO (0xff) || map --mem /Win10XPE_x64.ISO (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
+title WinPE.iso - ISO or ISO from RAM - 465 MB
+find --set-root --ignore-floppies /WinPE.iso
+map /WinPE.iso (0xff) || map --mem /WinPE.iso (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
 iftitle [if exist /vhds.lst] VHDs menu
 find --set-root /vhds.lst
 configfile /vhds.lst
 
 iftitle [if exist /grubfm.iso] Grub2 File Manager of a1ive - /grubfm.iso
-find --set-root /grubfm.iso
+# find --set-root /grubfm.iso
 map --mem /grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
 iftitle [if exist /efi/boot/grubfm.iso] Grub2 File Manager of a1ive - /efi/boot/grubfm.iso
-find --set-root /efi/boot/grubfm.iso
+# find --set-root /efi/boot/grubfm.iso
 map --mem /efi/boot/grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
+
+iftitle [if exist /grubfm_multiarch.iso] Grub2 File Manager of a1ive - /grubfm_multiarch.iso
+# find --set-root /grubfm_multiarch.iso
+map --mem /grubfm_multiarch.iso (0xff)
+map --hook
+chainloader (0xff)
+
+title Reboot Main Menu
+chainloader (hd0)+1
 
 iftitle [ls (hd0,0)/iso] ISO Linux Menu - (hd0,0)/iso
 set iso_drive=(hd0,0)
