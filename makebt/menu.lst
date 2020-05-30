@@ -1,170 +1,87 @@
 color white/blue  black/light-gray white/black white/black
+# color black/green  red/light-gray
+# setmenu --string=75=0=0xff0000="date&time"
+#general command to pick highest mode available up to 1000 xres - recommended if you have a wide variety of systems
+#pick highest resolution up to 1000x10000 and either 24-bit or 32-bit colour only
+# graphicsmode -1 100:1000 100:10000 24:32
 
 # splashimage /images/sunrise.gz
 timeout 10
 default 0
- 
-iftitle [if exist /bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM
-chainloader /bootmgr
 
-title Win10XPE_x64.ISO - ISO or ISO from RAM - 892 MB
+iftitle [if exist (hd0,0)/bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM - (hd0,0)/bootmgr
+chainloader (hd0,0)/bootmgr
+
+iftitle [if exist (hd0,1)/bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM - (hd0,1)/bootmgr
+chainloader (hd0,1)/bootmgr
+
+iftitle [if exist (hd0,0)/Win10XPE_x64.ISO || (hd0,1)/Win10XPE_x64.ISO] Win10XPE_x64 ISO or ISO from RAM
 find --set-root --ignore-floppies /Win10XPE_x64.ISO
 map /Win10XPE_x64.ISO (0xff) || map --mem /Win10XPE_x64.ISO (0xff)
 map --hook
 root (0xff)
 chainloader (0xff)
 
-title WinPE.iso - ISO or ISO from RAM - 465 MB
+iftitle [if exist (hd0,0)/WinPE.iso || (hd0,1)/WinPE.iso] WinPE.iso - ISO or ISO from RAM
 find --set-root --ignore-floppies /WinPE.iso
 map /WinPE.iso (0xff) || map --mem /WinPE.iso (0xff)
 map --hook
 root (0xff)
 chainloader (0xff)
 
-iftitle [if exist /vhds.lst] VHDs menu
+title VHDs menu
 find --set-root /vhds.lst
 configfile /vhds.lst
 
-iftitle [if exist /grubfm.iso] Grub2 File Manager of a1ive - /grubfm.iso
-# find --set-root /grubfm.iso
+iftitle [if exist (hd0,0)/grubfm.iso || (hd0,1)/grubfm.iso] Grub2 File Manager of a1ive - /grubfm.iso
+find --set-root /grubfm.iso
 map --mem /grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
-iftitle [if exist /efi/boot/grubfm.iso] Grub2 File Manager of a1ive - /efi/boot/grubfm.iso
-# find --set-root /efi/boot/grubfm.iso
-map --mem /efi/boot/grubfm.iso (0xff)
+iftitle [if exist (hd0,0)/grubfm_multiarch.iso || (hd0,1)/grubfm_multiarch.iso] Grub2 File Manager of a1ive - /grubfm_multiarch.iso
+find --set-root /grubfm_multiarch.iso
+map --mem /grubfm_multiarch.iso
 map --hook
 chainloader (0xff)
 
-iftitle [if exist /grubfm_multiarch.iso] Grub2 File Manager of a1ive - /grubfm_multiarch.iso
-# find --set-root /grubfm_multiarch.iso
-map --mem /grubfm_multiarch.iso (0xff)
-map --hook
-chainloader (0xff)
+iftitle [ls (hd0,0)/images] Windows ISO Menu - (hd0,0)/images
+set iso_drive=(hd0,0)
+find --set-root /menu_Win_ISO.lst
+configfile /menu_Win_ISO.lst
+
+iftitle [ls (hd0,1)/images] Windows ISO Menu - (hd0,1)/images
+set iso_drive=(hd0,1)
+find --set-root /menu_Win_ISO.lst
+configfile /menu_Win_ISO.lst
+
+iftitle [ls (hd0,0)/images] Linux   ISO Menu - (hd0,0)/images
+set iso_drive=(hd0,0)
+find --set-root /menu_Linux.lst
+configfile /menu_Linux.lst
+
+iftitle [ls (hd0,1)/images] Linux   ISO Menu - (hd0,1)/images
+set iso_drive=(hd0,1)
+find --set-root /menu_Linux.lst
+configfile /menu_Linux.lst
+
+iftitle [ls (hd0,0)/iso] Linux   ISO Menu - (hd0,0)/iso
+set iso_drive=(hd0,0)
+find --set-root /menu_Linux.lst
+configfile /menu_Linux.lst
+
+title AIO Linux OS
+find --set-root /AIO/Menu/Linux.lst
+configfile /AIO/Menu/Linux.lst
+
+iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
+chainloader (hd1,0)/bootmgr
 
 title Reboot Main Menu
 chainloader (hd0)+1
 
-iftitle [ls (hd0,0)/iso] ISO Linux Menu - (hd0,0)/iso
-set iso_drive=(hd0,0)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd0,0)/images] ISO Linux Menu - (hd0,0)/images
-set iso_drive=(hd0,0)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd0,1)/images] ISO Linux Menu - (hd0,1)/images
-set iso_drive=(hd0,1)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd1,0)/images] ISO Linux Menu - (hd1,0)/images
-set iso_drive=(hd1,0)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd1,1)/images] ISO Linux Menu - (hd1,1)/images
-set iso_drive=(hd1,1)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd1,2)/images] ISO Linux Menu - (hd1,2)/images
-set iso_drive=(hd1,2)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd2,0)/images] ISO Linux Menu - (hd2,0)/images
-set iso_drive=(hd2,0)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd3,0)/images] ISO Linux Menu - (hd3,0)/images
-set iso_drive=(hd3,0)
-configfile /menu_Linux.lst
-
-iftitle [ls (hd4,0)/images] ISO Linux Menu - (hd4,0)/images
-set iso_drive=(hd4,0)
-configfile /menu_Linux.lst
-
-iftitle [if exist /AIO/Menu/Linux.lst] AIO Linux OS
-configfile /AIO/Menu/Linux.lst
-
-iftitle [if exist /images/linuxmint.iso] ISO Linux Mint - linuxmint.iso
-set iso_path=/images/linuxmint.iso
-map %iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
-iftitle [if exist /images/runtimelivecd.iso] ISO Knoppix - runtimelivecd.iso
-set iso_path=/images/runtimelivecd.iso
-map %iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
-initrd /boot/isolinux/minirt.gz
-
-iftitle [if exist /images/knoppix.iso] ISO Knoppix - knoppix.iso
-set iso_path=/images/knoppix.iso
-map %iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
-initrd /boot/isolinux/minirt.gz
-
-iftitle [if exist /images/ubuntu.iso] ISO Ubuntu - ubuntu.iso
-set iso_path=/images/ubuntu.iso
-map %iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
-iftitle [if exist /images/Porteus-CINNAMON-v4.0-x86_64.iso] ISO Linux Porteus - Porteus-CINNAMON-v4.0-x86_64.iso
-set iso_path=/images/Porteus-CINNAMON-v4.0-x86_64.iso
-map %iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
-initrd /boot/syslinux/initrd.xz
-
-iftitle [if exist /images/memtest.bin] MemTest86+
-kernel /images/memtest.bin
-
-title find and load NTLDR of Windows NT/2K/XP
-find --set-root --ignore-floppies --ignore-cd /ntldr
-map () (hd0)
-map (hd0) ()
-map --rehook
-find --set-root --ignore-floppies --ignore-cd /ntldr
-chainloader /ntldr
-
-title find and load BOOTMGR of Windows 7/8/10
-find --set-root --ignore-floppies --ignore-cd /bootmgr
-map () (hd0)
-map (hd0) ()
-map --rehook
-find --set-root --ignore-floppies --ignore-cd /bootmgr
-chainloader /bootmgr
-
-iftitle [if exist /images/7pe_x86_E.iso] 7PE ISO - 302 MB - images/7pe_x86_E.iso
-set pe86e=/images/7pe_x86_E.iso
-map  %pe86e% (0xff)
-map --hook
-root (0xff)
-chainloader (0xff)/BOOTMGR || chainloader (0xff)/bootmgr
-
-iftitle [if exist /images/LiveXP_WIM.iso] Live XP - images/LiveXP_WIM.iso
-map /images/LiveXP_WIM.iso (0xff) || map --mem /images/LiveXP_WIM.iso (0xff)
-map --hook
-root (0xff)
-chainloader (0xff)
-
-iftitle [if exist /images/LiveXP_RAM.iso] Live XP - images/LiveXP_RAM.iso
-map /images/LiveXP_RAM.iso (0xff) || map --mem /images/LiveXP_RAM.iso (0xff)
-map --hook
-root (0xff)
-chainloader (0xff)
-
 title Reboot
 reboot
- 
+
 title Switch Off
 halt

@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  May 24, 2020
+ Author:        WIMB  -  May 28, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 4.2 in rule 176
+ Program:       UEFI_MULTI_x86.exe - Version 4.3 in rule 176
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -14,7 +14,7 @@
 
  Script Function:
 	Install Boot Image File on Harddisk or USB-Drive
-	Enables to Launch Boot Image from GRUB4DOS menu.lst
+	Enables to Launch Boot Image from Grub4dos menu.lst
 	Useful as Escape Boot Option for System Backup and Restore with WinNTSetup
 	or to boot with PE to prepare your Harddisk for Install of Windows XP or Windows 7
 
@@ -70,7 +70,7 @@ Opt("GuiOnEventMode", 1)
 Opt("TrayIconHide", 1)
 
 ; Setting variables
-Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $mk_bcd=0, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR"
+Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR"
 Global $btimgfile="", $pe_nr=1, $hStatus, $pausecopy=0, $TargetSpaceAvail=0, $TargetSize, $TargetFree, $FSvar_WinDrvDrive="", $g4d=0, $bm_flag = 0, $g4dmbr=0
 Global $hGuiParent, $GO, $EXIT, $SourceDir, $Source, $TargetSel, $Target, $image_file="", $img_fext="", $grldrUpd, $g4d_bcd, $xp_bcd
 Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_BS=1, $refind, $Menu_Type
@@ -90,7 +90,7 @@ Global $tmpdrive="", $WinDrv, $WinDrvSel, $WinDrvSize, $WinDrvFree, $WinDrvFileS
 
 Global $OS_drive = StringLeft(@WindowsDir, 2)
 
-Global $str = "", $bt_files[12] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", _
+Global $str = "", $bt_files[13] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
 "\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt", "\makebt\grub.exe"]
 
 If @OSArch <> "X86" Then
@@ -173,9 +173,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x86 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 4.2  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.3  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 4.2  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.3  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
@@ -238,7 +238,6 @@ $grldrUpd = GUICtrlCreateCheckbox("", 224, 188, 17, 17)
 GUICtrlSetTip($grldrUpd, " Update Grub4dos grldr Version on Boot Drive " & @CRLF _
 & " Forces Update grldr.mbr for Grub4dos in Boot Manager Menu " & @CRLF _
 & " Forces Update a1ive Grub2 File Manager grubfm.iso ")
-; & " Forces Update menu.lst and menu_Linux.lst ")
 GUICtrlCreateLabel( "Update Grub4dos grldr", 248, 190)
 
 $Boot_vhd = GUICtrlCreateCheckbox("", 32, 163, 17, 17)
@@ -365,7 +364,11 @@ Func CheckGo()
 
 	If $WinDrvDrive <> "" And $TargetDrive <> "" Then
 		GUICtrlSetState($GO, $GUI_ENABLE)
-		_GUICtrlStatusBar_SetText($hStatus," Use GO to Make Multi-Boot USB-Drive", 0)
+		If $btimgfile = "" Then
+			_GUICtrlStatusBar_SetText($hStatus," Select Boot Image Or Use GO to Make Multi-Boot Drive", 0)
+		Else
+			_GUICtrlStatusBar_SetText($hStatus," Use GO to Make Multi-Boot USB-Drive", 0)
+		EndIf
 	Else
 		If GUICtrlRead($GO) = $GUI_ENABLE Then
 			GUICtrlSetState($GO, $GUI_DISABLE)
@@ -502,7 +505,7 @@ Func _WinAPI_GetFirmwareEnvironmentVariable()
 EndFunc   ;==>_WinAPI_GetFirmwareEnvironmentVariable
 ;===================================================================================================
 Func _img_fsel()
-	Local $len, $pos, $posfol, $img_fname="", $btpos, $valid=0, $pos3=0, $pos4=0, $pos5=0, $noxpmbr = 0, $pos1=0, $pos2=0, $vhdxmbr = 0, $vhdmbr = 0
+	Local $len, $pos, $posfol, $img_fname="", $btpos, $valid=0, $pos3=0, $pos4=0, $pos5=0, $noxpmbr = 0, $pos1=0, $pos2=0
 
 	DisableMenus(1)
 	GUICtrlSetData($ImageType, "")
@@ -517,6 +520,7 @@ Func _img_fsel()
 	$img_fext=""
 	$bootsdi = ""
 	$BTIMGSize=0
+	$img_folder = ""
 	If FileExists(@ScriptDir & "\makebt\bs_temp") Then DirRemove(@ScriptDir & "\makebt\bs_temp",1)
 	If Not FileExists(@ScriptDir & "\makebt\bs_temp") Then DirCreate(@ScriptDir & "\makebt\bs_temp")
 
@@ -624,7 +628,6 @@ Func _img_fsel()
 			$vhdfile_name = StringMid($btimgfile, 4)
 			$vhdfile_name_only = StringMid($btimgfile, $pos + 1)
 		EndIf
-		; $image_file = $vhdfile_name
 
 		$valid = 1
 		GUICtrlSetData($ImageType, "VHD - IMG")
@@ -663,8 +666,6 @@ Func _img_fsel()
 				Return
 			EndIf
 			$pos4 = HexSearch(@ScriptDir & "\makebt\bs_temp\iso_43008_512.bs", "SOURCES", 16, 0)
-			; $pos5 = HexSearch(@ScriptDir & "\makebt\bs_temp\iso_43008_512.bs", "BOOT", 16, 0)
-			; If $pos4 Or $pos5 Then
 			If $pos4 Then
 				GUICtrlSetData($ImageType, "WinPE - ISO")
 				If $BTIMGSize < 2000 Then $valid = 1
@@ -677,9 +678,6 @@ Func _img_fsel()
 		SystemFileRedirect("On")
 		If FileExists(@WindowsDir & "\system32\bcdedit.exe") Then
 			$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-		; 32-bits makebt\bcdedit.exe can be used in any case, but Win8x32 bcdedit cannot be used in XP
-		;	ElseIf FileExists(@ScriptDir & "\makebt\bcdedit.exe") Then
-		;		$bcdedit = @ScriptDir & "\makebt\bcdedit.exe"
 		Else
 			GUICtrlSetData($ImageType, "")
 			GUICtrlSetData($ImageSize, "")
@@ -779,26 +777,6 @@ Func _img_fsel()
 		Else
 			; Unknown Boot Image
 			$valid = 0
-			; old code about vhd
-;~ 							; HDD Image - WinVBlock or FiraDisk driver
-;~ 							; Vista MBR and NTFS Bootsector contain 33C08ED0BC007C whereas XP MBR has 33C08ED0BC007CFB50
-;~ 					;		$noxpmbr = HexSearch(@ScriptDir & "\makebt\bs_temp\img_512.bs", "33C08ED0BC007CFB50", 16, 1)
-;~ 							$noxpmbr = HexSearch(@ScriptDir & "\makebt\bs_temp\img_512.bs", "33C08ED0BC007C", 16, 1)
-;~ 					;		MsgBox(48, "INFO - Search MBR BootCode", "MBR BootCode at pos = " & $noxpmbr, 0)
-;~ 							$vhdxmbr = HexSearch(@ScriptDir & "\makebt\bs_temp\img_512.bs", "7668647866696C65", 16, 1)
-;~ 							$vhdmbr = HexSearch(@ScriptDir & "\makebt\bs_temp\img_512.bs", "636F6E6563746978", 16, 1)
-;~ 							If $noxpmbr <> 1 And $vhdxmbr <> 1 And $vhdmbr <> 1 Then
-;~ 								; $valid = 0
-;~ 								MsgBox(48, " WARNING - MBR BootCode NOT Found ", "Selected = " & $btimgfile & @CRLF & @CRLF _
-;~ 									& "Image Size = " & $BTIMGSize & " MB " & @CRLF & @CRLF _
-;~ 									& "Standard MBR BootCode NOT Found " & @CRLF & @CRLF _
-;~ 									& "Not sure if Image is valid and Bootable ", 0)
-;~ 								;	$btimgfile = ""
-;~ 								;	GUICtrlSetData($ImageType, "")
-;~ 								;	GUICtrlSetData($ImageSize, "")
-;~ 								;	DisableMenus(0)
-;~ 								;	Return
-;~ 							EndIf
 		EndIf
 	EndIf
 
@@ -817,24 +795,11 @@ Func _img_fsel()
 		Return
 	EndIf
 
-	;	If $img_fext = "vhdx" Then
-	;		MsgBox(48, "WARNING - VHDX incompatible with Grub4dos ", " Unable to make Grub4dos Boot Menu for VHDX " _
-	;			& @CRLF & @CRLF & "Install in VHD for Grub4dos Support " _
-	;			& @CRLF & @CRLF & "VHDX Booting with Boot Manager is supported ")
-	;	EndIf
-
 	If GUICtrlRead($ImageType) = "VHD - IMG" And $img_fext = "vhd" Then
 		If $FSvar_WinDrvDrive = "FAT32" Then
 			MsgBox(48, "WARNING - Only Booting as RAMDISK supported", "VHD requires NTFS for Booting as FILEDISK " _
 			& @CRLF & @CRLF & "System Drive " & $WinDrvDrive & " has FileSystem " & $FSvar_WinDrvDrive _
 			& @CRLF & @CRLF & "VHD Booting from RAMDISK is supported ")
-			;	$valid = 0
-			;	GUICtrlSetData($ImageSize, "")
-			;	GUICtrlSetData($ImageType, "")
-			;	GUICtrlSetState($Boot_vhd, $GUI_UNCHECKED + $GUI_DISABLE)
-			;	$btimgfile = ""
-			;	DisableMenus(0)
-			;	Return
 		EndIf
 	EndIf
 
@@ -909,6 +874,7 @@ Func _target_drive()
 	GUICtrlSetData($Target, "")
 	GUICtrlSetData($TargetSize, "")
 	GUICtrlSetData($TargetFree, "")
+	GUICtrlSetData($Combo_Folder,"Folder on B")
 
 	$TargetSelect = FileSelectFolder("Select your USB Boot Drive - Active Drive for Boot Files", "")
 	If @error Then
@@ -1034,6 +1000,10 @@ Func _target_drive()
 		$PartStyle = _GetDrivePartitionStyle(StringLeft($TargetDrive, 1))
 		; MsgBox(64, "Partition Style and Firmware", "Partition Style = " & $PartStyle & @CRLF _
 		; & @CRLF & "Firmware = " & $Firmware)
+		If FileExists($TargetDrive & "\ventoy") Then
+			GUICtrlSetData($Combo_Folder,"Folder on S")
+		EndIf
+
 	EndIf
 	If Not CheckSize() Then
 		MsgBox(48, "ERROR - System Drive NOT Valid", " NOT Enough FreeSpace")
@@ -1189,9 +1159,6 @@ Func _wim_menu()
 
 	If FileExists(@WindowsDir & "\system32\bcdedit.exe") Then
 		$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-	; 32-bits makebt\bcdedit.exe can be used in any case
-	;	ElseIf FileExists(@ScriptDir & "\makebt\bcdedit.exe") Then
-	;		$bcdedit = @ScriptDir & "\makebt\bcdedit.exe"
 	Else
 		MsgBox(48, "WARNING - bcdedit.exe is missing ", "Unable to Add WIM to Boot Manager Menu " & @CRLF & @CRLF _
 		& "Need Windows 7/8/10 Or 7/8/10 PE to Add WIM to Boot Manager " & @CRLF & @CRLF & " Boot with Windows 7/8/10 or 7/8/10 PE ", 5)
@@ -1939,7 +1906,6 @@ Func _Go()
 	EndIf
 
 	If FileExists($TargetDrive & "\grldr") And Not FileExists($TargetDrive & "\menu.lst") And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		$mk_bcd = 2
 		MsgBox(48, "WARNING - SUSPECT CONFIG ERROR ", " grldr found without menu.lst " & @CRLF & @CRLF _
 		& " Unable to Add Grub4dos to BootManager Menu" & @CRLF & @CRLF _
 		& " Use Update Grub4dos grldr Checkbox to solve problem ", 0)
@@ -2101,6 +2067,10 @@ Func _Go()
 		RunWait(@ComSpec & " /c makebt\dsfo.exe \\.\PHYSICALDRIVE" & $inst_disk & " 0 32256 makebt\backups\" & $headbkp, @ScriptDir, @SW_HIDE)
 	EndIf
 
+	If FileExists($TargetDrive & "\ventoy") Then
+		$ventoy = 1
+	EndIf
+
 	; Keep Ventoy MBR and Ventoy Grub2
 	If $ventoy Then
 		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
@@ -2137,7 +2107,7 @@ Func _Go()
 
 	If $xpmbr=0 And $g4dmbr=0 And $inst_disk <> "" And $inst_part <> "" And $PartStyle = "MBR" Then
 		; Only for fixed USB drives having MBR and partition table Forced Update MBR Boot Code
-		If $DriveType <> "Removable" And $usbfix And $ventoy=0 And Not FileExists($TargetDrive & "\ventoy") Then
+		If $DriveType <> "Removable" And $usbfix And $ventoy=0 Then
 			; Use bootsect.exe instead of MBRFIX.exe
 			If FileExists(@WindowsDir & "\system32\bootsect.exe") Then
 				$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bootsect.exe /nt60 " & $TargetDrive & " /mbr", @ScriptDir, @SW_HIDE)
@@ -2216,6 +2186,7 @@ Func _Go()
 		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\menu_Win_ISO.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Win_ISO.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 	EndIf
 
@@ -2224,12 +2195,12 @@ Func _Go()
 		If FileExists($TargetDrive & "\boot.ini") Then
 			FileSetAttrib($TargetDrive & "\boot.ini", "-RSH")
 			FileCopy($TargetDrive & "\boot.ini", $TargetDrive & "\boot_ini.txt", 1)
-			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start GRUB4DOS - XP Menu"')
+			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
 			IniWrite($TargetDrive & "\boot.ini", "Boot Loader", "Timeout", 20)
 		Else
 			IniWriteSection($TargetDrive & "\boot.ini", "Boot Loader", "Timeout=20" & @LF & _
 			"Default=C:\grldr")
-			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start GRUB4DOS - XP Menu"')
+			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
 		EndIf
 
 		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") And FileExists(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN") Then
@@ -2551,49 +2522,38 @@ Func _Go()
 			_RC_IMG()
 		ElseIf GUICtrlRead($ImageType) = "FreeDOS - IMG" Or GUICtrlRead($ImageType) = "MS-DOS - IMG" And $PartStyle = "MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Making  Entry in Grub4dos Boot Menu - wait ....", 0)
-			_SF_IMG()
+			If FileExists($TargetDrive & "\menu.lst") Then _g4d_sf_img_menu()
 		ElseIf GUICtrlRead($ImageType) = "LiveXP BootSDI - IMG" Or GUICtrlRead($ImageType) = "BartPE - ISO" And $PartStyle = "MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Making  Entry in Grub4dos Boot Menu - wait ....", 0)
 			_BT_IMG()
 		ElseIf GUICtrlRead($ImageType) = "CD - ISO" Or GUICtrlRead($ImageType) = "WinPE - ISO" And $PartStyle = "MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Making  Entry in Grub4dos Boot Menu - wait ....", 0)
-			_CD_ISO()
+			If FileExists($TargetDrive & "\menu.lst") Then _g4d_cd_iso_menu()
 		ElseIf GUICtrlRead($ImageType) = "WinPE - WIM" Then
-			$mk_bcd = 1
 			_wim_menu()
-			If $PartStyle = "MBR" Then
-				_bcd_menu()
-			EndIf
 		Else
 			If GUICtrlRead($ImageType) = "VHD - IMG" Then
 				If @OSVersion <> "WIN_VISTA" And @OSVersion <> "WIN_2003" And @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_XPe" And @OSVersion <> "WIN_2000" Then
-					; If $DriveType="Removable" Or $usbfix Then
 					If $img_fext = "vhd" Or $img_fext = "vhdx" Then
 						_vhd_menu()
 						Sleep(3000)
+						; VHDX incompatible with Grub4dos
 						If $img_fext = "vhdx" Then $g4d_w7vhd_flag=0
-						If $g4d_w7vhd_flag=0 Or $img_fext = "vhdx" And $PartStyle = "MBR" Then
-							; MsgBox(48, "WARNING - WinVBlock and FiraDisk Driver Not Installed in Source ", " Unable to make Grub4dos Boot Menu for Win7 VHD ", 3)
-							$mk_bcd = 1
-							_bcd_menu()
-						EndIf
 					EndIf
-					; EndIf
 				EndIf
 				If $g4d_w7vhd_flag=1 And $PartStyle = "MBR" Then
 					_GUICtrlStatusBar_SetText($hStatus," Making  Entry in Grub4dos Boot Menu - wait ....", 0)
-					_HDD_IMG()
+					If FileExists($TargetDrive & "\menu.lst") Then _g4d_hdd_img_menu()
 				EndIf
 			EndIf
 		EndIf
+	EndIf
+
+	If $g4dmbr=0 And $g4d_vista <> 0 And $PartStyle = "MBR" Then
+		_bcd_menu()
 	Else
-		If $g4dmbr=0 And $g4d_vista <> 0 And $PartStyle = "MBR" Then
-			$mk_bcd = 1
-			_bcd_menu()
-		Else
-			GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
-			GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
-		EndIf
+		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 	EndIf
 
 	If FileExists($TargetDrive & "\bootmgr") Then
@@ -2623,32 +2583,57 @@ Func _Go()
 		& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
 	EndIf
 
-	If $mk_bcd = 1  Then
-		If Not FileExists($TargetDrive & "\bootmgr") And $PartStyle = "MBR" Then
-			_GUICtrlStatusBar_SetText($hStatus," End of Program - WARNING", 0)
-			MsgBox(64, " END OF PROGRAM - WARNING ", $TargetDrive & "\bootmgr is missing on Target Boot Drive " & @CRLF & @CRLF _
-			& " Manually add file bootmgr from Win 7/8/10 to Drive " & $TargetDrive & @CRLF _
-			& @CRLF & " After Reboot Select Boot Image from Menu ")
-		Else
-			_GUICtrlStatusBar_SetText($hStatus," End of Program - OK", 0)
-			MsgBox(64, " END OF PROGRAM - OK ", " After Reboot Select Boot Image from Menu ")
-		EndIf
-	ElseIf $mk_bcd = 2  Then
-		If GUICtrlRead($g4d_bcd) = $GUI_CHECKED Or Not FileExists($TargetDrive & "\grldr.mbr") Then
-			_GUICtrlStatusBar_SetText($hStatus," End of Program - WARNING", 0)
-			MsgBox(64, " END OF PROGRAM - WARNING ", @CRLF _
-			& " Unable to make GRUB4DOS entry in Boot Manager BCD Menu " & @CRLF & @CRLF _
-			& " Manually use bcdedit to Install GRUB4DOS in Boot Manager BCD Menu ")
-		Else
-			_GUICtrlStatusBar_SetText($hStatus," End of Program - OK", 0)
-			MsgBox(64, " END OF PROGRAM - OK ", " After Reboot Select Boot Image from Menu ")
-		EndIf
-	Else
-		_GUICtrlStatusBar_SetText($hStatus," End of Program - OK", 0)
-		MsgBox(64, " END OF PROGRAM - OK ", " End of Program  - OK " & @CRLF _
-		& @CRLF & " After Reboot Select Boot Image from Menu ")
+	If Not FileExists($TargetDrive & "\bootmgr") And $PartStyle = "MBR" Then
+		MsgBox(64, " WARNING - bootmgr is missing ", $TargetDrive & "\bootmgr is missing on Target Boot Drive " & @CRLF & @CRLF _
+		& " Manually add file bootmgr from Win 7/8/10 to Drive " & $TargetDrive)
 	EndIf
-	Exit
+
+	_GUICtrlStatusBar_SetText($hStatus," End of Program Or Again ?", 0)
+	$ikey = MsgBox(48+4+256, " END OF PROGRAM Or Again ? ", " End of Program  - OK - Enter to Finish " & @CRLF _
+	& @CRLF & " After Reboot Select Boot Image from Menu " & @CRLF _
+	& @CRLF & " Run Again to Add Other Boot Image ? ")
+
+	If $ikey = 6 Then
+		GUICtrlSetData($ImageType, "")
+		GUICtrlSetData($ImageSize, "")
+		GUICtrlSetData($IMG_File, "")
+		$btimgfile = ""
+		$vhdfolder = ""
+		$vhdfile_name = ""
+		$vhdfile_name_only = ""
+		$image_file=""
+		$img_fext=""
+		$bootsdi = ""
+		$BTIMGSize=0
+		$img_folder = ""
+
+		$ContentSource = ""
+		$content_folder = ""
+		GUICtrlSetData($AddContentSource, "")
+		$ContentSize=0
+		GUICtrlSetData($GUI_ContentSize, "")
+
+		GUICtrlSetData($ProgressAll, 0)
+		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_ENABLE)
+		GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_ENABLE)
+
+		GUICtrlSetState($Boot_vhd, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
+		$w78sys=0
+
+		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
+		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
+		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_ENABLE)
+
+		GUICtrlSetState($TargetSel, $GUI_ENABLE)
+		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
+
+		GUICtrlSetState($Menu_Type, $GUI_DISABLE)
+
+		DisableMenus(0)
+	Else
+		Exit
+	EndIf
 
 EndFunc ;==> _Go
 ;===================================================================================================
@@ -2861,8 +2846,6 @@ Func _BT_IMG()
 		EndIf
 	EndIf
 
-	; GUICtrlSetData($ProgressAll, 80)
-
 	If GUICtrlRead($g4d_bcd) = $GUI_UNCHECKED And GUICtrlRead($xp_bcd) = $GUI_UNCHECKED And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
 		If $g4d Or $g4dmbr <> 0 Then
 			_g4d_bt_img_menu()
@@ -2877,12 +2860,10 @@ Func _BT_IMG()
 	If FileExists($TargetDrive & "\menu.lst") Then _g4d_bt_img_menu()
 
 	If $g4d_vista <> 0 Then
-		$mk_bcd = 1
 		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") Or Not FileExists($TargetDrive & "\NTDETECT.COM") Then
 			MsgBox(48, "WARNING - Missing File on Target Drive", " BOOTFONT.BIN Or NTDETECT.COM Not Found " & @CRLF & @CRLF _
 			& " Solution: Manually Add NTDETECT.COM to Target Drive ", 0)
 		EndIf
-		_bcd_menu()
 	EndIf
 
 EndFunc   ;==> _BT_IMG
@@ -2897,14 +2878,12 @@ Func _RC_IMG()
 		$path_image_file= $img_folder & "\" & $image_file
 	EndIf
 
-
 	$len = StringLen($image_file)
 	$pos = StringInStr($image_file, ".", 0, -1)
 	$img_fext = StringRight($image_file, $len-$pos)
 	$hd_cd = "/rdexportashd"
 ;	If $img_fext = "iso" Then $hd_cd = "/rdexportascd"
 ;	If $img_fext = "is_" Then $hd_cd = "/rdexportascd"
-
 
 	If FileExists($TargetDrive & "\RCLDR") Then	FileSetAttrib($TargetDrive & "\RCLDR", "-RSH")
 	If FileExists($TargetDrive & "\rcons.sif") Then FileSetAttrib($TargetDrive & "\rcons.sif", "-RSH")
@@ -2932,8 +2911,6 @@ Func _RC_IMG()
 
 	If FileExists(@ScriptDir & "\makebt\CATCH22") Then DirCopy(@ScriptDir & "\makebt\CATCH22", $TargetDrive & "\CATCH22", 1)
 
-	; GUICtrlSetData($ProgressAll, 80)
-
 	If GUICtrlRead($g4d_bcd) = $GUI_UNCHECKED And GUICtrlRead($xp_bcd) = $GUI_UNCHECKED And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
 		If $g4d Or $g4dmbr <> 0 Then
 			_g4d_rc_img_menu()
@@ -2948,87 +2925,13 @@ Func _RC_IMG()
 	If FileExists($TargetDrive & "\menu.lst") Then _g4d_rc_img_menu()
 
 	If $g4d_vista <> 0 Then
-		$mk_bcd = 1
 		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") Or Not FileExists($TargetDrive & "\NTDETECT.COM") Then
 			MsgBox(48, "WARNING - Missing File on Target Drive", " BOOTFONT.BIN Or NTDETECT.COM Not Found " & @CRLF & @CRLF _
 			& " Solution: Manually Add NTDETECT.COM to Target Drive ", 0)
 		EndIf
-		_bcd_menu()
 	EndIf
 
 EndFunc   ;==> _RC_IMG
-;===================================================================================================
-Func _SF_IMG()
-
-	If GUICtrlRead($g4d_bcd) = $GUI_UNCHECKED And GUICtrlRead($xp_bcd) = $GUI_UNCHECKED And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		If $g4d Or $g4dmbr <> 0 Then
-			_g4d_sf_img_menu()
-			Return
-		EndIf
-	EndIf
-
-	If FileExists($TargetDrive & "\grldr") And FileExists($TargetDrive & "\menu.lst") And $g4d_vista = 0 And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		_g4d_sf_img_menu()
-		Return
-	EndIf
-
-	If FileExists($TargetDrive & "\menu.lst") Then _g4d_sf_img_menu()
-
-	If $g4d_vista <> 0 Then
-		$mk_bcd = 1
-		_bcd_menu()
-	EndIf
-
-EndFunc   ;==> _SF_IMG
-;===================================================================================================
-Func _CD_ISO()
-
-	$DriveType=DriveGetType($TargetDrive)
-
-	If GUICtrlRead($g4d_bcd) = $GUI_UNCHECKED And GUICtrlRead($xp_bcd) = $GUI_UNCHECKED And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		If $g4d Or $g4dmbr <> 0 Then
-			_g4d_cd_iso_menu()
-			Return
-		EndIf
-	EndIf
-
-	If FileExists($TargetDrive & "\grldr") And FileExists($TargetDrive & "\menu.lst") And $g4d_vista = 0 And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		_g4d_cd_iso_menu()
-		Return
-	EndIf
-
-	If FileExists($TargetDrive & "\menu.lst") Then _g4d_cd_iso_menu()
-
-	If $g4d_vista <> 0 Then
-		$mk_bcd = 1
-		_bcd_menu()
-	EndIf
-
-EndFunc   ;==> _CD_ISO
-;===================================================================================================
-Func _HDD_IMG()
-
-	If GUICtrlRead($g4d_bcd) = $GUI_UNCHECKED And GUICtrlRead($xp_bcd) = $GUI_UNCHECKED And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		If $g4d Or $g4dmbr <> 0 Then
-			_g4d_hdd_img_menu()
-			Return
-		EndIf
-	EndIf
-
-	If FileExists($TargetDrive & "\grldr") And FileExists($TargetDrive & "\menu.lst") And $g4d_vista = 0 And GUICtrlRead($grldrUpd) = $GUI_UNCHECKED Then
-		FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
-		_g4d_hdd_img_menu()
-		Return
-	EndIf
-
-	If FileExists($TargetDrive & "\menu.lst") Then _g4d_hdd_img_menu()
-
-	If $g4d_vista <> 0 Then
-		$mk_bcd = 1
-		_bcd_menu()
-	EndIf
-
-EndFunc   ;==> _HDD_IMG
 ;===================================================================================================
 Func TogglePause()
 	$Paused = NOT $Paused
@@ -3253,14 +3156,7 @@ Func _g4d_hdd_img_menu()
 			FileWriteLine($TargetDrive & "\menu.lst", "# Sector-mapped disk")
 			FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
 			FileWriteLine($TargetDrive & "\menu.lst", "map /" & $entry_image_file & " (hd0)")
-			; FileWriteLine($TargetDrive & "\menu.lst", "# Dummy WinVBlock parameter disk")
-			; FileWriteLine($TargetDrive & "\menu.lst", "map --rd-size=2048")
-			; FileWriteLine($TargetDrive & "\menu.lst", "map --mem (rd)+4 (0x55)")
-			; FileWriteLine($TargetDrive & "\menu.lst", "# Commit mapped drives")
 			FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
-			; FileWriteLine($TargetDrive & "\menu.lst", "# Tell WinVBlock the filename to switch from sector-mapped to file-backed")
-			; FileWriteLine($TargetDrive & "\menu.lst", "write (0x55) #!GRUB4DOS\x00v=1\x00" & $entry_image_file & "\x00\x80\x00")
-			; FileWriteLine($TargetDrive & "\menu.lst", "# Boot Windows in Image file")
 			FileWriteLine($TargetDrive & "\menu.lst", "root (hd0,0)")
 			If GUICtrlRead($Menu_Type) = "XP - WinVBlock" Then
 				FileWriteLine($TargetDrive & "\menu.lst", "chainloader /ntldr")
@@ -3273,14 +3169,7 @@ Func _g4d_hdd_img_menu()
 		FileWriteLine($TargetDrive & "\menu.lst", "# Sector-mapped disk")
 		FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
 		FileWriteLine($TargetDrive & "\menu.lst", "map --top --mem /" & $entry_image_file & " (hd0)")
-		; FileWriteLine($TargetDrive & "\menu.lst", "# Dummy WinVBlock parameter disk")
-		; FileWriteLine($TargetDrive & "\menu.lst", "map --rd-size=2048")
-		; FileWriteLine($TargetDrive & "\menu.lst", "map --mem (rd)+4 (0x55)")
-		; FileWriteLine($TargetDrive & "\menu.lst", "# Commit mapped drives")
 		FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
-		; FileWriteLine($TargetDrive & "\menu.lst", "# Tell WinVBlock the filename to switch from sector-mapped to file-backed")
-		; FileWriteLine($TargetDrive & "\menu.lst", "write (0x55) #!GRUB4DOS\x00v=1\x00" & $entry_image_file & "\x00\x80\x00")
-		; FileWriteLine($TargetDrive & "\menu.lst", "# Boot Windows in Image file")
 		FileWriteLine($TargetDrive & "\menu.lst", "root (hd0,0)")
 		If GUICtrlRead($Menu_Type) = "XP - WinVBlock" Then
 			FileWriteLine($TargetDrive & "\menu.lst", "chainloader /ntldr")
@@ -3293,7 +3182,6 @@ Func _g4d_hdd_img_menu()
 			If $DriveSysType="Removable" Or $usbsys Then
 				If $FSvar_WinDrvDrive="NTFS" Then
 					FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "iftitle [if exist (hd0,0)/" & $entry_image_file & "] (hd0,0)/" & $entry_image_file & " - SVBus  FILEDISK - " & $BTIMGSize & " MB - map as (hd-1) for WIMBOOT")
-					; FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
 					FileWriteLine($TargetDrive & "\menu.lst", "map (hd0,0)/" & $entry_image_file & " (hd-1)")
 					FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
 					FileWriteLine($TargetDrive & "\menu.lst", "root (hd-1,0)")
@@ -3312,7 +3200,6 @@ Func _g4d_hdd_img_menu()
 					FileWriteLine($TargetDrive & "\menu.lst", "chainloader /bootmgr")
 				EndIf
 				FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "iftitle [if exist (hd0,1)/" & $entry_image_file & "] (hd0,1)/" & $entry_image_file & " - SVBus  RAMDISK  - " & $BTIMGSize & " MB - map as (hd-1) for WIMBOOT")
-				; FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
 				FileWriteLine($TargetDrive & "\menu.lst", "map --top --mem (hd0,1)/" & $entry_image_file & " (hd-1)")
 				FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
 				FileWriteLine($TargetDrive & "\menu.lst", "root (hd-1,0)")
@@ -3332,26 +3219,6 @@ Func _g4d_hdd_img_menu()
 				FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
 				FileWriteLine($TargetDrive & "\menu.lst", "root (hd-1,0)")
 				FileWriteLine($TargetDrive & "\menu.lst", "chainloader /bootmgr")
-;~ 				If $FSvar_WinDrvDrive="NTFS" Then
-;~ 					FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "title " & $entry_image_file & " - SVBus  FILEDISK - " & $BTIMGSize & " MB - map as disk+1 for WIMBOOT")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "root | set myroot=")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "set mydisk=%myroot:~3,1%")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "set /a mydisk=%mydisk%+1")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "map /" & $entry_image_file & " (hd%mydisk%)")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "root (hd%mydisk%,0)")
-;~ 					FileWriteLine($TargetDrive & "\menu.lst", "chainloader /bootmgr")
-;~ 				EndIf
-;~ 				FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "title " & $entry_image_file & " - SVBus  RAMDISK  - " & $BTIMGSize & " MB - map as disk+1 for WIMBOOT")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "find --set-root --ignore-floppies /" & $entry_image_file)
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "root | set myroot=")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "set mydisk=%myroot:~3,1%")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "set /a mydisk=%mydisk%+1")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "map --top --mem /" & $entry_image_file & " (hd%mydisk%)")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "map --hook")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "root (hd%mydisk%,0)")
-;~ 				FileWriteLine($TargetDrive & "\menu.lst", "chainloader /bootmgr")
 			EndIf
 		EndIf
 		If  $driver_flag = 2 Then
@@ -3428,27 +3295,15 @@ EndFunc   ;==> _g4d_hdd_img_menu
 Func _bcd_menu()
 	Local $file, $line, $guid, $pos1, $pos2
 
-	; If Not FileExists($TargetDrive & "\bootmgr") Then $mk_bcd = 2
-	If Not FileExists($TargetDrive & "\Boot\BCD") Then $mk_bcd = 2
-
 	; already set in _GO
 	; SystemFileRedirect("On")
 
 	If FileExists(@WindowsDir & "\system32\bcdedit.exe") Then
 		$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-	; Removed - In x86 OS with Target x64 W7 gives bcdedit is not valid 32-bits
-	;	ElseIf FileExists($TargetDrive & "\Windows\System32\bcdedit.exe") Then
-	;		$bcdedit = $TargetDrive & "\Windows\System32\bcdedit.exe"
-		;	If Not FileExists(@ScriptDir & "\makebt\bcdedit.exe") Then
-		;		FileCopy($TargetDrive & "\Windows\System32\bcdedit.exe", @ScriptDir & "\makebt\", 1)
-		;	EndIf
-	; 32-bits makebt\bcdedit.exe can be used in any case
-	;	ElseIf FileExists(@ScriptDir & "\makebt\bcdedit.exe") Then
-	;		$bcdedit = @ScriptDir & "\makebt\bcdedit.exe"
 	Else
-		$mk_bcd = 2
+		$bcdedit = ""
 	EndIf
-	If $mk_bcd = 1 And $bcdedit <> "" Then
+	If FileExists($TargetDrive & "\Boot\BCD") And $bcdedit <> "" Then
 		$store = $TargetDrive & "\Boot\BCD"
 
 		If GUICtrlRead($g4d_bcd) = $GUI_CHECKED Or Not FileExists($TargetDrive & "\grldr.mbr") Then
@@ -3456,7 +3311,7 @@ Func _bcd_menu()
 			If Not FileExists($TargetDrive & "\grldr.mbr") Or GUICtrlRead($grldrUpd) = $GUI_CHECKED Then FileCopy(@ScriptDir & "\makebt\grldr.mbr", $TargetDrive & "\", 1)
 
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-			& $store & " /create /d " & '"' & "Start GRUB4DOS" & '"' & " /application bootsector > makebt\bs_temp\bcd_out.txt", @ScriptDir, @SW_HIDE)
+			& $store & " /create /d " & '"' & "Grub4dos Menu" & '"' & " /application bootsector > makebt\bs_temp\bcd_out.txt", @ScriptDir, @SW_HIDE)
 			$file = FileOpen(@ScriptDir & "\makebt\bs_temp\bcd_out.txt", 0)
 			$line = FileReadLine($file)
 			FileClose($file)
@@ -3474,10 +3329,6 @@ Func _bcd_menu()
 					RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 					& $store & " /default " & $guid, $TargetDrive & "\", @SW_HIDE)
 				EndIf
-				;		MsgBox(0, "BOOTMGR - GRUB4DOS ENTRY in BCD OK ", "GRUB4DOS Boot Entry was made in Store " & $TargetDrive & "\Boot\BCD " & @CRLF & @CRLF _
-				;		& "Grub4Dos GUID in BCD Store = " & $guid, 3)
-				;	Else
-				;		MsgBox(48, "ERROR - GRUB4DOS GUID NOT Valid", "GRUB4DOS GUID NOT Found in BOOTMGR Menu", 3)
 			EndIf
 		EndIf
 
@@ -3494,7 +3345,7 @@ Func _bcd_menu()
 				'"Start Windows XP HD-1 Partition 1"' & " /noexecute=optin /fastdetect")
 				IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "multi(0)disk(0)rdisk(1)partition(2)" & $WinFol, _
 				'"Start Windows XP HD-1 Partition 2"' & " /noexecute=optin /fastdetect")
-				IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start GRUB4DOS - XP Menu"')
+				IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
 			EndIf
 			If Not FileExists($TargetDrive & "\BOOTFONT.BIN") Then
 				FileCopy(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN", $TargetDrive & "\", 1)
@@ -3550,7 +3401,7 @@ Func _bcd_grub2()
 		_GUICtrlStatusBar_SetText($hStatus," Making Grub2 - AIO grub2win Entry in Boot Manager Menu - wait ....", 0)
 
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-		& $store & " /create /d " & '"' & "Grub2 - AIO grub2win" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2.txt", @ScriptDir, @SW_HIDE)
+		& $store & " /create /d " & '"' & "Grub 2 Win - AIO grub2win" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2.txt", @ScriptDir, @SW_HIDE)
 		$file = FileOpen(@ScriptDir & "\makebt\bs_temp\bcd_grub2.txt", 0)
 		$line = FileReadLine($file)
 		FileClose($file)
@@ -3595,7 +3446,7 @@ Func _bcd_grub2win()
 		_GUICtrlStatusBar_SetText($hStatus," Making  Grub2Win Entry in Boot Manager Menu - wait ....", 0)
 
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
-		& $store & " /create /d " & '"' & "Grub 2 for Windows - Linux ISO" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2win.txt", @ScriptDir, @SW_HIDE)
+		& $store & " /create /d " & '"' & "Grub 2 Win - Linux ISO" & '"' & " /application bootsector > makebt\bs_temp\bcd_grub2win.txt", @ScriptDir, @SW_HIDE)
 		$file = FileOpen(@ScriptDir & "\makebt\bs_temp\bcd_grub2win.txt", 0)
 		$line = FileReadLine($file)
 		FileClose($file)

@@ -1,12 +1,6 @@
 iftitle [if exist /bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM
 chainloader /bootmgr
 
-title Grub4dos Menu
-configfile /menu.lst
-
-title Reboot Main Menu
-chainloader (hd0)+1
-
 iftitle [if exist %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso] ISO Linux Mint - %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso
 set iso_path=/images/linuxmint-19.3-cinnamon-64bit.iso
 map %iso_drive%%iso_path% (0xff)
@@ -182,3 +176,18 @@ map --hook
 root (0xff)
 kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
 initrd /boot/syslinux/initrd.xz
+
+iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
+chainloader (hd1,0)/bootmgr
+
+title Grub4dos Menu
+configfile /menu.lst
+
+title Reboot Main Menu
+chainloader (hd0)+1
+
+title Reboot
+reboot
+
+title Switch Off
+halt

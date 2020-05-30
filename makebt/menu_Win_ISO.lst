@@ -1,0 +1,65 @@
+iftitle [if exist (hd0,0)/bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM - (hd0,0)/bootmgr
+chainloader (hd0,0)/bootmgr
+
+iftitle [if exist (hd0,1)/bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM - (hd0,1)/bootmgr
+chainloader (hd0,1)/bootmgr
+
+iftitle [if exist %iso_drive%/images/Win10XPE_x64.ISO] Win10XPE_x64 ISO - %iso_drive%/images/Win10XPE_x64.ISO
+map %iso_drive%/images/Win10XPE_x64.ISO (0xff) || map --mem %iso_drive%/images/Win10XPE_x64.ISO (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
+iftitle [if exist %iso_drive%/images/WinPE.iso] WinPE.iso  - ISO - %iso_drive%/images/WinPE.iso
+map %iso_drive%/images/WinPE.iso (0xff) || map --mem %iso_drive%/images/WinPE.iso (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
+iftitle [if exist %iso_drive%/images/memtest.bin] MemTest86+ - %iso_drive%/images/memtest.bin
+kernel %iso_drive%/images/memtest.bin
+
+iftitle [if exist %iso_drive%/images/7pe_x86_E.iso] 7PE - %iso_drive%/images/7pe_x86_E.iso
+map  %iso_drive%/images/7pe_x86_E.iso (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)/BOOTMGR || chainloader (0xff)/bootmgr
+
+iftitle [if exist %iso_drive%/images/7pe_amd64_E.iso] 7PE - %iso_drive%/images/7pe_amd64_E.iso
+map %iso_drive%/images/7pe_amd64_E.iso (0xFF)
+map --hook
+chainloader (0xFF)
+
+iftitle [if exist %iso_drive%/images/LiveXP_WIM.iso] Live XP - %iso_drive%/images/LiveXP_WIM.iso
+map %iso_drive%/images/LiveXP_WIM.iso (0xff) || map --mem %iso_drive%/images/LiveXP_WIM.iso (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
+iftitle [if exist %iso_drive%/images/LiveXP_RAM.iso] Live XP - %iso_drive%/images/LiveXP_RAM.iso
+map %iso_drive%/images/LiveXP_RAM.iso (0xff) || map --mem %iso_drive%/images/LiveXP_RAM.iso (0xff)
+map --hook
+root (0xff)
+chainloader (0xff)
+
+iftitle [if exist %iso_drive%/images/HDDR2011.gz] Hard Disk Drive Regenerator 2011 - %iso_drive%/images/HDDR2011.gz
+map --mem %iso_drive%/images/HDDR2011.gz (0xFF)
+map --hook
+chainloader (0xFF)
+
+iftitle [if exist %iso_drive%/images/HDDR2013.gz] Hard Disk Drive Regenerator 2013 - %iso_drive%/images/HDDR2013.gz
+map --mem %iso_drive%/images/HDDR2011.gz (0xFF)
+map --hook
+chainloader (0xFF)
+
+iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
+chainloader (hd1,0)/bootmgr
+
+title Reboot Main Menu
+chainloader (hd0)+1
+
+title Reboot
+reboot
+
+title Switch Off
+halt
