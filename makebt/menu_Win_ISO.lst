@@ -16,6 +16,10 @@ map --hook
 root (0xff)
 chainloader (0xff)
 
+title VHDs menu
+find --set-root /vhds.lst
+configfile /vhds.lst
+
 iftitle [if exist %iso_drive%/images/memtest.bin] MemTest86+ - %iso_drive%/images/memtest.bin
 kernel %iso_drive%/images/memtest.bin
 

@@ -177,6 +177,10 @@ root (0xff)
 kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
 initrd /boot/syslinux/initrd.xz
 
+title AIO Linux OS
+find --set-root /AIO/Menu/Linux.lst
+configfile /AIO/Menu/Linux.lst
+
 iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
 chainloader (hd1,0)/bootmgr
 

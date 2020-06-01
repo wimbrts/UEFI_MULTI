@@ -15,33 +15,13 @@ chainloader (hd0,0)/bootmgr
 iftitle [if exist (hd0,1)/bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM - (hd0,1)/bootmgr
 chainloader (hd0,1)/bootmgr
 
-iftitle [if exist (hd0,0)/Win10XPE_x64.ISO || (hd0,1)/Win10XPE_x64.ISO] Win10XPE_x64 ISO or ISO from RAM
-find --set-root --ignore-floppies /Win10XPE_x64.ISO
-map /Win10XPE_x64.ISO (0xff) || map --mem /Win10XPE_x64.ISO (0xff)
-map --hook
-root (0xff)
-chainloader (0xff)
-
-iftitle [if exist (hd0,0)/WinPE.iso || (hd0,1)/WinPE.iso] WinPE.iso - ISO or ISO from RAM
-find --set-root --ignore-floppies /WinPE.iso
-map /WinPE.iso (0xff) || map --mem /WinPE.iso (0xff)
-map --hook
-root (0xff)
-chainloader (0xff)
-
-title VHDs menu
-find --set-root /vhds.lst
-configfile /vhds.lst
-
-iftitle [if exist (hd0,0)/grubfm.iso || (hd0,1)/grubfm.iso] Grub2 File Manager of a1ive - /grubfm.iso
-find --set-root /grubfm.iso
-map --mem /grubfm.iso (0xff)
+iftitle [if exist (hd0,0)/grubfm.iso] Grub2 File Manager of a1ive - (hd0,0)/grubfm.iso
+map --mem (hd0,0)/grubfm.iso (0xff)
 map --hook
 chainloader (0xff)
 
-iftitle [if exist (hd0,0)/grubfm_multiarch.iso || (hd0,1)/grubfm_multiarch.iso] Grub2 File Manager of a1ive - /grubfm_multiarch.iso
-find --set-root /grubfm_multiarch.iso
-map --mem /grubfm_multiarch.iso
+iftitle [if exist (hd0,0)/grubfm_multiarch.iso] Grub2 File Manager of a1ive - (hd0,0)/grubfm_multiarch.iso
+map --mem (hd0,0)/grubfm_multiarch.iso
 map --hook
 chainloader (0xff)
 
@@ -69,10 +49,6 @@ iftitle [ls (hd0,0)/iso] Linux   ISO Menu - (hd0,0)/iso
 set iso_drive=(hd0,0)
 find --set-root /menu_Linux.lst
 configfile /menu_Linux.lst
-
-title AIO Linux OS
-find --set-root /AIO/Menu/Linux.lst
-configfile /AIO/Menu/Linux.lst
 
 iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
 chainloader (hd1,0)/bootmgr

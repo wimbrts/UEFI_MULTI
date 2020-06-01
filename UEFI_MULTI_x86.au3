@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  May 28, 2020
+ Author:        WIMB  -  June 01, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 4.3 in rule 176
+ Program:       UEFI_MULTI_x86.exe - Version 4.4 in rule 176
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -72,7 +72,7 @@ Opt("TrayIconHide", 1)
 ; Setting variables
 Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR"
 Global $btimgfile="", $pe_nr=1, $hStatus, $pausecopy=0, $TargetSpaceAvail=0, $TargetSize, $TargetFree, $FSvar_WinDrvDrive="", $g4d=0, $bm_flag = 0, $g4dmbr=0
-Global $hGuiParent, $GO, $EXIT, $SourceDir, $Source, $TargetSel, $Target, $image_file="", $img_fext="", $grldrUpd, $g4d_bcd, $xp_bcd
+Global $hGuiParent, $GO, $EXIT, $SourceDir, $Source, $TargetSel, $Target, $image_file="", $img_fext="", $grldrUpd, $g4d_bcd, $xp_bcd, $g4d_default = 0
 Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_BS=1, $refind, $Menu_Type
 Global $DriveType="Fixed", $usbfix=0, $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = ""
 Global $vhdfolder = "", $vhdfile_name = "", $vhdfile_name_only = "", $img_folder = ""
@@ -173,9 +173,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x86 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 4.3  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.4  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 4.3  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.4  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
@@ -558,6 +558,7 @@ Func _img_fsel()
 			MsgBox(48,"ERROR - Boot Image File Selection Not Valid", "Boot Image Not in root Or rootfolder max 8 chars" & @CRLF & @CRLF & "Selected Boot Image = " & $btimgfile & @CRLF & @CRLF _
 			& "Select Boot Image in folder max 8 chars Or in root of " & @CRLF & @CRLF _
 			& "USB Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+			$image_file = ""
 			$btimgfile = ""
 			DisableMenus(0)
 			Return
@@ -573,6 +574,8 @@ Func _img_fsel()
 	If $img_fext = "iso" Or $img_fext = "is_" Then
 		If $len > 30 Or StringRegExp($img_fname, "[^A-Z0-9a-z-_.]") Or StringRegExp($img_fext, "[^A-Za-z_]") Then
 			MsgBox(48, " FileName NOT Valid ", "Selected = " & $image_file & @CRLF & @CRLF & "Max 26.3 FileName with  " & @CRLF & "Characters 0-9 A-Z a-z - _  ")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
 			DisableMenus(0)
 			Return
@@ -581,6 +584,8 @@ Func _img_fsel()
 		If $len > 12 Or StringRegExp($img_fname, "[^A-Z0-9a-z-_]") Or StringRegExp($img_fext, "[^A-Za-z_]") Then
 			MsgBox(48, " File or FileName NOT Valid ", "Selected = " & $image_file & @CRLF & @CRLF _
 			& "IMG FileNames must be conform DOS 8.3 " & @CRLF & "Allowed Characters 0-9 A-Z a-z - _  ")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
 			DisableMenus(0)
 			Return
@@ -595,7 +600,12 @@ Func _img_fsel()
 		If StringLeft($btimgfile, 2) <> $WinDrvDrive Then
 			MsgBox(48,"ERROR - VHD is Not on System Drive", "VHD File Selection Invalid" & @CRLF & @CRLF & "Selected VHD File = " & $btimgfile & @CRLF & @CRLF _
 			& "Copy VHD to Root Or Folder max 8 chars on System Drive " & $WinDrvDrive)
+			GUICtrlSetData($ImageSize, "")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
 			DisableMenus(0)
 			Return
 		EndIf
@@ -604,7 +614,12 @@ Func _img_fsel()
 				; OK
 			Else
 				MsgBox(48,"ERROR - Old Windows Version", "VHDX Only Supported in Win 8/10" & @CRLF & @CRLF & "Selected VHD File = " & $btimgfile)
+				GUICtrlSetData($ImageSize, "")
+				$image_file = ""
+				$img_fext=""
 				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			EndIf
@@ -616,7 +631,12 @@ Func _img_fsel()
 			If $posfol <> 3 Or $pos > 12 Then
 				MsgBox(48,"ERROR - VHD File Selection Not Valid", "VHD Not in root Or rootfolder max 8 chars" & @CRLF & @CRLF & "Selected VHD File = " & $btimgfile & @CRLF & @CRLF _
 				& "Select VHD in folder max 8 chars Or in root of System Drive " & $WinDrvDrive)
+				GUICtrlSetData($ImageSize, "")
+				$image_file = ""
+				$img_fext=""
 				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			Else
@@ -644,13 +664,32 @@ Func _img_fsel()
 			EndIf
 		EndIf
 	ElseIf $img_fext = "iso" Or $img_fext = "is_" Then
+		If $PartStyle = "GPT" Then
+			MsgBox(48,"ERROR - GPT as Boot Drive Not Valid", "Grub4dos Not supported for GPT Drive" & @CRLF & @CRLF & "Selected ISO File = " & $btimgfile & @CRLF & @CRLF _
+			& "Select MBR Boot Drive " & @CRLF & @CRLF _
+			& "Boot Drive = " & $TargetDrive & "    System Drive = " & $WinDrvDrive)
+			GUICtrlSetData($ImageSize, "")
+			$image_file = ""
+			$img_fext=""
+			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
+			DisableMenus(0)
+			Return
+		EndIf
+
 		RunWait(@ComSpec & " /c makebt\dsfo.exe " & '"' & $btimgfile & '"' & " 43008 512 makebt\bs_temp\iso_43008_512.bs", @ScriptDir, @SW_HIDE)
 		$pos3 = HexSearch(@ScriptDir & "\makebt\bs_temp\iso_43008_512.bs", "WINSXS", 16, 0)
 		If $pos3 Then
 			If StringLeft($btimgfile, 2) <> $TargetDrive Then
 				MsgBox(48,"ERROR - BartPE ISO is Not on USB Boot Drive", "ISO File Selection Invalid" & @CRLF & @CRLF & "Selected ISO File = " & $btimgfile & @CRLF & @CRLF _
 				& "Copy ISO to Root Or Folder max 8 chars on Boot Drive " & $TargetDrive)
+				GUICtrlSetData($ImageSize, "")
+				$image_file = ""
+				$img_fext=""
 				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			EndIf
@@ -660,8 +699,13 @@ Func _img_fsel()
 			If StringLeft($btimgfile, 2) <> $WinDrvDrive And StringLeft($btimgfile, 2) <> $TargetDrive Then
 				MsgBox(48,"ERROR - ISO is Not on USB Boot Or System Drive", "ISO File Selection Invalid" & @CRLF & @CRLF & "Selected ISO File = " & $btimgfile & @CRLF & @CRLF _
 				& "Copy ISO to Root Or Folder max 8 chars on " & @CRLF & @CRLF _
-				& "USB Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+				& "Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+				GUICtrlSetData($ImageSize, "")
+				$image_file = ""
+				$img_fext=""
 				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			EndIf
@@ -687,6 +731,7 @@ Func _img_fsel()
 			$img_fext=""
 			$bootsdi = ""
 			$BTIMGSize=0
+			$img_folder = ""
 			SystemFileRedirect("Off")
 			MsgBox(48, "WARNING - bcdedit.exe is missing ", "Unable to Add WIM to Boot Manager Menu " & @CRLF & @CRLF _
 			& "Need Windows 7/8/10 Or PE to Add WIM to Boot Manager " & @CRLF & @CRLF & " Boot with Windows 7/8/10 or PE ", 5)
@@ -696,8 +741,13 @@ Func _img_fsel()
 		If StringLeft($btimgfile, 2) <> $WinDrvDrive And StringLeft($btimgfile, 2) <> $TargetDrive Then
 			MsgBox(48,"ERROR - WIM is Not on USB Boot Or System Drive", "WIM File Selection Invalid" & @CRLF & @CRLF & "Selected WIM File = " & $btimgfile & @CRLF & @CRLF _
 			& "Copy WIM to Root Or Folder max 8 chars on " & @CRLF & @CRLF _
-			& "USB Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+			& "Boot Drive " & $TargetDrive & "  Or  System Drive " & $WinDrvDrive)
+			GUICtrlSetData($ImageSize, "")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
 			DisableMenus(0)
 			Return
 		EndIf
@@ -722,10 +772,29 @@ Func _img_fsel()
 		$valid = 1
 		GUICtrlSetData($ImageType, "WinPE - WIM")
 	Else
+		If $PartStyle = "GPT" Then
+			MsgBox(48,"ERROR - GPT as Boot Drive Not Valid", "Grub4dos Not supported for GPT Drive" & @CRLF & @CRLF & "Selected ISO File = " & $btimgfile & @CRLF & @CRLF _
+			& "Select MBR Boot Drive " & @CRLF & @CRLF _
+			& "Boot Drive = " & $TargetDrive & "    System Drive = " & $WinDrvDrive)
+			GUICtrlSetData($ImageSize, "")
+			$image_file = ""
+			$img_fext=""
+			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
+			DisableMenus(0)
+			Return
+		EndIf
+
 		If StringLeft($btimgfile, 2) <> $TargetDrive Then
 			MsgBox(48,"ERROR - IMG is Not on USB Boot Drive", "IMG File Selection Invalid" & @CRLF & @CRLF & "Selected IMG File = " & $btimgfile & @CRLF & @CRLF _
 			& "Copy IMG to Root Or Folder max 8 chars on Boot Drive " & $TargetDrive)
+			GUICtrlSetData($ImageSize, "")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
 			DisableMenus(0)
 			Return
 		EndIf
@@ -737,12 +806,15 @@ Func _img_fsel()
 			If $BTIMGSize >= 500 And $BTIMGSize < 3600 Then
 				$valid = 0
 				MsgBox(48, " WARNING - SuperFloppy Image - MBR is missing ", "Selected = " & $btimgfile & @CRLF & @CRLF _
-					& "Image Size = " & $BTIMGSize & " MB " & @CRLF & @CRLF _
-					& "SuperFloppy Image - NTFS or FAT in BootSector Found " & @CRLF & @CRLF _
-					& "Image Not Bootable from FiraDisk RAMDISK ", 0)
-				$btimgfile = ""
-				GUICtrlSetData($ImageType, "")
+				& "Image Size = " & $BTIMGSize & " MB " & @CRLF & @CRLF _
+				& "SuperFloppy Image - NTFS or FAT in BootSector Found " & @CRLF & @CRLF _
+				& "Image Not Bootable from FiraDisk RAMDISK ", 0)
 				GUICtrlSetData($ImageSize, "")
+				$image_file = ""
+				$img_fext=""
+				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			EndIf
@@ -790,7 +862,14 @@ Func _img_fsel()
 		GUICtrlSetData($ImageSize, "")
 		GUICtrlSetData($ImageType, "")
 		GUICtrlSetState($Boot_vhd, $GUI_UNCHECKED + $GUI_DISABLE)
+		$vhdfolder = ""
+		$vhdfile_name = ""
+		$vhdfile_name_only = ""
+		$image_file = ""
+		$img_fext=""
 		$btimgfile = ""
+		$BTIMGSize=0
+		$img_folder = ""
 		DisableMenus(0)
 		Return
 	EndIf
@@ -811,7 +890,11 @@ Func _img_fsel()
 			$valid = 0
 			GUICtrlSetData($ImageSize, "")
 			GUICtrlSetData($ImageType, "")
+			$image_file = ""
+			$img_fext=""
 			$btimgfile = ""
+			$BTIMGSize=0
+			$img_folder = ""
 			DisableMenus(0)
 			Return
 		EndIf
@@ -827,7 +910,11 @@ Func _img_fsel()
 				$valid = 0
 				GUICtrlSetData($ImageSize, "")
 				GUICtrlSetData($ImageType, "")
+				$image_file = ""
+				$img_fext=""
 				$btimgfile = ""
+				$BTIMGSize=0
+				$img_folder = ""
 				DisableMenus(0)
 				Return
 			EndIf
@@ -845,7 +932,11 @@ Func _img_fsel()
 		GUICtrlSetData($ImageSize, "")
 		GUICtrlSetData($ImageType, "")
 		GUICtrlSetData($IMG_File, "")
+		$image_file = ""
+		$img_fext=""
 		$btimgfile = ""
+		$BTIMGSize=0
+		$img_folder = ""
 	EndIf
 	DisableMenus(0)
 EndFunc   ;==> _img_fsel
@@ -1358,7 +1449,7 @@ Func _wim_menu()
 
 	; and for efi
 	$store = $TargetDrive & "\efi\microsoft\boot\BCD"
-	If Not FileExists($TargetDrive & "\efi\microsoft\boot\BCD") Then
+	If Not FileExists($TargetDrive & "\efi\microsoft\boot\BCD") And $PartStyle = "GPT" Then
 		If Not FileExists($TargetDrive & "\efi\boot") Then DirCreate($TargetDrive & "\efi\boot")
 		If Not FileExists($TargetDrive & "\efi\microsoft\boot") Then DirCreate($TargetDrive & "\efi\microsoft\boot")
 		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts") Then DirCreate($TargetDrive & "\efi\microsoft\boot\fonts")
@@ -2021,6 +2112,19 @@ Func _Go()
 		FileClose($file)
 	EndIf
 
+	If $usbfix = 0 Then
+		$ikey = MsgBox(48+4+256, "WARNING - Boot Drive is NOT USB", "Boot Drive is NOT USB Drive" & @CRLF & @CRLF & _
+		"Target Boot Drive = " & $TargetDrive & "   HDD = " & $inst_disk & "   PART = " & $inst_part & @CRLF & @CRLF _
+		& "Modify the Booting of your Computer ? " & @CRLF & @CRLF _
+		& "Are You Sure ? - This is an Internal Harddisk ! ")
+		If $ikey <> 6 Then
+			GUICtrlSetData($ProgressAll, 0)
+			DisableMenus(0)
+			_GUICtrlStatusBar_SetText($hStatus," First Select Target Drives and then Sources", 0)
+			Return
+		EndIf
+	EndIf
+
 	GUICtrlSetData($ProgressAll, 30)
 	_GUICtrlStatusBar_SetText($hStatus," Checking MBR BootCode - Wait ... ", 0)
 
@@ -2031,6 +2135,7 @@ Func _Go()
 ;~ 			"Target Drive = " & $TargetDrive & "   HDD = " & $inst_disk & "   PART = " & $inst_part)
 ;~ 			Exit
 ;~ 		EndIf
+
 
 	If $inst_disk <> "" And $inst_part <> "" And $PartStyle = "MBR" Then
 		RunWait(@ComSpec & " /c makebt\dsfo.exe \\.\PHYSICALDRIVE" & $inst_disk & " 0 512 makebt\bs_temp\hd_" & $inst_disk & ".mbr", @ScriptDir, @SW_HIDE)
@@ -2161,8 +2266,9 @@ Func _Go()
 		If FileExists(@ScriptDir & "\makebt\Uefi_Multi.ico") And Not FileExists($WinDrvDrive & "\Uefi_Multi.ico") Then FileCopy(@ScriptDir & "\makebt\Uefi_Multi.ico", $WinDrvDrive & "\")
 	EndIf
 
-	; Update existing grldr and grldr.mbr
+	; Update existing grldr and grldr.mbr - Set Grub4dos entry default
 	If GUICtrlRead($grldrUpd) = $GUI_CHECKED And $PartStyle = "MBR" Then
+		If $DriveType="Removable" Or $usbfix Then $g4d_default = 1
 		; If FileExists($TargetDrive & "\grldr") Then
 		; 	FileSetAttrib($TargetDrive & "\grldr", "-RSH")
 		; 	FileCopy($TargetDrive & "\grldr", $TargetDrive & "\grldr_old")
@@ -2190,7 +2296,7 @@ Func _Go()
 		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 	EndIf
 
-	; NTLD BootSector XP
+	; NTLDR BootSector XP
 	If $g4d_vista = 0 And $PartStyle = "MBR" Then
 		If FileExists($TargetDrive & "\boot.ini") Then
 			FileSetAttrib($TargetDrive & "\boot.ini", "-RSH")
@@ -2221,9 +2327,10 @@ Func _Go()
 		EndIf
 	EndIf
 
+	SystemFileRedirect("On")
+
 	; Create Windows BootManager Menu on USB if BCD Not exist
 	If $DriveType="Removable" Or $usbfix Then
-		SystemFileRedirect("On")
 		If Not FileExists($TargetDrive & "\Boot\BCD") Or Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
 			If FileExists(@WindowsDir & "\system32\bcdboot.exe") Then
 				_WinLang()
@@ -2261,8 +2368,49 @@ Func _Go()
 				FileMove($TargetDrive & "\efi\boot\bootmgfw.efi", $TargetDrive & "\efi\boot\bootia32.efi", 1)
 			EndIf
 		EndIf
-		SystemFileRedirect("Off")
+	Else
+		If FileExists(@WindowsDir & "\system32\bcdedit.exe") And $PartStyle = "MBR" Then
+			$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
+
+			If Not FileExists($TargetDrive & "\Boot\BCD") Then
+				DirCopy(@WindowsDir & "\Boot\PCAT", $TargetDrive & "\Boot", 1)
+				DirCopy(@WindowsDir & "\Boot\Fonts", $TargetDrive & "\Boot\Fonts", 1)
+				DirCopy(@WindowsDir & "\Boot\Resources", $TargetDrive & "\Boot\Resources", 1)
+				If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi") Then
+					FileCopy(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi", $TargetDrive & "\Boot\", 1)
+				EndIf
+				FileMove($TargetDrive & "\Boot\bootmgr", $TargetDrive & "\bootmgr", 1)
+				FileMove($TargetDrive & "\Boot\bootnxt", $TargetDrive & "\BOOTNXT", 1)
+
+				$store = $TargetDrive & "\Boot\BCD"
+				RunWait(@ComSpec & " /c " & $bcdedit & " /createstore " & $store, $TargetDrive & "\", @SW_HIDE)
+				sleep(1000)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create {bootmgr}", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} description " & '"' & "Windows Boot Manager" & '"', $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} device boot", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} inherit {globalsettings}", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} timeout 20", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} toolsdisplayorder {memdiag}", $TargetDrive & "\", @SW_HIDE)
+				; sleep(1000)
+
+;~ 					$winload = "winload.exe"
+;~ 					$bcd_guid_outfile = "makebt\bs_temp\hdd_crea_win_guid.txt"
+;~ 					_win_boot_menu()
+
+				$sdi_guid_outfile = "makebt\bs_temp\hdd_crea_sdi_guid.txt"
+				$bcd_guid_outfile = "makebt\bs_temp\hdd_crea_pe_guid.txt"
+				_pe_boot_menu()
+
+				_mem_boot_menu()
+
+				$g4d_default = 1
+				$bcdboot_flag = 1
+
+			EndIf
+		EndIf
 	EndIf
+
+	SystemFileRedirect("Off")
 
 	If GUICtrlRead($ImageType) = "LiveXP BootSDI - IMG" Or GUICtrlRead($ImageType) = "BartPE - ISO" Or GUICtrlRead($ImageType) = "XP Rec Cons - IMG" Then
 		If $g4d_vista And Not FileExists($TargetDrive & "\BOOTFONT.BIN") And Not FileExists(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN") Then
@@ -2419,14 +2567,6 @@ Func _Go()
 		EndIf
 	EndIf
 
-	; Add always Boot\boot.sdi for PE WIM and Boot\bootvhd.dll for booting VHD in BIOS mode
-	If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi") Then
-		FileCopy(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi", $TargetDrive & "\Boot\", 1)
-	EndIf
-	If Not FileExists($TargetDrive & "\Boot\bootvhd.dll") And FileExists(@WindowsDir & "\Boot\PCAT\bootvhd.dll") Then
-		FileCopy(@WindowsDir & "\Boot\PCAT\bootvhd.dll", $TargetDrive & "\Boot\", 1)
-	EndIf
-
 	SystemFileRedirect("Off")
 	If $DriveType="Removable" Or $usbfix And GUICtrlRead($refind) = $GUI_CHECKED Then
 		If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootx64.efi") Then
@@ -2561,6 +2701,16 @@ Func _Go()
 		FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
 	EndIf
 
+	; Add always Boot\boot.sdi for PE WIM and Boot\bootvhd.dll for booting VHD in BIOS mode
+	If FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
+		If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi") Then
+			FileCopy(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi", $TargetDrive & "\Boot\", 9)
+		EndIf
+		If Not FileExists($TargetDrive & "\Boot\bootvhd.dll") And FileExists(@WindowsDir & "\Boot\PCAT\bootvhd.dll") Then
+			FileCopy(@WindowsDir & "\Boot\PCAT\bootvhd.dll", $TargetDrive & "\Boot\", 9)
+		EndIf
+	EndIf
+
 	SystemFileRedirect("Off")
 
 	GUICtrlSetData($ProgressAll, 90)
@@ -2568,25 +2718,27 @@ Func _Go()
 
 	GUICtrlSetData($ProgressAll, 100)
 
-	If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
-		_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x64 needs file bootx64.efi ", 0)
-		MsgBox(64, " WARNING - UEFI x64 needs file bootx64.efi ", " BIOS boot OK, but UEFI x64 needs file efi\boot\bootx64.efi " & @CRLF & @CRLF _
-		& $TargetDrive & "\efi\boot\bootx64.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
-		& " Get from Win 8/10 x64 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
-		& " Copy file bootmgfw.efi as bootx64.efi in " & $TargetDrive & "\efi\boot" )
+	If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" Then
+		If FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
+			_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x64 needs file bootx64.efi ", 0)
+			MsgBox(64, " WARNING - UEFI x64 needs file bootx64.efi ", " UEFI x64 needs file efi\boot\bootx64.efi " & @CRLF & @CRLF _
+			& $TargetDrive & "\efi\boot\bootx64.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
+			& " Get from Win 8/10 x64 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
+			& " Copy file bootmgfw.efi as bootx64.efi in " & $TargetDrive & "\efi\boot" )
+		EndIf
 	EndIf
-	If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
-		_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x86 needs file bootia32.efi ", 0)
-		MsgBox(64, " WARNING - UEFI x86 needs file bootia32.efi ", " BIOS boot OK, but UEFI x86 needs file efi\boot\bootia32.efi " & @CRLF & @CRLF _
-		& $TargetDrive & "\efi\boot\bootia32.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
-		& " Get from Win 8/10 x86 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
-		& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
-	EndIf
+;~ 		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
+;~ 			_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x86 needs file bootia32.efi ", 0)
+;~ 			MsgBox(64, " WARNING - UEFI x86 needs file bootia32.efi ", " BIOS boot OK, but UEFI x86 needs file efi\boot\bootia32.efi " & @CRLF & @CRLF _
+;~ 			& $TargetDrive & "\efi\boot\bootia32.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
+;~ 			& " Get from Win 8/10 x86 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
+;~ 			& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
+;~ 		EndIf
 
-	If Not FileExists($TargetDrive & "\bootmgr") And $PartStyle = "MBR" Then
-		MsgBox(64, " WARNING - bootmgr is missing ", $TargetDrive & "\bootmgr is missing on Target Boot Drive " & @CRLF & @CRLF _
-		& " Manually add file bootmgr from Win 7/8/10 to Drive " & $TargetDrive)
-	EndIf
+;~ 		If Not FileExists($TargetDrive & "\bootmgr") And $PartStyle = "MBR" Then
+;~ 			MsgBox(64, " WARNING - bootmgr is missing ", $TargetDrive & "\bootmgr is missing on Target Boot Drive " & @CRLF & @CRLF _
+;~ 			& " Manually add file bootmgr from Win 7/8/10 to Drive " & $TargetDrive)
+;~ 		EndIf
 
 	_GUICtrlStatusBar_SetText($hStatus," End of Program Or Again ?", 0)
 	$ikey = MsgBox(48+4+256, " END OF PROGRAM Or Again ? ", " End of Program  - OK - Enter to Finish " & @CRLF _
@@ -3325,7 +3477,7 @@ Func _bcd_menu()
 				& $store & " /set " & $guid & " path \grldr.mbr", $TargetDrive & "\", @SW_HIDE)
 				RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 				& $store & " /displayorder " & $guid & " /addlast", $TargetDrive & "\", @SW_HIDE)
-				If $DriveType="Removable" Or $usbfix And GUICtrlRead($grldrUpd) = $GUI_CHECKED Then
+				If $g4d_default = 1 Then
 					RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 					& $store & " /default " & $guid, $TargetDrive & "\", @SW_HIDE)
 				EndIf
