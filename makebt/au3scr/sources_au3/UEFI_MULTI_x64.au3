@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  June 01, 2020
+ Author:        WIMB  -  June 08, 2020
 
- Program:       UEFI_MULTI_x64.exe - Version 4.4 in rule 176
+ Program:       UEFI_MULTI_x64.exe - Version 4.5 in rule 176
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -173,9 +173,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 4.4  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.5  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 4.4  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.5  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
@@ -500,7 +500,7 @@ Func _WinAPI_GetFirmwareEnvironmentVariable()
         Case 998
             Return "UEFI"
         Case Else
-            Return "UNKNOWN"
+            Return "UEFI"
     EndSwitch
 EndFunc   ;==>_WinAPI_GetFirmwareEnvironmentVariable
 ;===================================================================================================
