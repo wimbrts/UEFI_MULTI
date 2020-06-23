@@ -21,7 +21,7 @@ map --hook
 chainloader (0xff)
 
 iftitle [if exist (hd0,0)/grubfm_multiarch.iso] Grub2 File Manager of a1ive - (hd0,0)/grubfm_multiarch.iso
-map --mem (hd0,0)/grubfm_multiarch.iso
+map --mem (hd0,0)/grubfm_multiarch.iso (0xff)
 map --hook
 chainloader (0xff)
 

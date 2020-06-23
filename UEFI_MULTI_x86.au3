@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  June 08, 2020
+ Author:        WIMB  -  June 21, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 4.5 in rule 176
+ Program:       UEFI_MULTI_x86.exe - Version 4.5 in rule 178
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
 	can be used to Copy Content Folder or Source Drive to Target Drive Or Folder - Allows to copy USB-drives
@@ -70,15 +70,15 @@ Opt("GuiOnEventMode", 1)
 Opt("TrayIconHide", 1)
 
 ; Setting variables
-Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR"
+Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR", $SysStyle = "MBR"
 Global $btimgfile="", $pe_nr=1, $hStatus, $pausecopy=0, $TargetSpaceAvail=0, $TargetSize, $TargetFree, $FSvar_WinDrvDrive="", $g4d=0, $bm_flag = 0, $g4dmbr=0
 Global $hGuiParent, $GO, $EXIT, $SourceDir, $Source, $TargetSel, $Target, $image_file="", $img_fext="", $grldrUpd, $g4d_bcd, $xp_bcd, $g4d_default = 0
 Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_BS=1, $refind, $Menu_Type
-Global $DriveType="Fixed", $usbfix=0, $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = ""
+Global $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = ""
 Global $vhdfolder = "", $vhdfile_name = "", $vhdfile_name_only = "", $img_folder = ""
 
 Global $driver_flag=3, $vhdmp=0, $SysWOW64=0, $WinFol="\Windows", $winload_flag=0, $PE_flag = 0, $WinDir_PE="D:\Windows", $WinDir_PE_flag=0, $WimOnSystemDrive = 0
-Global $bcdedit="", $winload = "winload.exe", $store = "", $DistLang = "en-US", $WinLang = "en-US", $bcdboot_flag = 0, $ventoy = 0
+Global $bcdedit="", $winload = "winload.exe", $store = "", $DistLang = "en-US", $WinLang = "en-US", $bcdboot_flag = 0, $ventoy = 0, $Target_MBR_FAT32 = 0
 
 Global $bcd_guid_outfile = "makebt\bs_temp\crea_bcd_guid.txt", $sdi_guid_outfile = "makebt\bs_temp\crea_sdi_guid.txt"
 
@@ -86,7 +86,9 @@ Global $Combo_EFI, $Combo_Folder, $Upd_MBR, $Boot_w8, $Boot_vhd, $vhd_cnt=0, $dt
 
 Global $AddContentBrowse, $AddContentSource, $ContentSize=0, $TotalSourceSize=0, $ContentSource, $GUI_ContentSize, $content_folder="", $NrCpdFiles
 
-Global $tmpdrive="", $WinDrv, $WinDrvSel, $WinDrvSize, $WinDrvFree, $WinDrvFileSys, $WinDrvSpaceAvail=0, $WinDrvDrive="", $sys_disk="", $sys_part="", $usbsys=0, $DriveSysType="Fixed"
+Global $tmpdrive="", $WinDrv, $WinDrvSel, $WinDrvSize, $WinDrvFree, $WinDrvFileSys, $WinDrvSpaceAvail=0, $WinDrvDrive="", $DriveSysType="Fixed", $DriveType="Fixed"
+
+Global $inst_disk="", $inst_part="", $sys_disk="", $sys_part="", $usbsys=0, $usbfix=0, $BusType = "", $BusSys = "", $Target_Device, $Target_Type, $Sys_Device, $Sys_Type
 
 Global $OS_drive = StringLeft(@WindowsDir, 2)
 
@@ -182,9 +184,9 @@ $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
 $ImageSize = GUICtrlCreateLabel( "", 225, 29, 50, 15, $ES_READONLY)
 
 GUICtrlCreateLabel( "Boot Image - VHD or WIM or Win ISO", 32, 29)
-$IMG_File = GUICtrlCreateInput($IMG_FileSelect, 32, 45, 303, 20, $ES_READONLY)
+$IMG_File = GUICtrlCreateInput("", 32, 45, 303, 20, $ES_READONLY)
 $IMG_FileSelect = GUICtrlCreateButton("...", 341, 46, 26, 18)
-GUICtrlSetTip(-1, " Make entry in Boot Manager Menu on Boot Drive for VHD or WIM file " & @CRLF _
+GUICtrlSetTip($IMG_File, " Make entry in Boot Manager Menu on Boot Drive for VHD or WIM file " & @CRLF _
 & " Make entry in Grub4dos Menu on Boot Drive for VHD or Win ISO file " & @CRLF _
 & " PE WIM or Win ISO can be located in folder on Boot or System Drive " & @CRLF _
 & " VHD can be in folder and must be located on NTFS System Drive e.g. " & @CRLF _
@@ -264,7 +266,8 @@ GUICtrlSetTip($refind, " Add Grub2 needed to boot Linux ISO in UEFI mode" & @CRL
 & " Setting Grub2 - Only for some Linux ISO Files in images folder " & @CRLF _
 & " Setting Other - use Addon with a1ive Grub2 File Manager " & @CRLF _
 & " and Grub2 Live ISO Multiboot for All Linux in iso folder " & @CRLF _
-& " *** Applied Only for USB Boot Drive *** ")
+& " and Grub 2 Win Menu for MBR FAT32 Boot Drive " & @CRLF _
+& " *** Applied Only for USB Or MBR FAT32 Boot Drive *** ")
 GUICtrlCreateLabel( "EFI Mgr", 328, 215)
 $Combo_EFI = GUICtrlCreateCombo("", 248, 212, 70, 24, $CBS_DROPDOWNLIST)
 GUICtrlSetData($Combo_EFI,"Grub 2|Other", "Grub 2")
@@ -272,29 +275,34 @@ GUICtrlSetTip($Combo_EFI, " Add Grub2 needed to boot Linux ISO in UEFI mode" & @
 & " Setting Grub2 - Only for some Linux ISO Files in images folder " & @CRLF _
 & " Setting Other - use Addon with a1ive Grub2 File Manager " & @CRLF _
 & " and Grub2 Live ISO Multiboot for All Linux in iso folder " & @CRLF _
-& " *** Applied Only for USB Boot Drive *** ")
+& " and Grub 2 Win Menu for MBR FAT32 Boot Drive " & @CRLF _
+& " *** Applied Only for USB Or MBR FAT32 Boot Drive *** ")
 
 GUICtrlCreateGroup("USB Target", 18, 252, 364, 89)
 
-GUICtrlCreateLabel( "Boot Drive", 32, 273)
-$Target = GUICtrlCreateInput($TargetSel, 110, 270, 95, 20, $ES_READONLY)
-$TargetSel = GUICtrlCreateButton("...", 211, 271, 26, 18)
-GUICtrlSetTip(-1, " Select your USB Boot Drive - Active FAT32 for WIM file " & @CRLF _
+GUICtrlCreateLabel( "Boot  Drive", 32, 273)
+$Target = GUICtrlCreateInput("", 110, 270, 40, 20, $ES_READONLY)
+$TargetSel = GUICtrlCreateButton("...", 156, 271, 26, 18)
+GUICtrlSetTip($Target, " Select your USB Boot Drive - Active FAT32 for WIM file " & @CRLF _
 & " GO will Make entry for WIM in Boot Manager Menu on Boot Drive ")
 GUICtrlSetOnEvent($TargetSel, "_target_drive")
-$TargetSize = GUICtrlCreateLabel( "", 253, 264, 100, 15, $ES_READONLY)
-$TargetFree = GUICtrlCreateLabel( "", 253, 281, 100, 15, $ES_READONLY)
+$TargetSize = GUICtrlCreateLabel( "", 198, 264, 90, 15, $ES_READONLY)
+$TargetFree = GUICtrlCreateLabel( "", 198, 281, 90, 15, $ES_READONLY)
+$Target_Device = GUICtrlCreateLabel( "", 295, 264, 85, 15, $ES_READONLY)
+$Target_Type = GUICtrlCreateLabel( "", 295, 281, 85, 15, $ES_READONLY)
 
 GUICtrlCreateLabel( "System Drive", 32, 315)
-$WinDrv = GUICtrlCreateInput("", 110, 312, 95, 20, $ES_READONLY)
-$WinDrvSel = GUICtrlCreateButton("...", 211, 313, 26, 18)
-GUICtrlSetTip(-1, " Select your USB System Drive - NTFS for VHD Or PE WIM file " & @CRLF _
+$WinDrv = GUICtrlCreateInput("", 110, 312, 40, 20, $ES_READONLY)
+$WinDrvSel = GUICtrlCreateButton("...", 156, 313, 26, 18)
+GUICtrlSetTip($WinDrv, " Select your USB System Drive - NTFS for VHD Or PE WIM file " & @CRLF _
 & " VHD must be located on NTFS System Drive " & @CRLF _
 & " PE WIM can be located on FAT32 Boot Drive Or on NTFS System Drive " & @CRLF _
 & " GO will Make entry for VHD or PE WIM in Boot Manager Menu on Boot Drive ")
 GUICtrlSetOnEvent($WinDrvSel, "_WinDrv_drive")
-$WinDrvSize = GUICtrlCreateLabel( "", 253, 306, 100, 15, $ES_READONLY)
-$WinDrvFree = GUICtrlCreateLabel( "", 253, 323, 100, 15, $ES_READONLY)
+$WinDrvSize = GUICtrlCreateLabel( "", 198, 306, 100, 15, $ES_READONLY)
+$WinDrvFree = GUICtrlCreateLabel( "", 198, 323, 100, 15, $ES_READONLY)
+$Sys_Device = GUICtrlCreateLabel( "", 295, 306, 85, 15, $ES_READONLY)
+$Sys_Type = GUICtrlCreateLabel( "", 295, 323, 85, 15, $ES_READONLY)
 
 $GO = GUICtrlCreateButton("GO", 235, 360, 70, 30)
 GUICtrlSetTip($GO,  " GO will Make entry for PE WIM Or VHD in Windows Boot Manager Menu " & @CRLF _
@@ -316,17 +324,17 @@ _GUICtrlStatusBar_SetText($hStatus," First Select USB Target Drives and then Sou
 
 DisableMenus(1)
 
-GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_ENABLE)
-GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_ENABLE)
+GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_DISABLE)
 
 GUICtrlSetState($Boot_vhd, $GUI_UNCHECKED + $GUI_DISABLE)
 GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
 
-GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
-GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
-GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_ENABLE)
+GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 
-GUICtrlSetState($TargetSel, $GUI_ENABLE)
+GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
 GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
 
 GUICtrlSetState($Menu_Type, $GUI_DISABLE)
@@ -925,6 +933,7 @@ Func _img_fsel()
 	If $valid Then
 		GUICtrlSetData($IMG_File, $btimgfile)
 		GUICtrlSetData($ImageSize, $BTIMGSize & " MB")
+		GUICtrlSetState($GO, $GUI_FOCUS)
 	Else
 		MsgBox(48, " Image File NOT Supported ", "Selected = " & $image_file & @CRLF & @CRLF _
 		& "Image Size = " & $BTIMGSize & " MB " & @CRLF & @CRLF _
@@ -962,15 +971,18 @@ Func _target_drive()
 	$TargetDrive = ""
 	$FSvar=""
 	$TargetSpaceAvail = 0
+	$Target_MBR_FAT32 = 0
 	GUICtrlSetData($Target, "")
 	GUICtrlSetData($TargetSize, "")
 	GUICtrlSetData($TargetFree, "")
+	GUICtrlSetData($Target_Device, "")
+	GUICtrlSetData($Target_Type, "")
 	GUICtrlSetData($Combo_Folder,"Folder on B")
 
 	$TargetSelect = FileSelectFolder("Select your USB Boot Drive - Active Drive for Boot Files", "")
 	If @error Then
 		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
-		GUICtrlSetState($TargetSel, $GUI_ENABLE)
+		GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
 		; DisableMenus(0)
 		Return
 	EndIf
@@ -979,7 +991,7 @@ Func _target_drive()
 	If $pos = 0 Then
 		MsgBox(48,"ERROR - Path Invalid", "Path Invalid - No Backslash Found" & @CRLF & @CRLF & "Selected Path = " & $TargetSelect)
 		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
-		GUICtrlSetState($TargetSel, $GUI_ENABLE)
+		GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
 		; DisableMenus(0)
 		Return
 	EndIf
@@ -989,7 +1001,7 @@ Func _target_drive()
 		MsgBox(48,"ERROR - Path Invalid", "Path Invalid - Space Found" & @CRLF & @CRLF & "Selected Path = " & $TargetSelect & @CRLF & @CRLF _
 		& "Solution - Use simple Path without Spaces ")
 		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
-		GUICtrlSetState($TargetSel, $GUI_ENABLE)
+		GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
 		; DisableMenus(0)
 		Return
 	EndIf
@@ -998,7 +1010,7 @@ Func _target_drive()
 	If $pos <> 2 Then
 		MsgBox(48,"ERROR - Path Invalid", "Drive Invalid - : Not found" & @CRLF & @CRLF & "Selected Path = " & $TargetSelect)
 		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
-		GUICtrlSetState($TargetSel, $GUI_ENABLE)
+		GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
 		; DisableMenus(0)
 		Return
 	EndIf
@@ -1040,7 +1052,7 @@ Func _target_drive()
 		Return
 	EndIf
 	If $valid Then
-		$DriveType=DriveGetType($Tdrive)
+		; $DriveType=DriveGetType($Tdrive)
 		$FSvar = DriveGetFileSystem( $Tdrive )
 		FOR $d IN $FileSys
 			If $d = $FSvar Then
@@ -1081,7 +1093,7 @@ Func _target_drive()
 		$TargetDrive = $Tdrive
 		GUICtrlSetData($Target, $TargetDrive)
 		$TargetSpaceAvail = Round(DriveSpaceFree($TargetDrive))
-		GUICtrlSetData($TargetSize, $FSvar & "     " & Round(DriveSpaceTotal($TargetDrive) / 1024, 1) & " GB")
+		GUICtrlSetData($TargetSize, $FSvar & "    " & Round(DriveSpaceTotal($TargetDrive) / 1024, 1) & " GB")
 		GUICtrlSetData($TargetFree, "FREE  = " & Round(DriveSpaceFree($TargetDrive) / 1024, 1) & " GB")
 		$Firmware = _WinAPI_GetFirmwareEnvironmentVariable()
 		If $FSvar <> "FAT32" And $Firmware = "UEFI" Then
@@ -1092,9 +1104,16 @@ Func _target_drive()
 		; MsgBox(64, "Partition Style and Firmware", "Partition Style = " & $PartStyle & @CRLF _
 		; & @CRLF & "Firmware = " & $Firmware)
 		If FileExists($TargetDrive & "\ventoy") Then
+			$ventoy = 1
 			GUICtrlSetData($Combo_Folder,"Folder on S")
 		EndIf
-
+		If $WinDrvDrive <> "" And $TargetDrive <> "" Then
+			_ListUsb_UEFI()
+		EndIf
+		If $FSvar = "FAT32" And $PartStyle = "MBR" Then
+			$Target_MBR_FAT32 = 1
+		EndIf
+		GUICtrlSetState($WinDrvSel, $GUI_FOCUS)
 	EndIf
 	If Not CheckSize() Then
 		MsgBox(48, "ERROR - System Drive NOT Valid", " NOT Enough FreeSpace")
@@ -1128,12 +1147,15 @@ Func _WinDrv_drive()
 	GUICtrlSetData($WinDrvFileSys, "")
 	GUICtrlSetData($WinDrvSize, "")
 	GUICtrlSetData($WinDrvFree, "")
+	GUICtrlSetData($Sys_Device, "")
+	GUICtrlSetData($Sys_Type, "")
+
 	GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
 	$w78sys=0
 
 	$WinDrvSelect = FileSelectFolder("Select your USB System Drive - NTFS for VHD or 7/8 System", "")
 	If @error Then
-		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
+		GUICtrlSetState($WinDrvSel, $GUI_ENABLE + $GUI_FOCUS)
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
 		; DisableMenus(0)
 		Return
@@ -1142,7 +1164,7 @@ Func _WinDrv_drive()
 	$pos = StringInStr($WinDrvSelect, "\", 0, -1)
 	If $pos = 0 Then
 		MsgBox(48,"ERROR - Path Invalid", "Path Invalid - No Backslash Found" & @CRLF & @CRLF & "Selected Path = " & $WinDrvSelect)
-		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
+		GUICtrlSetState($WinDrvSel, $GUI_ENABLE + $GUI_FOCUS)
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
 		; DisableMenus(0)
 		Return
@@ -1152,7 +1174,7 @@ Func _WinDrv_drive()
 	If $pos Then
 		MsgBox(48,"ERROR - Path Invalid", "Path Invalid - Space Found" & @CRLF & @CRLF & "Selected Path = " & $WinDrvSelect & @CRLF & @CRLF _
 		& "Solution - Use simple Path without Spaces ")
-		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
+		GUICtrlSetState($WinDrvSel, $GUI_ENABLE + $GUI_FOCUS)
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
 		; DisableMenus(0)
 		Return
@@ -1161,7 +1183,7 @@ Func _WinDrv_drive()
 	$pos = StringInStr($WinDrvSelect, ":", 0, 1)
 	If $pos <> 2 Then
 		MsgBox(48,"ERROR - Path Invalid", "Drive Invalid - : Not found" & @CRLF & @CRLF & "Selected Path = " & $WinDrvSelect)
-		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
+		GUICtrlSetState($WinDrvSel, $GUI_ENABLE + $GUI_FOCUS)
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
 		; DisableMenus(0)
 		Return
@@ -1214,12 +1236,15 @@ Func _WinDrv_drive()
 	If $valid Then
 		$WinDrvDrive = StringLeft($WinDrvSelect, 2)
 
-		$DriveSysType=DriveGetType($WinDrvDrive)
-
 		GUICtrlSetData($WinDrv, $WinDrvDrive)
 		$WinDrvSpaceAvail = Round(DriveSpaceFree($WinDrvDrive))
 		GUICtrlSetData($WinDrvSize, $FSvar & "     " & Round(DriveSpaceTotal($WinDrvDrive) / 1024, 1) & " GB")
 		GUICtrlSetData($WinDrvFree, "FREE  = " & Round(DriveSpaceFree($WinDrvDrive) / 1024, 1) & " GB")
+		$SysStyle = _GetDrivePartitionStyle(StringLeft($WinDrvDrive, 1))
+
+		If $WinDrvDrive <> "" And $TargetDrive <> "" Then
+			_ListUsb_UEFI()
+		EndIf
 		If @OSVersion <> "WIN_VISTA" And @OSVersion <> "WIN_2003" And @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_XPe" And @OSVersion <> "WIN_2000" Then
 			SystemFileRedirect("On")
 			If FileExists($WinDrvDrive & $WinFol & "\system32\bcdboot.exe") And FileExists($WinDrvDrive & $WinFol & "\Boot") And FileExists($WinDrvDrive & $WinFol & "\System32\DriverStore\FileRepository") Then
@@ -1228,6 +1253,8 @@ Func _WinDrv_drive()
 			EndIf
 			SystemFileRedirect("Off")
 		EndIf
+		GUICtrlSetState($IMG_FileSelect, $GUI_FOCUS)
+
 		;	If $FSvar <> "NTFS" Then
 		;		MsgBox(48, "WARNING - Target System Drive is NOT NTFS ", "Target System Drive has " & $FSvar & " FileSystem " & @CRLF _
 		;		& @CRLF & "OK for USB-Stick booting WIM or ISO " & @CRLF _
@@ -1930,12 +1957,142 @@ Func _vhd_menu()
 
 EndFunc   ;==> _vhd_menu
 ;===================================================================================================
+Func _ListUsb_UEFI()
+	Local $linesplit[20], $file, $line, $pos1, $pos2
+
+	Local $mptarget=0, $mpsystem=0, $count = 0, $count_none = 0, $BusType_none = 0, $disk_none = "", $part_none = "", $Target_Found = 0
+
+	$DriveType=DriveGetType($TargetDrive)
+	$DriveSysType=DriveGetType($WinDrvDrive)
+	GUICtrlSetData($Combo_EFI, "Grub 2")
+
+	If FileExists(@ScriptDir & "\makebt\usblist.txt") Then
+		FileCopy(@ScriptDir & "\makebt\usblist.txt", @ScriptDir & "\makebt\usblist_bak.txt", 1)
+		FileDelete(@ScriptDir & "\makebt\usblist.txt")
+	EndIf
+	; Sleep(2000)
+
+	RunWait(@ComSpec & " /c makebt\listusbdrives\ListUsbDrives.exe -a > makebt\usblist.txt", @ScriptDir, @SW_HIDE)
+
+	$inst_disk=""
+	$inst_part=""
+	$sys_disk=""
+	$sys_part=""
+	$BusType = ""
+	$BusSys = ""
+	$usbfix=0
+	$usbsys=0
+	$file = FileOpen(@ScriptDir & "\makebt\usblist.txt", 0)
+	If $file <> -1 Then
+		$count = 0
+		$mptarget = 0
+		$mpsystem = 0
+		$count_none = 0
+		While 1
+			$line = FileReadLine($file)
+			If @error = -1 Then ExitLoop
+			If $line <> "" Then
+				$count = $count + 1
+				$linesplit = StringSplit($line, "=")
+				$linesplit[1] = StringStripWS($linesplit[1], 3)
+				If $linesplit[1] = "MountPoint" And $linesplit[0] = 2 Then
+					$linesplit[2] = StringStripWS($linesplit[2], 3)
+					If $linesplit[2] = $TargetDrive & "\" Then
+						$mptarget = 1
+						$Target_Found = 1
+						; MsgBox(0, "TargetDrive Found - OK", " TargetDrive = " & $linesplit[2], 3)
+					ElseIf $linesplit[2] = "none" Then
+						$mptarget = 3
+						$count_none = $count_none + 1
+					Else
+						$mptarget = 0
+					EndIf
+					If $linesplit[2] = $WinDrvDrive & "\" Then
+						$mpsystem = 1
+						; MsgBox(0, "SystemDrive Found - OK", " SystemDrive = " & $linesplit[2], 3)
+					Else
+						$mpsystem = 0
+					EndIf
+				EndIf
+				If $mptarget = 1 Then
+					If $linesplit[1] = "Bus Type" And $linesplit[0] = 2 Then
+						$linesplit[2] = StringStripWS($linesplit[2], 3)
+						$BusType = $linesplit[2]
+						If $linesplit[2] = "USB" Then
+							$usbfix = 1
+						Else
+							$usbfix = 0
+						EndIf
+						;	MsgBox(0, "TargetDrive USB or HDD ?", " Bus Type = " & $linesplit[2], 3)
+					EndIf
+					If $linesplit[1] = "Device Number" And $linesplit[0] = 2 Then
+						$inst_disk = StringStripWS($linesplit[2], 3)
+					EndIf
+					If $linesplit[1] = "Partition Number" Then
+						$inst_part = StringLeft(StringStripWS($linesplit[2], 3), 1)
+					EndIf
+				EndIf
+				If $mptarget = 3 Then
+					If $linesplit[1] = "Bus Type" And $linesplit[0] = 2 Then
+						$linesplit[2] = StringStripWS($linesplit[2], 3)
+						$BusType_none = $linesplit[2]
+					EndIf
+					If $linesplit[1] = "Device Number" And $linesplit[0] = 2 Then
+						$disk_none = StringStripWS($linesplit[2], 3)
+					EndIf
+					If $linesplit[1] = "Partition Number" Then
+						$part_none = StringLeft(StringStripWS($linesplit[2], 3), 1)
+					EndIf
+				EndIf
+				If $mpsystem = 1 Then
+					If $linesplit[1] = "Bus Type" And $linesplit[0] = 2 Then
+						$linesplit[2] = StringStripWS($linesplit[2], 3)
+						$BusSys = $linesplit[2]
+						If $linesplit[2] = "USB" Then
+							$usbsys = 1
+						Else
+							$usbsys = 0
+						EndIf
+						;	MsgBox(0, "SystemDrive USB or HDD ?", " Bus Type = " & $linesplit[2], 3)
+					EndIf
+					If $linesplit[1] = "Device Number" And $linesplit[0] = 2 Then
+						$sys_disk = StringStripWS($linesplit[2], 3)
+					EndIf
+					If $linesplit[1] = "Partition Number" Then
+						$sys_part = StringLeft(StringStripWS($linesplit[2], 3), 1)
+					EndIf
+				EndIf
+			EndIf
+		Wend
+		FileClose($file)
+	EndIf
+
+	If $Target_Found = 1 Then
+		GUICtrlSetData($Target_Device, $PartStyle & "  hd " & $inst_disk & "  p " & $inst_part)
+		GUICtrlSetData($Target_Type, $BusType & "   " &  StringLeft($DriveType, 5))
+	ElseIf $count_none = 1 Then
+		GUICtrlSetData($Target_Device, $PartStyle & "  hd " & $disk_none & "  p " & $part_none)
+		GUICtrlSetData($Target_Type, $BusType_none & "   " &  StringLeft($DriveType, 5))
+	Else
+		GUICtrlSetData($Target_Device, "")
+		GUICtrlSetData($Target_Type, "")
+	EndIf
+
+	GUICtrlSetData($Sys_Device, $SysStyle & "  hd " & $sys_disk & "  p " & $sys_part)
+	GUICtrlSetData($Sys_Type, $BusSys & "   " &  StringLeft($DriveSysType, 5))
+
+	If $usbfix = 0 And $Target_MBR_FAT32 = 1 And $PartStyle = "MBR" Then
+		GUICtrlSetData($Combo_EFI, "Other")
+	EndIf
+
+EndFunc   ;==> __ListUsb_UEFI
+;===================================================================================================
 Func _Go()
 	Local $val=0, $len, $pos, $ikey, $mkimg_err = 0
 
-	Local $fhan, $mbrsrc
+	Local $fhan, $mbrsrc, $bcd_create_flag=0
 
-	Local $file, $line, $linesplit[20], $inst_disk="", $inst_part="", $mptarget=0, $mpsystem=0
+	; Local $file, $line, $linesplit[20], $mptarget=0, $mpsystem=0
 	Local $notactiv=0, $xpmbr=0, $count, $activebyte = "00", $bkp, $headbkp
 
 	Local $FileList, $sl, $dest
@@ -2033,84 +2190,6 @@ Func _Go()
 	Sleep(2000)
 
 	GUICtrlSetData($ProgressAll, 20)
-	_GUICtrlStatusBar_SetText($hStatus," List USB Drives - wait ...", 0)
-
-	$DriveType=DriveGetType($TargetDrive)
-
-	If FileExists(@ScriptDir & "\makebt\usblist.txt") Then
-		FileCopy(@ScriptDir & "\makebt\usblist.txt", @ScriptDir & "\makebt\usblist_bak.txt", 1)
-		FileDelete(@ScriptDir & "\makebt\usblist.txt")
-	EndIf
-	Sleep(2000)
-
-	RunWait(@ComSpec & " /c makebt\listusbdrives\ListUsbDrives.exe -a > makebt\usblist.txt", @ScriptDir, @SW_HIDE)
-
-	$usbfix=0
-	$file = FileOpen(@ScriptDir & "\makebt\usblist.txt", 0)
-	If $file <> -1 Then
-		$count = 0
-		$mptarget = 0
-		$mpsystem = 0
-		While 1
-			$line = FileReadLine($file)
-			If @error = -1 Then ExitLoop
-			If $line <> "" Then
-				$count = $count + 1
-				$linesplit = StringSplit($line, "=")
-				$linesplit[1] = StringStripWS($linesplit[1], 3)
-				If $linesplit[1] = "MountPoint" And $linesplit[0] = 2 Then
-					$linesplit[2] = StringStripWS($linesplit[2], 3)
-					If $linesplit[2] = $TargetDrive & "\" Then
-						$mptarget = 1
-						; MsgBox(0, "TargetDrive Found - OK", " TargetDrive = " & $linesplit[2], 3)
-					Else
-						$mptarget = 0
-					EndIf
-					If $linesplit[2] = $WinDrvDrive & "\" Then
-						$mpsystem = 1
-						; MsgBox(0, "SystemDrive Found - OK", " SystemDrive = " & $linesplit[2], 3)
-					Else
-						$mpsystem = 0
-					EndIf
-				EndIf
-				If $mptarget = 1 Then
-					If $linesplit[1] = "Bus Type" And $linesplit[0] = 2 Then
-						$linesplit[2] = StringStripWS($linesplit[2], 3)
-						If $linesplit[2] = "USB" Then
-							$usbfix = 1
-						Else
-							$usbfix = 0
-						EndIf
-						;	MsgBox(0, "TargetDrive USB or HDD ?", " Bus Type = " & $linesplit[2], 3)
-					EndIf
-					If $linesplit[1] = "Device Number" And $linesplit[0] = 2 Then
-						$inst_disk = StringStripWS($linesplit[2], 3)
-					EndIf
-					If $linesplit[1] = "Partition Number" Then
-						$inst_part = StringLeft(StringStripWS($linesplit[2], 3), 1)
-					EndIf
-				EndIf
-				If $mpsystem = 1 Then
-					If $linesplit[1] = "Bus Type" And $linesplit[0] = 2 Then
-						$linesplit[2] = StringStripWS($linesplit[2], 3)
-						If $linesplit[2] = "USB" Then
-							$usbsys = 1
-						Else
-							$usbsys = 0
-						EndIf
-						;	MsgBox(0, "SystemDrive USB or HDD ?", " Bus Type = " & $linesplit[2], 3)
-					EndIf
-					If $linesplit[1] = "Device Number" And $linesplit[0] = 2 Then
-						$sys_disk = StringStripWS($linesplit[2], 3)
-					EndIf
-					If $linesplit[1] = "Partition Number" Then
-						$sys_part = StringLeft(StringStripWS($linesplit[2], 3), 1)
-					EndIf
-				EndIf
-			EndIf
-		Wend
-		FileClose($file)
-	EndIf
 
 	If $usbfix = 0 Then
 		$ikey = MsgBox(48+4+256, "WARNING - Boot Drive is NOT USB", "Boot Drive is NOT USB Drive" & @CRLF & @CRLF & _
@@ -2335,6 +2414,7 @@ Func _Go()
 			If FileExists(@WindowsDir & "\system32\bcdboot.exe") Then
 				_WinLang()
 				$bcdboot_flag = 1
+				$g4d_default = 1
 				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And $PE_flag = 0 Then
 					_GUICtrlStatusBar_SetText($hStatus," UEFI - Make Boot Manager Menu on USB " & $TargetDrive & " - wait .... ", 0)
 					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
@@ -2344,6 +2424,7 @@ Func _Go()
 						If $WinDir_PE_flag=0 Then
 							$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $WinDir_PE & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
 						Else
+							$bcd_create_flag=1
 							_BCD_Create()
 						EndIf
 					Else
@@ -2351,8 +2432,25 @@ Func _Go()
 						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
 					EndIf
 				EndIf
-				FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
-				FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
+				Sleep(1000)
+				If FileExists($TargetDrive & "\Boot\BCD") Then
+					RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdedit.exe" & " /store " _
+					& $TargetDrive & "\Boot\BCD" & " /set {default} bootmenupolicy legacy", @ScriptDir, @SW_HIDE)
+					$store = $TargetDrive & "\Boot\BCD"
+					$sdi_guid_outfile = "makebt\bs_temp\crea_sdi_guid.txt"
+					$bcd_guid_outfile = "makebt\bs_temp\crea_pe_guid.txt"
+					If $bcd_create_flag=0 Then _pe_boot_menu()
+				EndIf
+				If FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+					RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdedit.exe" & " /store " _
+					& $TargetDrive & "\EFI\Microsoft\Boot\BCD" & " /set {default} bootmenupolicy legacy", @ScriptDir, @SW_HIDE)
+					$store = $TargetDrive & "\EFI\Microsoft\Boot\BCD"
+					$sdi_guid_outfile = "makebt\bs_temp\crea_efi_sdi_guid.txt"
+					$bcd_guid_outfile = "makebt\bs_temp\crea_efi_pe_guid.txt"
+					If $bcd_create_flag=0 Then _pe_boot_menu()
+				EndIf
+				If FileExists($TargetDrive & "\Boot") Then FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
+				If FileExists($TargetDrive & "\bootmgr") Then FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
 			EndIf
 		EndIf
 		; UEFI x64 Fix bootx64.efi and UEFI x86 Fix bootia32.efi
@@ -2641,9 +2739,22 @@ Func _Go()
 		If FileExists($TargetDrive & "\grub2\g2bootmgr\gnugrub.kernel.bios") Then
 			_bcd_grub2win()
 		EndIf
+	ElseIf $usbfix=0 And $Target_MBR_FAT32 = 1 And GUICtrlRead($refind) = $GUI_CHECKED Then
+		If GUICtrlRead($Combo_EFI) = "Other" Then
+			If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
+				GUICtrlSetData($ProgressAll, 75)
+				_GUICtrlStatusBar_SetText($hStatus," Adding Grub2Win for BIOS mode - wait .... ", 0)
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub2", $TargetDrive & "\grub2", 1)
+			EndIf
+			DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
+			If FileExists($TargetDrive & "\grub2\g2bootmgr\gnugrub.kernel.bios") Then
+				_bcd_grub2win()
+			EndIf
+		EndIf
 	Else
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 	EndIf
+
 	SystemFileRedirect("On")
 
 	Sleep(1000)
@@ -2689,7 +2800,7 @@ Func _Go()
 		EndIf
 	EndIf
 
-	If $g4dmbr=0 And $g4d_vista <> 0 And $PartStyle = "MBR" Then
+	If $PartStyle = "MBR" Then
 		_bcd_menu()
 	Else
 		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
@@ -2766,16 +2877,16 @@ Func _Go()
 		GUICtrlSetData($GUI_ContentSize, "")
 
 		GUICtrlSetData($ProgressAll, 0)
-		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_ENABLE)
-		GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_ENABLE)
+		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED)
+		GUICtrlSetState($grldrUpd, $GUI_UNCHECKED)
 
 		GUICtrlSetState($Boot_vhd, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
 		$w78sys=0
 
-		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
-		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_ENABLE)
-		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_ENABLE)
+		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED)
+		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED)
+		GUICtrlSetState($refind, $GUI_UNCHECKED)
 
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
 		GUICtrlSetState($WinDrvSel, $GUI_ENABLE)
@@ -3106,23 +3217,45 @@ Func DisableMenus($endis)
 		GUICtrlSetState($IMG_File, $endis)
 		GUICtrlSetState($AddContentBrowse, $endis)
 		GUICtrlSetState($AddContentSource, $endis)
+		GUICtrlSetState($Combo_Folder, $endis)
+		If $PartStyle <> "MBR" Then
+			GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
+		Else
+			GUICtrlSetState($grldrUpd, $endis)
+			GUICtrlSetState($g4d_bcd, $endis)
+			GUICtrlSetState($xp_bcd, $endis)
+			GUICtrlSetState($refind, $endis)
+			GUICtrlSetState($Combo_EFI, $endis)
+			If $BusType <> "USB" Then
+				GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+			Else
+				GUICtrlSetState($Upd_MBR, $endis)
+			EndIf
+		EndIf
 	Else
 		GUICtrlSetState($IMG_FileSelect, $GUI_DISABLE)
 		GUICtrlSetState($IMG_File, $GUI_DISABLE)
 		GUICtrlSetState($AddContentBrowse, $GUI_DISABLE)
 		GUICtrlSetState($AddContentSource, $GUI_DISABLE)
-	EndIf
-
-	If $PartStyle <> "MBR" Then
-		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Combo_Folder, $GUI_DISABLE)
 		GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
-	Else
-		GUICtrlSetState($Upd_MBR, $endis)
-		GUICtrlSetState($grldrUpd, $endis)
-		GUICtrlSetState($g4d_bcd, $endis)
-		GUICtrlSetState($xp_bcd, $endis)
+		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
+	EndIf
+
+	; Keep Ventoy MBR and Ventoy Grub2
+	If $ventoy Then
+		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 	EndIf
 
 	If @OSVersion <> "WIN_VISTA" And @OSVersion <> "WIN_2003" And @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_XPe" And @OSVersion <> "WIN_2000" Then
@@ -3150,19 +3283,18 @@ Func DisableMenus($endis)
 	Else
 		GUICtrlSetState($Menu_Type, $GUI_DISABLE)
 	EndIf
-	GUICtrlSetState($Combo_Folder, $endis)
-	GUICtrlSetState($Combo_EFI, $endis)
-
-	GUICtrlSetState($refind, $endis)
 
 	GUICtrlSetState($WinDrvSel, $endis)
 	GUICtrlSetState($WinDrv, $endis)
 	GUICtrlSetState($TargetSel, $endis)
 	GUICtrlSetState($Target, $endis)
 	GUICtrlSetState($GO, $GUI_DISABLE)
+
 	GUICtrlSetData($IMG_File, $btimgfile)
 	GUICtrlSetData($AddContentSource, $ContentSource)
 	GUICtrlSetData($Target, $TargetDrive)
+	GUICtrlSetData($WinDrv, $WinDrvDrive)
+
 EndFunc ;==>DisableMenus
 ;===================================================================================================
 Func HexSearch($fl, $str1, $bin = 0, $ind = 0)
@@ -4180,10 +4312,12 @@ Func _BCD_Inside_Entry()
 		& $store & " /set " & $guid & " detecthal on", $tmpdrive & "\", @SW_HIDE)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 		& $store & " /set " & $guid & " bootmenupolicy legacy", $tmpdrive & "\", @SW_HIDE)
-		If $SysWOW64=1 And StringRight($vhdfile_name_only, 4) = ".vhd" And $PartStyle = "MBR" Or $driver_flag = 3 Then
+		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+		& $store & " /set " & $guid & " loadoptions DISABLE_INTEGRITY_CHECKS", $tmpdrive & "\", @SW_HIDE)
+		; If $SysWOW64=1 And StringRight($vhdfile_name_only, 4) = ".vhd" And $PartStyle = "MBR" Or $driver_flag = 3 Then
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 			& $store & " /set " & $guid & " testsigning on", $tmpdrive & "\", @SW_HIDE)
-		EndIf
+		; EndIf
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} device boot", $tmpdrive & "\", @SW_HIDE)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} nointegritychecks on", $tmpdrive & "\", @SW_HIDE)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} timeout 1", $tmpdrive & "\", @SW_HIDE)
@@ -4274,10 +4408,12 @@ Func _BCD_BootDrive_VHD_Entry()
 		& $store & " /set " & $guid & " detecthal on", $TargetDrive & "\", @SW_HIDE)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 		& $store & " /set " & $guid & " bootmenupolicy legacy", $TargetDrive & "\", @SW_HIDE)
-		If $SysWOW64=1 And StringRight($vhdfile_name, 4) = ".vhd" And $PartStyle = "MBR" Or $driver_flag = 3 Then
+		RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
+		& $store & " /set " & $guid & " loadoptions DISABLE_INTEGRITY_CHECKS", $TargetDrive & "\", @SW_HIDE)
+		; If $SysWOW64=1 And StringRight($vhdfile_name, 4) = ".vhd" And $PartStyle = "MBR" Or $driver_flag = 3 Then
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 			& $store & " /set " & $guid & " testsigning on", $TargetDrive & "\", @SW_HIDE)
-		EndIf
+		; EndIf
 		If $OS_drive <> $TargetDrive Then
 			RunWait(@ComSpec & " /c " & $bcdedit & " /store " _
 			& $store & " /set {bootmgr} nointegritychecks on", $TargetDrive & "\", @SW_HIDE)
