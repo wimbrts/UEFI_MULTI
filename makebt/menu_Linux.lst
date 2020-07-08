@@ -1,22 +1,6 @@
 iftitle [if exist /bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM
 chainloader /bootmgr
 
-iftitle [if exist %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso] ISO Linux Mint - %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso
-set iso_path=/images/linuxmint-19.3-cinnamon-64bit.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
-iftitle [if exist %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso && if exist %iso_drive%/images/linuxmint/casper-rw] ISO Linux Mint Persist - %iso_drive%/images/linuxmint-19.3-cinnamon-64bit.iso
-set iso_path=/images/linuxmint-19.3-cinnamon-64bit.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper persistent persistent-path=/images/linuxmint/ iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
 iftitle [if exist %iso_drive%/images/linuxmint.iso] ISO Linux Mint - %iso_drive%/images/linuxmint.iso
 set iso_path=/images/linuxmint.iso
 map %iso_drive%%iso_path% (0xff)
@@ -49,22 +33,6 @@ root (0xff)
 kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
 initrd /boot/isolinux/minirt.gz
 
-iftitle [if exist %iso_drive%/images/ubuntu-19.10-desktop-amd64.iso] ISO Ubuntu - %iso_drive%/images/ubuntu-19.10-desktop-amd64.iso
-set iso_path=/images/ubuntu-19.10-desktop-amd64.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
-iftitle [if exist %iso_drive%/images/ubuntu-19.10-desktop-amd64.iso && if exist %iso_drive%/images/ubuntu/casper-rw] ISO Ubuntu Persist - %iso_drive%/images/ubuntu-19.10-desktop-amd64.iso
-set iso_path=/images/ubuntu-19.10-desktop-amd64.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/images/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
 iftitle [if exist %iso_drive%/images/ubuntu.iso] ISO Ubuntu - %iso_drive%/images/ubuntu.iso
 set iso_path=/images/ubuntu.iso
 map %iso_drive%%iso_path% (0xff)
@@ -81,29 +49,13 @@ root (0xff)
 kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/images/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
 initrd /casper/initrd
 
-iftitle [if exist %iso_drive%/images/Porteus-CINNAMON-v4.0-x86_64.iso] ISO Linux Porteus - %iso_drive%/images/Porteus-CINNAMON-v4.0-x86_64.iso
-set iso_path=/images/Porteus-CINNAMON-v4.0-x86_64.iso
+iftitle [if exist %iso_drive%/images/Porteus.iso] ISO Linux Porteus - %iso_drive%/images/Porteus.iso
+set iso_path=/images/Porteus.iso
 map %iso_drive%%iso_path% (0xff)
 map --hook
 root (0xff)
 kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
 initrd /boot/syslinux/initrd.xz
-
-iftitle [if exist %iso_drive%/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso] ISO Linux Mint - %iso_drive%/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
-set iso_path=/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
-iftitle [if exist %iso_drive%/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso && if exist %iso_drive%/iso/linuxmint/casper-rw] ISO Linux Mint Persist - %iso_drive%/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
-set iso_path=/iso/linuxmint/linuxmint-19.3-cinnamon-64bit.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper persistent persistent-path=/iso/linuxmint/ iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
 
 iftitle [if exist %iso_drive%/iso/linuxmint/linuxmint.iso] ISO Linux Mint - %iso_drive%/iso/linuxmint/linuxmint.iso
 set iso_path=/iso/linuxmint/linuxmint.iso
@@ -137,22 +89,6 @@ root (0xff)
 kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
 initrd /boot/isolinux/minirt.gz
 
-iftitle [if exist %iso_drive%/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso] ISO Ubuntu - %iso_drive%/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
-set iso_path=/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
-iftitle [if exist %iso_drive%/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso && if exist %iso_drive%/iso/ubuntu/casper-rw] ISO Ubuntu Persist - %iso_drive%/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
-set iso_path=/iso/ubuntu/ubuntu-19.10-desktop-amd64.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/iso/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
 iftitle [if exist %iso_drive%/iso/ubuntu/ubuntu.iso] ISO Ubuntu - %iso_drive%/iso/ubuntu/ubuntu.iso
 set iso_path=/iso/ubuntu/ubuntu.iso
 map %iso_drive%%iso_path% (0xff)
@@ -169,8 +105,8 @@ root (0xff)
 kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/iso/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
 initrd /casper/initrd
 
-iftitle [if exist %iso_drive%/iso/Porteus-CINNAMON-v4.0-x86_64.iso] ISO Linux Porteus - %iso_drive%/iso/Porteus-CINNAMON-v4.0-x86_64.iso
-set iso_path=/iso/Porteus-CINNAMON-v4.0-x86_64.iso
+iftitle [if exist %iso_drive%/iso/Porteus.iso] ISO Linux Porteus - %iso_drive%/iso/Porteus.iso
+set iso_path=/iso/Porteus.iso
 map %iso_drive%%iso_path% (0xff)
 map --hook
 root (0xff)
