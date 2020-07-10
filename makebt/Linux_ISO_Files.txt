@@ -45,4 +45,8 @@ Thanks to:
 - a1ive for making Grub2 File Manager - https://github.com/a1ive/grub2-filemanager/releases
 - ValdikSS for making Super UEFIinSecureBoot Disk v3 - https://github.com/ValdikSS/Super-UEFIinSecureBoot-Disk/releases
 - Matthias Saou - thias - for making glim - https://github.com/thias/glim
+- chenall for making Grub4dos - https://github.com/chenall/grub4dos/releases and http://grub4dos.chenall.net/categories/downloads/
+
+More Info on UEFI Secure booting - https://habr.com/ru/post/446238/
+
 

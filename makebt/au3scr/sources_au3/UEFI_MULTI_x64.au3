@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  July 06, 2020
+ Author:        WIMB  -  July 10, 2020
 
- Program:       UEFI_MULTI_x64.exe - Version 4.6 in rule 189
+ Program:       UEFI_MULTI_x64.exe - Version 4.7 in rule 189
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -31,18 +31,18 @@
 
  Credits and Thanks to:
 	JFX for making WinNTSetup4 to Install Windows 2k/XP/2003/Vista/7/8/10 x86/x64 - https://msfn.org/board/topic/149612-winntsetup-v41/
-	chenall, tinybit and Bean for making Grub4dos - http://code.google.com/p/grub4dos-chenall/downloads/list or https://github.com/chenall/grub4dos/releases
 	karyonix for making FiraDisk driver- http://reboot.pro/topic/8804-firadisk-latest-00130/
 	Sha0 for making WinVBlock driver - http://reboot.pro/topic/8168-winvblock/
 	Olof Lagerkvist for ImDisk virtual disk driver - http://www.ltr-data.se/opencode.html#ImDisk and http://reboot.pro/index.php?showforum=59
-	Uwe Sieber for making ListUsbDrives - http://www.uwe-sieber.de/english.html
 	Dariusz Stanislawek for the DS File Ops Kit (DSFOK) - http://members.ozemail.com.au/~nulifetv/freezip/freeware/
 	cdob and maanu to Fix Win7 for booting from USB - http://reboot.pro/topic/14186-usb-hdd-boot-and-windows-7-sp1/
 
+	Uwe Sieber for making ListUsbDrives - http://www.uwe-sieber.de/english.html
 	a1ive for making Grub2 Boot Manager - https://github.com/a1ive/grub/releases
 	a1ive for making Grub2 File Manager - https://github.com/a1ive/grub2-filemanager/releases
 	ValdikSS for making Super UEFIinSecureBoot Disk v3 - https://github.com/ValdikSS/Super-UEFIinSecureBoot-Disk/releases
 	Matthias Saou - thias - for making glim - https://github.com/thias/glim
+	chenall for making Grub4dos - https://github.com/chenall/grub4dos/releases and http://grub4dos.chenall.net/categories/downloads/
 
 	The program is released "as is" and is free for redistribution, use or changes as long as original author,
 	credits part and link to the reboot.pro and MSFN support forum are clearly mentioned
@@ -184,9 +184,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 4.6  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 4.6  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 4.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
@@ -275,7 +275,7 @@ GUICtrlSetTip($refind, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux 
 & " - Mint   UEFI - Only for some Linux ISO Files in images folder " & @CRLF _
 & " - Super UEFI - use Addon with a1ive Grub2 File Manager " & @CRLF _
 & "   and Grub2 Live ISO Multiboot Menu for All Linux in iso folder " & @CRLF _
-& " - MBR  Only - use Addon with a1ive Grub2 File Manager - All Linux ISO ")
+& " - MBR - use Addon to Install a1ive Grub2 Boot Manager - All Linux ISO ")
 GUICtrlCreateLabel( "Grub2 M", 328, 215)
 $Combo_EFI = GUICtrlCreateCombo("", 238, 212, 80, 24, $CBS_DROPDOWNLIST)
 GUICtrlSetData($Combo_EFI,"Mint   UEFI|Super UEFI|Mint + MBR|Sup + MBR|MBR  Only", "Mint   UEFI")
@@ -283,7 +283,7 @@ GUICtrlSetTip($Combo_EFI, " Add Grub2 Boot Manager for UEFI and MBR mode and Lin
 & " - Mint   UEFI - Only for some Linux ISO Files in images folder " & @CRLF _
 & " - Super UEFI - use Addon with a1ive Grub2 File Manager " & @CRLF _
 & "   and Grub2 Live ISO Multiboot Menu for All Linux in iso folder " & @CRLF _
-& " - MBR  Only - use Addon with a1ive Grub2 File Manager - All Linux ISO ")
+& " - MBR - use Addon to Install a1ive Grub2 Boot Manager - All Linux ISO ")
 
 GUICtrlCreateGroup("USB Target", 18, 252, 364, 89)
 
@@ -2732,6 +2732,10 @@ Func _Go()
 		ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Sup + MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding Super Grub2 EFI Manager - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
+			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\efi\grub\x86_64-efi", 1)
+			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\efi\grub\i386-efi", 1)
+			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\efi\grub\locale", 1)
+			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\efi\grub\fonts", 1)
 			;	If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
 			;		GUICtrlSetData($ProgressAll, 75)
 			;		_GUICtrlStatusBar_SetText($hStatus," Adding Grub2Win for BIOS mode - wait .... ", 0)
