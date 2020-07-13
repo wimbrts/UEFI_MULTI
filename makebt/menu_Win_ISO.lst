@@ -56,6 +56,16 @@ map --mem %iso_drive%/images/HDDR2011.gz (0xFF)
 map --hook
 chainloader (0xFF)
 
+iftitle [if exist %iso_drive%/images/DOS288D.IMG] MS DOS SuperFLoppy Image - %iso_drive%/images/DOS288D.IMG - 3 MB
+# find --set-root --ignore-floppies /images/DOS288D.IMG
+map --mem %iso_drive%/images/DOS288D.IMG (fd0)
+map --hook
+chainloader (fd0)+1
+rootnoverify (fd0)
+
+iftitle [if exist (hd0,1)/io.sys] Windows 98SE - (hd0,1)/io.sys
+chainloader (hd0,1)/io.sys
+
 iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
 chainloader (hd1,0)/bootmgr
 

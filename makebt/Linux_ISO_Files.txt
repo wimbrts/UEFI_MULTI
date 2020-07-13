@@ -1,4 +1,4 @@
-USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-07-08
+USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-07-12
 
 How to make USB Drive booting with Linux ISO files in MBR BIOS and in UEFI Secure mode ?
 
@@ -23,16 +23,19 @@ Select as UEFI Boot entry on USB the Linux Mint Or Super UEFI Grub2 file \EFI\Bo
 
 Program Settings to Add Grub2 Manager: "Mint   UEFI|Super UEFI|Mint + MBR|Sup + MBR|MBR  Only"
 
-Linux ISO files in images folder:
+The Sup + MBR setting is Super UEFI + MBR
+The Mint + MBR setting is Linux Mint UEFI + MBR
+
+Linux ISO files in images folder - Only for linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso
 UEFI mode - Linux Mint Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \Boot\grub\grub.cfg and grub_Linux.cfg Menu
 UEFI mode - Super UEFI Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \EFI\grub\grub.cfg  and grub_Linux.cfg Menu
 MBR BIOS  - a1ive Grub2 Boot Manager installed in MBR and booting with \grub\grub.cfg and grub_Linux.cfg Menu
 MBR BIOS  - also available Grub4dos Menu booting with menu.lst and menu_Linux.lst
 
-Linux ISO files in iso folder:
+All Linux ISO files in iso folder:
 UEFI mode - GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim\main.cfg and inc-linux.cfg files
 MBR BIOS  - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
-MBR BIOS  - also available Grub4dos Menu booting with menu.lst and menu_Linux.lst
+MBR BIOS  - also available for some Linux ISO files Grub4dos Menu booting with menu.lst and menu_Linux.lst
 
 Download Linux ISO file:
 Linux Mint Cinnamon - https://linuxmint.com/download.php
@@ -48,5 +51,8 @@ Thanks to:
 - chenall for making Grub4dos - https://github.com/chenall/grub4dos/releases and http://grub4dos.chenall.net/categories/downloads/
 
 More Info on UEFI Secure booting - https://habr.com/ru/post/446238/
+The Super UEFI setting uses Super UEFI shim combined with ailive Grub2 Boot Manager - Addon with a1ive Grub2 Boot Manager is required
+
+The MBR BIOS mode involves Install of a1ive Grub2 in MBR - Addon with a1ive Grub2 Boot Manager is required
 
 

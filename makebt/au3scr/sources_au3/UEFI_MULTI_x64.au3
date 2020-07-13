@@ -3,7 +3,7 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  July 10, 2020
+ Author:        WIMB  -  July 12, 2020
 
  Program:       UEFI_MULTI_x64.exe - Version 4.7 in rule 189
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
@@ -2559,39 +2559,6 @@ Func _Go()
 
 	SystemFileRedirect("Off")
 
-	If GUICtrlRead($ImageType) = "LiveXP BootSDI - IMG" Or GUICtrlRead($ImageType) = "BartPE - ISO" Or GUICtrlRead($ImageType) = "XP Rec Cons - IMG" Then
-		If $g4d_vista And Not FileExists($TargetDrive & "\BOOTFONT.BIN") And Not FileExists(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN") Then
-			MsgBox(48, "STOP - XP File BOOTFONT.BIN Needed ", "Solution - Run UEFI_MULTI once in XP OS " & @CRLF & @CRLF _
-			& " Or add BOOTFONT.BIN manually to makebt\Boot_XP folder ", 0)
-			GUICtrlSetData($ProgressAll, 0)
-			DisableMenus(0)
-			_GUICtrlStatusBar_SetText($hStatus," First Select Target Drives and then Sources", 0)
-			Return
-		EndIf
-	EndIf
-
-	; Code Not needed anymore - in case of NTLDR BootSector then Grub4dos Menu always available which allows to use BootManager Menu
-;~ 		If $g4d_vista=0 And Not FileExists($TargetDrive & "\grldr") And Not FileExists($TargetDrive & "\menu.lst") Then
-;~ 			If Not FileExists($TargetDrive & "\NTDETECT.COM") And Not FileExists(@ScriptDir & "\makebt\Boot_XP\NTDETECT.COM") And Not FileExists(@ScriptDir & "\makebt\ntdetect.com") Then
-;~ 				MsgBox(48, "WARNING - File NTDETECT.COM Needed to Enable Boot XP ", " Missing File makebt\Boot_XP\NTDETECT.COM " & @CRLF & @CRLF _
-;~ 				& " Solution - Run UEFI_MULTI once in XP OS " & @CRLF & @CRLF _
-;~ 				& " Or add NTDETECT.COM manually to makebt\Boot_XP folder ", 0)
-;~ 				GUICtrlSetData($ProgressAll, 0)
-;~ 				DisableMenus(0)
-;~ 				_GUICtrlStatusBar_SetText($hStatus," Please Select Source and Target Drive", 0)
-;~ 				Return
-;~ 			EndIf
-;~ 			If Not FileExists($TargetDrive & "\NTLDR") And Not FileExists(@ScriptDir & "\makebt\Boot_XP\NTLDR") Then
-;~ 				MsgBox(48, "WARNING - File NTLDR Needed to Enable Boot XP ", " Missing File makebt\Boot_XP\NTLDR " & @CRLF & @CRLF _
-;~ 				& " Solution - Run UEFI_MULTI once in XP OS " & @CRLF & @CRLF _
-;~ 				& " Or add NTLDR manually to makebt\Boot_XP folder ", 0)
-;~ 				GUICtrlSetData($ProgressAll, 0)
-;~ 				DisableMenus(0)
-;~ 				_GUICtrlStatusBar_SetText($hStatus," First Select Target Drives and then Sources", 0)
-;~ 				Return
-;~ 			EndIf
-;~ 		EndIf
-
 	GUICtrlSetData($ProgressAll, 50)
 	Sleep(2000)
 
@@ -2759,6 +2726,7 @@ Func _Go()
 			If GUICtrlRead($Combo_EFI) = "Mint + MBR"  Or GUICtrlRead($Combo_EFI) = "MBR  Only" Then
 				DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
 			EndIf
+			$grub2=1
 		EndIf
 
 		; _GUICtrlStatusBar_SetText($hStatus," Adding Grub Config - wait .... ", 0)
@@ -2771,12 +2739,8 @@ Func _Go()
 				FileCopy(@ScriptDir & "\UEFI_MAN\boot\grub\Main.cfg", $TargetDrive & "\boot\grub\", 1)
 			Else
 				If GUICtrlRead($Combo_EFI) = "Mint   UEFI" Or GUICtrlRead($Combo_EFI) = "Mint + MBR" Then
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub.cfg", $TargetDrive & "\boot\grub\", 8)
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
-				ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or "Sup + MBR" Then
-					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 8)
-					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
-				Else
+					FileCopy(@ScriptDir & "\UEFI_MAN\boot\grub\grub.cfg", $TargetDrive & "\boot\grub\", 8)
+					FileCopy(@ScriptDir & "\UEFI_MAN\boot\grub\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 8)
 				EndIf
 			EndIf
 		Else
@@ -2785,12 +2749,8 @@ Func _Go()
 					FileMove($TargetDrive & "\boot\grub\grub.cfg", $TargetDrive & "\boot\grub\org-grub.cfg", 1)
 				EndIf
 				If GUICtrlRead($Combo_EFI) = "Mint   UEFI" Or GUICtrlRead($Combo_EFI) = "Mint + MBR" Then
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub.cfg", $TargetDrive & "\boot\grub\", 1)
-					FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
-				ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Sup + MBR" Then
-					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub.cfg", $TargetDrive & "\boot\grub\", 1)
-					If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\efi\boot\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
-				Else
+					FileCopy(@ScriptDir & "\UEFI_MAN\boot\grub\grub.cfg", $TargetDrive & "\boot\grub\", 1)
+					FileCopy(@ScriptDir & "\UEFI_MAN\boot\grub\grub_Linux.cfg", $TargetDrive & "\boot\grub\", 1)
 				EndIf
 			EndIf
 		EndIf
@@ -2900,11 +2860,21 @@ Func _Go()
 	GUICtrlSetData($ProgressAll, 80)
 	Sleep(1000)
 
-	If $g4d_vista And GUICtrlRead($xp_bcd) = $GUI_CHECKED Then
-		If Not FileExists($TargetDrive & "\NTLDR") And Not FileExists(@ScriptDir & "\makebt\Boot_XP\NTLDR") Then
-			MsgBox(48, "WARNING - Files Needed to Enable Boot XP ", " Missing File makebt\Boot_XP\NTLDR " & @CRLF & @CRLF _
-			& " Solution - Run UEFI_MULTI once in XP OS Or Manually Add " & @CRLF & @CRLF _
-			& " ntldr + NTDETECT.COM + Bootfont.bin to USB and Boot_XP ", 0)
+	If GUICtrlRead($ImageType) = "LiveXP BootSDI - IMG" Or GUICtrlRead($ImageType) = "BartPE - ISO" Or GUICtrlRead($ImageType) = "XP Rec Cons - IMG" Then
+		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") Then
+			MsgBox(48, "WARNING - XP File BOOTFONT.BIN is Missing ", "Solution - Run UEFI_MULTI once in XP OS " & @CRLF & @CRLF _
+			& " Or add BOOTFONT.BIN manually to makebt\Boot_XP folder " & @CRLF & @CRLF _
+			& " Add BOOTFONT.BIN manually to Boot Drive " & $TargetDrive, 0)
+		EndIf
+	EndIf
+
+	; NTLDR BootSector and NT MBR
+	If $g4d_vista=0 And $xpmbr=1 And $grub2=0 And $PartStyle = "MBR" Or GUICtrlRead($xp_bcd) = $GUI_CHECKED Then
+		If Not FileExists($TargetDrive & "\NTLDR") Then
+			MsgBox(48, "WARNING - File NTLDR Needed to Enable Boot XP ", " Missing File makebt\Boot_XP\NTLDR " & @CRLF & @CRLF _
+			& " Solution - Run UEFI_MULTI once in XP OS " & @CRLF & @CRLF _
+			& " Or add NTLDR manually to makebt\Boot_XP folder " & @CRLF & @CRLF _
+			& " Enable Boot XP - Add NTLDR manually to Boot Drive " & $TargetDrive, 0)
 		EndIf
 	EndIf
 
@@ -2925,11 +2895,6 @@ Func _Go()
 ;~ 			& $TargetDrive & "\efi\boot\bootia32.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
 ;~ 			& " Get from Win 8/10 x86 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
 ;~ 			& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
-;~ 		EndIf
-
-;~ 		If Not FileExists($TargetDrive & "\bootmgr") And $PartStyle = "MBR" Then
-;~ 			MsgBox(64, " WARNING - bootmgr is missing ", $TargetDrive & "\bootmgr is missing on Target Boot Drive " & @CRLF & @CRLF _
-;~ 			& " Manually add file bootmgr from Win 7/8/10 to Drive " & $TargetDrive)
 ;~ 		EndIf
 
 	_GUICtrlStatusBar_SetText($hStatus," End of Program Or Again ?", 0)
