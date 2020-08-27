@@ -25,6 +25,9 @@ map --mem (hd0,0)/grubfm_multiarch.iso (0xff)
 map --hook
 chainloader (0xff)
 
+iftitle [if exist (hd0,0)/grub/core.img] Grub2 Menu of a1ive - (hd0,0)/grub/core.img
+kernel /grub/core.img
+
 iftitle [ls (hd0,0)/images] Windows ISO Menu - (hd0,0)/images
 set iso_drive=(hd0,0)
 find --set-root /menu_Win_ISO.lst
@@ -42,11 +45,6 @@ configfile /menu_Linux.lst
 
 iftitle [ls (hd0,1)/images] Linux   ISO Menu - (hd0,1)/images
 set iso_drive=(hd0,1)
-find --set-root /menu_Linux.lst
-configfile /menu_Linux.lst
-
-iftitle [ls (hd0,0)/iso] Linux   ISO Menu - (hd0,0)/iso
-set iso_drive=(hd0,0)
 find --set-root /menu_Linux.lst
 configfile /menu_Linux.lst
 

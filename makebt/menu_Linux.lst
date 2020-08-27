@@ -57,61 +57,13 @@ root (0xff)
 kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
 initrd /boot/syslinux/initrd.xz
 
-iftitle [if exist %iso_drive%/iso/linuxmint/linuxmint.iso] ISO Linux Mint - %iso_drive%/iso/linuxmint/linuxmint.iso
-set iso_path=/iso/linuxmint/linuxmint.iso
+iftitle [if exist %iso_drive%/images/kali-linux.iso] KALI Linux - %iso_drive%/images/kali-linux.iso
+set iso_path=/images/kali-linux.iso
 map %iso_drive%%iso_path% (0xff)
 map --hook
 root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
-iftitle [if exist %iso_drive%/iso/linuxmint/linuxmint.iso && if exist %iso_drive%/iso/linuxmint/casper-rw] ISO Linux Mint Persist - %iso_drive%/iso/linuxmint/linuxmint.iso
-set iso_path=/iso/linuxmint/linuxmint.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/linuxmint.seed boot=casper persistent persistent-path=/iso/linuxmint/ iso-scan/filename=%iso_path% quiet splash --
-initrd /casper/initrd.lz
-
-iftitle [if exist %iso_drive%/iso/knoppix/runtimelivecd.iso] ISO Knoppix - %iso_drive%/iso/knoppix/runtimelivecd.iso
-set iso_path=/iso/knoppix/runtimelivecd.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
-initrd /boot/isolinux/minirt.gz
-
-iftitle [if exist %iso_drive%/iso/knoppix/knoppix.iso] ISO Knoppix - %iso_drive%/iso/knoppix/knoppix.iso
-set iso_path=/iso/knoppix/knoppix.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/isolinux/linux bootfrom=/dev/*%iso_path% knoppix_dir=/KNOPPIX ramdisk_size=100000 lang=en apm=power-off nomce libata.force=noncq hpsa.hpsa_allow_any=1 loglevel=1 noswap tz=localtime
-initrd /boot/isolinux/minirt.gz
-
-iftitle [if exist %iso_drive%/iso/ubuntu/ubuntu.iso] ISO Ubuntu - %iso_drive%/iso/ubuntu/ubuntu.iso
-set iso_path=/iso/ubuntu/ubuntu.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
-iftitle [if exist %iso_drive%/iso/ubuntu/ubuntu.iso && if exist %iso_drive%/iso/ubuntu/casper-rw] ISO Ubuntu Persist - %iso_drive%/iso/ubuntu/ubuntu.iso
-set iso_path=/iso/ubuntu/ubuntu.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper persistent persistent-path=/iso/ubuntu/ iso-scan/filename=%iso_path% quiet splash ---
-initrd /casper/initrd
-
-iftitle [if exist %iso_drive%/iso/Porteus.iso] ISO Linux Porteus - %iso_drive%/iso/Porteus.iso
-set iso_path=/iso/Porteus.iso
-map %iso_drive%%iso_path% (0xff)
-map --hook
-root (0xff)
-kernel /boot/syslinux/vmlinuz nomagic base_only norootcopy from=%iso_path%
-initrd /boot/syslinux/initrd.xz
+kernel /live/vmlinuz findiso=%iso_path% boot=live components splash username=kali hostname=kali
+initrd /live/initrd.img
 
 title AIO Linux OS
 find --set-root /AIO/Menu/Linux.lst

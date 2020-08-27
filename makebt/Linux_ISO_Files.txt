@@ -1,19 +1,20 @@
-USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-07-12
+USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-08-27
 
 How to make USB Drive booting with Linux ISO files in MBR BIOS and in UEFI Secure mode ?
 
-In USB_FORMAT and UEFI_MULTI select Grub2 Manager - Super UEFI and MBR BIOS options require addon-glim-agFM
+In USB_FORMAT and UEFI_MULTI select Grub2 Manager
+- Super UEFI and MBR BIOS options require addon-glim-agFM
 - Use R-mouse 7-zip menu to Extract here will Add the content of addon to existing folder and confirm overwrites 4x with yes
 
-A. Linux Mint UEFI Manager - Addon is Not needed - Support for some Linux ISO files only - Download Linux Mint - Knoppix Live - Ubuntu - Porteus
-   Copy  Linux ISO to folder images on USB Boot - Rename as linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso
-   UEFI Secure - Grub2 Menu from \Boot\grub\grub.cfg and \Boot\grub\grub_Linux.cfg - Linux Mint bootx64.efi and grubx64.efi of 15-05-2018
+A. Linux Mint UEFI Manager - Addon is Not needed - Support for some Linux ISO files only - Download Linux Mint - Knoppix Live - Ubuntu - Porteus - KALI
+   Copy  Linux ISO to folder images on USB Boot - Rename as linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso - kali-linux.iso
+   Linux Mint UEFI Secure - Grub2 Menu from \Boot\grub\grub.cfg and \Boot\grub\grub_Linux.cfg - Linux Mint bootx64.efi and grubx64.efi of 15-05-2018
    MBR BIOS mode - Grub4dos Menu booting with menu.lst and menu_Linux.lst
    a1ive Grub2 File Manager from Addon can be used in UEFI Grub2 Menu and always in MBR BIOS Grub4dos Menu to boot a lot of Linux ISO files
 
-B. Super UEFI Manager - use addon-glim-agFM - support for a lot of Linux ISO files - UEFI Grub2 from Super-UEFIinSecureBoot-Disk_v3
-   Copy Your Linux ISO to folder \iso\YourLinux on FAT32 USB Boot drive U-BOOT  - more info on UEFI Secure booting
-   UEFI Secure - Grub2 Menu from \EFI\grub\grub.cfg and grub_Linux.cfg with GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim
+B. Super UEFI Manager - use addon-glim-agFM - support for a lot of Linux ISO files
+   Copy Your Linux ISO to folder \iso\YourLinux on FAT32 USB Boot drive U-BOOT
+   Super UEFI Secure - Grub2 Menu from \EFI\grub\grub.cfg and grub_Linux.cfg with GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim
    MBR BIOS mode - a1ive Grub2 Menu from \grub\grub.cfg and grub_Linux.cfg with GRUB2 Live ISO Multiboot menu from \grub\glim\main.cfg and inc-linux.cfg files
    a1ive Grub2 File Manager from agFM Addon can be used in UEFI Secure Grub2 and MBR BIOS Grub4dos Menu to select a lot of Linux ISO files
 
@@ -26,22 +27,25 @@ Program Settings to Add Grub2 Manager: "Mint   UEFI|Super UEFI|Mint + MBR|Sup + 
 The Sup + MBR setting is Super UEFI + MBR
 The Mint + MBR setting is Linux Mint UEFI + MBR
 
-Linux ISO files in images folder - Only for linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso
+Linux ISO files renamed in images folder - Only for linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso - kali-linux.iso
 UEFI mode - Linux Mint Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \Boot\grub\grub.cfg and grub_Linux.cfg Menu
 UEFI mode - Super UEFI Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \EFI\grub\grub.cfg  and grub_Linux.cfg Menu
-MBR BIOS  - a1ive Grub2 Boot Manager installed in MBR and booting with \grub\grub.cfg and grub_Linux.cfg Menu
-MBR BIOS  - also available Grub4dos Menu booting with menu.lst and menu_Linux.lst
+MBR BIOS  - a1ive Grub2 Boot Manager installed in MBR Or Grub4dos > Grub2 Menu using grub\core.img - booting with \grub\grub.cfg and grub_Linux.cfg Menu
+MBR BIOS  - Grub4dos Menu booting with menu.lst and menu_Linux.lst
 
-All Linux ISO files in iso folder:
-UEFI mode - GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim\main.cfg and inc-linux.cfg files
-MBR BIOS  - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
-MBR BIOS  - also available for some Linux ISO files Grub4dos Menu booting with menu.lst and menu_Linux.lst
+All Linux ISO files with original fullname in subfolder of iso folder - addon-glim-agFM required
+UEFI mode - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim\main.cfg and inc-linux.cfg files
+MBR BIOS  - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
 
 Download Linux ISO file:
 Linux Mint Cinnamon - https://linuxmint.com/download.php
 Knoppix Runtime Live CD - https://www.runtime.org/data-recovery-live-cd.htm
 Ubuntu Desktop - https://ubuntu.com/download/desktop
 Porteus x86_64 PassWord = toor - http://www.porteus.org/ and http://porteus.org/porteus-mirrors.html and http://www.mirrorservice.org/sites/dl.porteus.org/
+Kali Linux - 64-bit Live - https://www.kali.org/downloads/
+Download USB_FORMAT and addon-glim-agFM - https://github.com/wimbrts/USB_FORMAT/releases
+Download UEFI_MULTI and addon-glim-agFM - https://github.com/wimbrts/UEFI_MULTI/releases
+wimb GitHub - https://github.com/wimbrts - More Info - https://msfn.org/board/topic/181311-usb-format-tool-and-uefi_multi/
 
 Thanks to:
 - a1ive for making Grub2 Boot Manager - https://github.com/a1ive/grub/releases
@@ -51,8 +55,8 @@ Thanks to:
 - chenall for making Grub4dos - https://github.com/chenall/grub4dos/releases and http://grub4dos.chenall.net/categories/downloads/
 
 More Info on UEFI Secure booting - https://habr.com/ru/post/446238/
-The Super UEFI setting uses Super UEFI shim combined with ailive Grub2 Boot Manager - Addon with a1ive Grub2 Boot Manager is required
+The Super UEFI setting uses Super UEFI shim combined with alive Grub2 Boot Manager - Addon with a1ive Grub2 Boot Manager is required
 
-The MBR BIOS mode involves Install of a1ive Grub2 in MBR - Addon with a1ive Grub2 Boot Manager is required
+Grub2 MBR BIOS mode involves Install of a1ive Grub2 in MBR Or Grub4dos > Grub2 Menu using grub\core.img - Addon with a1ive Grub2 Boot Manager is required
 
 
