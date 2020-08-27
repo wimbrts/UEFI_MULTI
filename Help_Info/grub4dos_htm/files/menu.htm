@@ -1,0 +1,702 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Configuration File Entries</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Configuration File Entries</h1>
+<hr />
+
+
+	<p>
+	It is worth noting that some of the Grub4dos commands (e.g. <font class="command">password</font>, <font class="command">fallback</font>, etc) are only used in configuration files – they are not relevant when using the command line. The configuration file is used to script boot options – the default menu is text based, alternatively a splash image can be used.
+	</p>
+
+
+	<p>
+	All commands in the configuration file must be in lower case. All boot options must begin with the command <font class="command">title</font>, which should be followed with the text to be displayed in the boot menu (e.g. <font class="command">title Boot Windows XP</font> will display the text “Boot Windows XP”.
+	</p>
+
+
+	<p>
+	Once the boot menu is displayed the selected menu option can be edited before booting (by pressing the <b>[e]</b> key), however the edits take place in memory and are not written to the configuration file.
+	</p>
+
+
+	<p>
+	Sample <font class="file">menu.lst</font> file (included with Grub4dos download) - 
+	</p>
+
+<div><textarea cols="80" rows="10" align=left readonly>
+# This is a sample menu.lst file. You should make some changes to it.
+# The old install method of booting via the stage-files has been removed.
+# Please install GRLDR boot strap code to MBR with the bootlace.com
+# utility under DOS/Win9x or Linux.
+
+color blue/green yellow/red white/magenta white/magenta
+timeout 30
+default /default
+
+title find and load NTLDR of Windows NT/2K/XP
+fallback 1
+find --set-root --ignore-floppies /ntldr
+chainloader /ntldr
+savedefault --wait=2
+
+title find and load BOOTMGR of Windows VISTA
+fallback 2
+find --set-root --ignore-floppies /bootmgr
+chainloader /bootmgr
+savedefault --wait=2
+
+title find and load CMLDR, the Recovery Console of Windows NT/2K/XP
+fallback 3
+find --set-root --ignore-floppies /cmldr
+chainloader /cmldr
+#####################################################################
+# write string "cmdcons" to memory 0000:7C03 in 2 steps:
+#####################################################################
+# step 1. Write 4 chars "cmdc" at 0000:7C03
+write 0x7C03 0x63646D63
+# step 2. Write 3 chars "ons" and an ending null at 0000:7C07
+write 0x7C07 0x00736E6F
+savedefault --wait=2
+
+title find and load IO.SYS of Windows 9x/Me
+fallback 4
+find --set-root /io.sys
+chainloader /io.sys
+savedefault --wait=2
+
+title find and boot 0PE.ISO
+fallback 5
+find --set-root /0PE/0PE.ISO
+map /0PE/0PE.ISO (0xff) || map --mem /0PE/0PE.ISO (0xff)
+map --hook
+chainloader (0xff)
+savedefault --wait=2
+
+title find and boot MicroPE.ISO
+fallback 6
+find --set-root /boot/MicroPE.ISO
+map /boot/MicroPE.ISO (0xff) || map --mem /boot/MicroPE.ISO (0xff)
+map --hook
+chainloader (0xff)
+savedefault --wait=2
+
+title Parted Magic ISO
+fallback 7
+find --set-root /pmagic.iso
+map /pmagic.iso (0xff) || map --mem /pmagic.iso (0xff)
+map --hook
+chainloader (0xff)
+savedefault --wait=2
+
+title Ultimate Boot CD ISO
+fallback 8
+find --set-root /ubcd.iso
+map /ubcd.iso (0xff) || map --mem /ubcd.iso (0xff)
+map --hook
+chainloader (0xff)
+savedefault --wait=2
+
+title commandline
+commandline
+
+title floppy (fd0)
+chainloader (fd0)+1
+rootnoverify (fd0)
+
+title back to dos
+quit
+
+title reboot
+reboot
+
+title halt
+halt
+
+title MAXDOS.IMG
+find --set-root --ignore-floppies /boot/MAXDOS.IMG
+map --mem /boot/MAXDOS.IMG (fd0)
+map --hook
+chainloader (fd0)+1
+rootnoverify (fd0)
+</textarea></div>
+
+	<p>
+	NOTE - all lines starting with # are comments - they are not processed.  
+	</p>
+
+	<ul>
+	<li><a href="#display">Display Options</a>
+	<li><a href="#help">Adding (Help) Messages to Menu Entries</a>
+	<li><a href="#default">Set Default Boot Option</a>
+	<li><a href="#password">Password Protecting Boot Options</a>
+	<li><a href="#submenu">Using Submenus</a>
+	<li><a href="#find">Using "find --set-root" Command</a>
+	<li><a href="#operators">Using "<font class="command">&&</font>" and "<font class="command">||</font>" Commands</a>
+	</ul>
+
+
+
+
+
+
+
+
+<a name="display"></a>
+<h2>Display Options</h2>
+
+	<p>
+	Menu colours can be set using the following command syntax (See also <b>APPENDIX - Commands</b> section <a href="commands.htm#color">here<a>). Default is white text on a black background, with current option being black text within a white highlight - 
+	</p>		
+		<div id=box>
+		color NORMAL HIGHLIGHT HELPTEXT HEADING<br />
+		</div>
+
+	<p>
+	NORMAL HIGHLIGHT HELPTEXT HEADING parameters use the format f/g, where f=foreground colour and b=background colour. Colours must be one of the following - black, blue, green, cyan, red, magenta, brown, light-gray, dark-gray, light-blue, light-green, light-cyan, light-red, light-magenta, yellow and white. 
+	</p>
+
+	<p>
+	The easiest way to demonstrate the syntax is to use a screenshot. The following menu.lst entry <font class="command">color light-blue/blue light-red/red light-green/green light-magenta/magenta</font> will display all menu entries with light blue text on a blue background (NORMAL) with the selected option being in light red text within a red highlight (HIGHLIGHT). The HELPTEXT section (below the boot menu) will use light-green text on a green background and the HEADING will use light-magenta text on a magenta background (see figure 1. below) -
+	</p>
+
+		<div id=img>
+		figure 1.
+		<IMG SRC="img/menu1.jpg">
+		</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<p>
+	It is also possible to use a background image with a menu, using either the <font class="command">splashimage</font> command or the <b>gfxmenu</b> package. Both of these options must be used in a configuration file and cannot be used from a command line. <b>gfxmenu</b> requires external files/packages and is much more complex than using the <font class="command">splashimage</font> command, however it does support .jpg images. For gfxmenu usage, see <a href="gfxmenu.htm">here</a>. 
+	</p>
+
+	<p>
+	If using the <font class="command">splashimage</font> command, the image will need to be in the .xpm format (which can be compressed with gzip) and must be 640x480 pixels with a maximum of 14 colours. For instructions on creating a splash image see next section (<a href="splash.htm">here</a>). To display splash image splash.xpm.gz (in current root directory) the following entry should be used in menu.lst -  
+	</p>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<div id=box>
+		splashimage=/splash.xpm.gz
+		</div>
+
+	<p>
+	To display splash image splash.xpm.gz (saved in 1st partition on 1st hard disk drive) the following entry should be used - 
+	</p>
+
+		<div id=box>
+		splashimage=(hd0,0)/splash.xpm.gz
+		</div>
+
+	<p>
+	By default the <font class="command">foreground</font> colour (all of the menu text and the highlight for the currently selected option) will be white and the <font class="command">background</font> colour (the highlighted text within the currently selected option) will be black. To change these colours use the following menu.lst entry - 
+	</p>
+
+		<div id=box>
+		splashimage=(hd0,0)/splash.xpm.gz <br />
+		foreground=RRGGBB <br />
+		background=RRGGBB <br />
+		</div>
+
+	<p>
+	Where RR is red, GG is green, and BB blue. Numbers must be in hexadecimal. In the following example the menu text and highlight for the selected option will be displayed in Blue (hex decimal value 0033FF) and the selected option will have Red (hex decimal value FF3300) text – refer to figure 2. below.
+	</p>
+
+		<div id=box>
+		splashimage=(hd0,0)/splash.xpm.gz <br />
+		foreground=0033FF <br />
+		background=FF3300 <br />
+		</div><br />
+
+			<div id=img>
+			figure 2.
+			<IMG SRC="img/menu2.jpg"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="help"></a>
+<h2>Adding (Help) Messages to Menu Entries</h2>
+
+	<p>
+	Grub4dos will display the following message beneath any available menu options - 
+	</p>	
+
+		<div id=box2>
+		Use the &uarr; and &darr; keys to highlight an entry. Press ENTER or 'b' to boot.  <br />
+		Press 'e' to edit the commands before booting, or 'c' for a command line.
+		</div>
+
+	<p>
+	It is possible to replace the above text with a user defined entry specific to individual menu items. Any message must be appended to the title line of the menu entry. Text to add should be preceeded by <font class="command">\n</font>. As an example, the following <font class="file">menu.lst</font> entry - 
+	</p>
+
+		<div id=box>
+		title MS DOS <br />
+		find --set-root /dos.img <br />
+		map --mem /dos.img (fd0) <br />
+		root (fd0) <br />
+		chainloader +1 <br />
+		</div><br />
+
+	<p>
+	Will display the menu in figure 3. - 
+	</p>
+
+		<div id=img>
+		figure 3.
+		<IMG SRC="img/menu3.jpg">
+		</div>
+
+	<p>
+	To add the message "Load DOS.img floppy disk image into RAM" to the <font class="file">menu.lst</font> entry for <font class="command">title MS DOS</font> - edit the entry, changing <font class="command">title MS DOS</font> to <font class="command">title MS DOS<b>\n</b>Load DOS.img floppy disk image into RAM</font>. The new <font class="file">menu.lst</font> entry - 
+	</p>
+
+		<div id=box>
+		title MS DOS\nLoad DOS.img floppy disk image into RAM <br />
+		find --set-root /dos.img <br />
+		map --mem /dos.img (fd0) <br />
+		root (fd0) <br />
+		chainloader +1 <br />
+		</div><br />
+
+	<p>
+	Will display the menu in figure 4. - 
+	</p>
+
+		<div id=img>
+		figure 4.
+		<IMG SRC="img/menu4.jpg">
+		</div>
+
+	<p>
+	Multiple lines can be added to the message by adding additional <font class="command">\n</font> (new line) entries/commands. E.g. <font class="command">title MS DOS<b>\n</b>Load DOS.img floppy disk image into RAM<b>\n</b>Mount as (fd0) and boot from the image</font> Will display the following text/message at the bottom of the menu screen - 
+	</p>
+
+		<div id=box2>
+		Load DOS.img floppy disk image into RAM <br />
+		Mount as (fd0) and boot from the image
+		</div>
+
+	<p>
+	Other commands can be used for the displayed message/text. The following is from <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> - 
+	</p>
+
+<div><textarea cols="80" rows="10" align=left readonly>
+Some C-style quote sequences are interpreted as follows:
+
+	\NNN	character with octal value NNN (1 to 3 digits)
+
+	\\	backslash
+
+	\a	alert (BEL)
+
+	\b	backspace
+
+	\f	form feed
+
+	\n	new line
+
+	\r	carriage return
+
+	\t	horizontal tab
+
+	\v	vertical tab
+
+	\xHH	byte with hexadecimal value HH (1 to 2 digits)
+</textarea>
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="default"></a>
+<h2>Set Default Boot Option</h2>
+
+	<p>
+	It is possible to specify a default boot option by using the <font class="command">default</font> command. If the <font class="command">timeout</font> command is also specified, the system will wait for the set timeout period before booting the default entry. 
+	</p>
+
+	<p>
+	To set a 10 second timeout use following entry -
+	</p>
+
+		<div id=box>
+		timeout 10<br />
+		</div>
+
+	<p>
+	To set a default entry (to be booted after timeout period has completed) use following entry (default 0=first menu item, default 1=second menu item, etc.) -
+	</p>
+
+		<div id=box>
+		default 0<br />
+		</div>
+
+
+	<p>
+	It is possible to change the default entry to the last option selected when Grub4dos was previously booted by using the <font class="command">default</font> command followed by a file. E.g. -
+	</p>
+
+		<div id=box>
+		default (hd0,0)/default <br />
+		</div>
+
+	<p>
+	The command <font class="command">default (hd0,0)/default</font> specifies that an entry be written to the file <font class="file">default</font>, on the first partition of the first hard disk (this file must be copied from the Grub4dos download – do not edit the file as it must remain 2048 bytes in size). If using this option, the drive containing the <font class="file">default</font> file must be writable. The menu entry must also include the command <font class="command">savedefault</font> – e.g. 
+	</p>
+		<div id=box>
+		timeout 10 <br />
+		default /default <br />
+		<br />
+		title Boot Windows XP <br />
+		root (hd0,1) <br />
+		chainloader +1 <br />
+		savedefault <br />
+		</div>
+
+
+
+
+<a name="password"></a>
+<h2>Password Protecting Boot Options</h2>
+
+	<p>
+	To restrict access to the command line interface use the command <font class="command">password</font> prior to any menu entries – e.g. 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10<br />
+		default /default<br />
+		password administrator<br />
+		<br />
+		title........
+		</div>
+
+	<p>
+	When booting Grub4dos with a password protected configuration file the default instructions will change from -
+	</p>
+
+		<div id=box2>
+		Use the &uarr; and &darr; keys to highlight an entry. Press ENTER or 'b' to boot.  <br />
+		Press 'e' to edit the commands before booting, or 'c' for a command line.
+		</div>
+
+	<p>
+	to -
+	</p>
+		<div id=box2>
+		Use the &uarr; and &darr; keys to highlight an entry. Press ENTER or 'b' to boot. <br />
+		Press 'p' to gain privileged control.
+		</div>
+
+	<p>
+	The user enters the <b>[p]</b> key to gain privileged control, followed by the specified password – which in the preceding example is administrator. 
+	</p>
+
+	<p>
+	It is possible to use an encrypted password by using the command <font class="command">password --md5</font> followed by the encrypted password – in the following case “$1$ZjU0$k107noL9DOaClJEu6n6f91” is an encryption of administrator. 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10<br />
+		default /default<br />
+		password --md5 $1$ZjU0$k107noL9DOaClJEu6n6f91<br />
+		<br />
+		title........
+		</div>
+
+	<p>
+	<b>WARNING - do <u>not</u> generate your "md5 hash” password using another program as it is unlikely to be compatible with Grub4dos (see <a target="_blank" href="http://www.boot-land.net/forums/?showtopic=2984">here</a>). To ensure compatibility use the <font class="command">md5crypt</font> command from within Grub4dos - see below.</b>
+	</p>
+
+	<p>
+	To create an encrypted password, boot Grub4dos and press <b>[c]</b> to access a command line interface, then type the command <font class="command">md5crypt</font> - this will prompt you to enter a password and will output the chosen password as an md5 hash (see figure 5. below).
+	</p>
+
+			<div id=img>
+			figure 5.
+			<IMG SRC="img/menu5.jpg"></div>
+
+
+	<p>
+	It is also possible to restrict access to individual menu items when a password has been set by using the <font class="command">lock</font> command, until the user enters the correct password (using <b>[p]</b> key to gain privileged control, followed by the password) any menu items designated with "lock" will not be accessible  - 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10<br />
+		default /default<br />
+		<br />
+		title........ <br />
+		lock
+		</div>
+
+
+	<p>
+	Alternatively the password command can be used to protect individual menu entries by specifying the password command within the entry – e.g. 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10<br />
+		default /default<br />
+		<br />
+		title........ <br />
+		password password2
+		</div>
+
+	<p>
+	md5 hash’s can also be used within menu entries. Different menu entries within the same configuration file can be protected with different passwords - whilst still using a <font class="command">password</font> entry at the start of the configuration file forcing the user to enter a password to <font class="box2">Press 'p' to gain privileged control</font> - e.g. 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10<br />
+		default /default<br />
+		password --md5 $1$ZjU0$k107noL9DOaClJEu6n6f91<br />
+		<br />
+		title........ <br />
+		password mypassword
+		</div>
+
+
+
+
+<a name="submenu"></a>
+<h2>Using Submenus</h2>
+
+	<p>
+	It is possible to create sub menus by using the <font class="command">configfile</font> command, followed by the filename of the configuration file you want to load. E.g. <font class="file">menu.lst</font> contents – 
+	</p>
+
+		<div id=box>
+		color light-blue/blue light-red/red <br />
+		timeout 10 <br />
+		password --md5 $1$ZjU0$k107noL9DOaClJEu6n6f91 <br />
+		<br />
+		title Boot Options <br />
+		lock  <br />
+		find --set-root /submenu.lst<br />
+		configfile /submenu.lst
+		</div>
+
+	<p>
+	Will load <font class="file">submenu.lst</font>. The <font class="file">submenu.lst</font> configuration file follows the same format as <font class="file">menu.lst</font> – a new menu colour scheme can be specified, default boot entry can be set, etc. Adding an option to return to the previous menu is recommended, to avoid being "stuck" in the submenu.
+	</p>
+
+
+
+<div><textarea cols="80" rows="10" align=left readonly>
+# submenu.lst
+		
+splashimage=(hd0,0)/splash4.xpm.gz
+foreground=0033FF
+background=FF3300 
+timeout 10
+default /default
+
+title Boot HDD#0
+chainloader (hd0)+1
+rootnoverify (hd0)
+savedefault
+
+title Boot HDD#1
+chainloader (hd1)+1
+rootnoverify (hd1)
+savedefault
+
+title Reboot
+reboot
+savedefault
+
+title Previous Menu
+find --set-root /menu.lst
+configfile /menu.lst
+
+
+</textarea></div>
+
+
+
+<a name="find"></a>
+<h2>Using "find --set-root" Command</h2>
+
+	<p>
+	The command <font class="command">find --set-root</font> combined with a filename can be used to locate a marker file on a device and set that device as the root for all further commands within the menu entry (or all further commands executed from the command line). E.g. – 
+	</p>
+
+		<div id=box>
+		title Find “hdd.tag” and chainload partition <br />
+		find --set-root /hdd.tag <br />
+		chainloader +1 <br />
+		</div>
+
+	<p>
+	The example above will search all supported partitions/devices for the file <font class="file">hdd.tag</font> and will set the <u>first device</u> it finds, containing <font class="file">hdd.tag</font>, as the root device. The partition boot sector of the device (<font class="command">chainloader +1</font> = first sector of current root device) will then be chainloaded.  
+	</p>
+
+
+	<p>
+	It is possible to locate and load operating systems in this way. If for example Windows XP is installed, the following entry could be used - 
+	</p>
+
+		<div id=box>
+		title Find and load “ntldr”<br />
+		find --set-root /ntldr <br />
+		chainloader /ntldr <br />
+		</div>
+
+	<p>
+	If using the above example it is assumed that the NT loader <font class="file">ntldr</font> is only present on one device. If multiple devices contain <font class="file">ntldr</font>, the first one found will be set as the root device. As this could lead to the wrong installation booting, searching for unique tag/marker files are preferred. Devices are searched in the order – 
+	<ul>
+	<li>(hd#)</li>
+	<li>(cd#)</li>
+	<li>(fd#)</li>
+	</ul>
+	</p>
+
+	
+	<p>
+	Please note that <font class="file">ntldr</font> (and other Windows loader/system files <font class="file">bootmgr</font> and <font class="file">io.sys</font>) must be on a partition on device (hd0), or Windows will not boot - see <a href="map.htm#swap">here</a> for a full explanation and workaround.
+	</p>
+
+
+	<p>
+	It is possible to exclude floppy devices (or cd devices) from the search by using the command <font class="command">--ignore-floppies</font> (or <font class="command">--ignore-cd</font>) - e.g. <font class="command">find --set-root --ignore-floppies /ntldr</font>.
+	</p>
+
+	<p>
+	<b>REMEMBER</b> - <font class="command">find --set-root</font> sometimes leads to unexpected behavior - e.g. if you have used the map command and the drive you are expecting to find the file on is no longer visible in Grub4dos. Always remember that the search stops with the first instance of the file you are scanning for. Even using marker files can result in unwanted behaviour if you had forgotten (or didn't know) that the file was on more than one device.
+	</p>
+
+
+
+<a name="operators"></a>
+<h2>Using "<font class="command">&&</font>" and "<font class="command">||</font>" Commands</h2>
+
+<p>
+The operator <font class="command">&&</font> can be used to execute a second command if the first command is executed without error. The operator <font class="command">||</font> can be used to execute a second command if executing the first command results in an error. From <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> -
+</p>
+
+
+<div><textarea cols="80" rows="10" align=left readonly>
+******************************************************************************
+***              Newly implemented operators `&&' and `||'                 ***
+******************************************************************************
+
+This implementation is very simple. It does not handle operator nesting.
+
+Usage of `&&':
+
+	command1 && command2
+
+Description:
+
+	If command1 returns true, then command2 will be executed.
+
+Usage of `||':
+
+	command1 || command2
+
+Description:
+
+	If command1 returns false, then command2 will be executed.
+
+Examples:
+
+	is64bit && default 0
+	is64bit || default 1
+</textarea></div>
+
+
+<p>
+Some pratical examples are included in <font class="file">grldr</font>'s embedded menu and in the sample <font class="file">menu.lst</font> file included in the Grub4dos download. </p>
+
+<p>
+The entry <font class="command">find --set-root --ignore-floppies --ignore-cd /menu.lst <b>&&</b> configfile /menu.lst</font> (from the embedded menu) will execute <font class="command">find --set-root --ignore-floppies --ignore-cd /menu.lst</font> (the root of all (hd) type devices will be searched for <font class="file">menu.lst</font> and the first device found containing <font class="file">menu.lst</font> will be set as the root device). If this part of the command completes successfully then the command <font class="command">configfile /menu.lst</font> will be executed.
+</p>
+
+<p>
+The entry <font class="command">map /pmagic.iso (0xff) <b>||</b> map --mem /pmagic.iso (0xff)</font> (from the sample <font class="file">menu.lst</font>) will execute <font class="command">map /pmagic.iso (0xff)</font> (mapping the cd image file <font class="file">pmagic.iso</font> as the virtual device (0xff)). If this command fails (if for example the image is non-contiguous) then the second part of the command <font class="command">map --mem /pmagic.iso (0xff)</font> will be executed.
+</p>
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="cli.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="embedded.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+
+
+</body>
+</html>
+

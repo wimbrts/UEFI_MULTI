@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Loading/Installing Grub4dos From Linux</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Loading/Installing Grub4dos From Linux</h1>
+<hr />
+
+
+
+	<ul>
+	<li><a href="#linux1">Load via Syslinux</a> </li>
+	<li><a href="#linux2">Load Via (Legacy) Grub</a> </li>
+	<li><a href="#linux3">Load From Linux (kexec)</a> </li>
+	<li><a href="#linux4">Installing Grub4dos Code to the MBR</a> </li>
+	<li><a href="#linux5">Installing Grub4dos Code to the Partition Boot Sector</a> </li>
+	</ul>
+
+
+
+
+<a name="linux1"></a>
+<h2>Load via SysLinux</h2>
+	<p>
+	To load via Syslinux you will first need to install Syslinux to a bootable device (version 3.70 tested). Copy <font class="file">C:\Grub4dos\GRUB.EXE</font> to the <font class="file">syslinux</font> folder on the drive containing your Syslinux files and add an entry to the Syslinux configuration file <font class="file">syslinux.cfg</font>. e.g. –
+	</p>
+
+		<div id=box>
+		LABEL grud4dos<br>
+		MENU LABEL Grub4dos<br>
+		KERNEL grub.exe<br>
+		</div>
+
+	<p>
+	Alternatively copy <font class="file">C:\Grub4dos\GRUB.EXE</font> to the root of the drive containing your Syslinux files and add following entry to <font class="file">syslinux.cfg</font> –
+	</p>
+
+		<div id=box>
+		LABEL grud4dos<br>
+		MENU LABEL Grub4dos<br>
+		KERNEL /grub.exe<br>
+		</div>
+
+	<p>
+	Note the use of <font class="command">kernel <b>/</b>grub.exe</font>.
+	</p>
+
+
+
+
+
+
+
+
+
+<a name="linux2"></a>
+<h2>Load Via (Legacy) Grub</h2>
+	<p>
+	Linux users with (Legacy) GRUB already installed can use it to boot Grub4dos. Identify the partition containing the GRUB boot files/folder (e.g. <font class="file">(hd0,0)/boot/grub</font>). Copy <font class="file">grub.exe</font> to the GRUB <font class="file">boot</font> folder. Now add the following entry to your <font class="file">/boot/grub/menu.lst</font> file.
+	</p>
+
+		<div id=box>
+		title Grub4dos<br>
+		root (hd0,0)<br>
+		kernel /boot/grub/grub.exe<br>
+		</div>
+	
+	<p>
+	Change the <font class="command">root (hd0,0)</font> command to reflect your own setup. 
+	</p>
+
+
+
+
+
+
+<a name="linux3"></a>
+<h2>Load From Linux (kexec)</h2>
+	<p>
+	Following was tested using ubuntu Linux (version 8.04 (Hardy Heron)) - kexec package was installed using terminal command <font class="command">sudo apt-get install kexec-tools</font> - 
+	</p>
+
+		<div id=box>
+		sudo kexec -l grub.exe<br>
+		sudo kexec -e
+		</div>
+
+
+
+
+
+
+
+<a name="linux4"></a>
+<h2>Installing Grub4dos Code to the MBR</h2>
+
+
+	<p>
+	To install Grub4dos code to the MBR use <font class="file">bootlace.com</font>. Using Puppy Linux version 4.0, (hd0) was identified as <b>/dev/sda</b> - Grub4dos was installed using the command <font class="command">/mnt/sdb1/bootlace.com /dev/sda</font>. Output from running this command in a terminal - 
+	</p>
+
+		<div id=box2>
+		# /mnt/sdb1/bootlace.com /dev/sda <br />
+		<br />
+		Disk geometry calculated according to the partition table: <br />
+		&emsp;&emsp;&emsp;Sectors per track=63, Number of heads=255 <br />
+		<br />
+		Success. <br />
+		<br />
+		</div>
+
+
+
+
+
+
+<a name="linux5"></a>
+<h2>Installing Grub4dos Code to the Partition Boot Sector</h2>
+
+	<p>The following instructions have been copied from <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> -
+	</p>
+	
+
+<div><textarea cols="80" rows="10" align=left readonly>
+******************************************************************************
+***           Use bootlace.com to install partition boot record            ***
+******************************************************************************
+
+Since bootlace.com has not implemented the --install-partition option, you
+need to use the already implemented --floppy=PartitionNumber option instead.
+
+Hear is a way you might want to follow:
+
+Step 1. Get the boot sectors of the partition and save to a file MYPART.TMP.
+	For NTFS, you need to get the beginning 16 sectors. For other type of
+	filesystems, you only need to get one sector, but getting more sectors
+	is also ok.
+
+Step 2. Run this:
+
+	bootlace.com --floppy=Y --sectors-per-track=S --heads=H --start-sector=B --total-sectors=C --vfat --ext2 --ntfs MYPART.TMP
+
+	where we suppose MYPART.TMP is for (hdX,Y) and the partition number Y
+	should be specified as in the --floppy=Y option.
+
+	Note that for FAT12/16/32/NTFS partitions, you can omit these options:
+
+		 --sectors-per-track, --heads, --start-sector, --total-sectors,
+		 --vfat and --ext2.
+
+	For NTFS partitions, you must specify --ntfs option.
+
+	For ext2 partitions, you can omit --vfat, --ntfs and --ext2 options,
+	but other options should be specified.
+
+Step 3. Put MYPART.TMP back on to the boot sector(s) of your original partition
+	(hdX,Y).
+
+
+Note: Only a few file systems(FAT12/16/32/NTFS/ext2/ext3) are supported by now.
+
+Note2: Under Linux you may directly write the partition. That is to say, Step
+	1 and Step 3 are not needed. Simply use its device name instead of
+	MYPART.TMP.
+
+Note3: grubinst has the feature of installing grldr boot code onto a partiton
+	boot area.
+</textarea></div>
+	
+	<p>
+	To install Grub4dos code to (hd0,1) which is an NTFS formatted partition and is device /dev/sda2 (in Puppy Linux version 4.0) - 
+	<ul>
+	<li>Use the formula (hdX,Y) to calculate the <b>floppy=</b> parameter to be used with <font class="file">bootlace.com</font>. For (hd0,1) Y=1, therefore we will use <b>floppy=1</b> (to install to (hd0,2) we would use floppy=2, for (hd1,3) we would use floppy=3, etc).</li>
+
+	<li>Use <font class="file">bootlace.com</font> command <font class="command">bootlace.com --floppy=1 --ntfs /dev/sda2</font> - hopefully you will receive confirmation similar to the following</li>
+
+		<div id=box2>
+		# /mnt/sdb1/bootlace.com --floppy=1 --ntfs /dev/sda2 <br />
+		<br />
+		Filesystem type is NTFS. <br />
+		<br />
+		Success. <br />
+		<br />
+		</div>
+
+	<li>Copy <font class="file">grldr</font> to (hd0,1) and set (hd0,1) as active. <font class="file">grldr</font> must be present on the partition on which the bootsector was installed, <font class="file">menu.lst</font> can however be on another partition.</li>
+
+	</ul>
+
+	</p>
+
+
+
+
+
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="install.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="grldrmbr.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+</body>
+</html>

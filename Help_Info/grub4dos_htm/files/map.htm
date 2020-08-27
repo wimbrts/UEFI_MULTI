@@ -1,0 +1,738 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Map Command</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Map Command</h1>
+<hr />
+
+	<div id=bullet>
+	The map command is used for disk emulation. It is one of the more complex commands available in Grub4dos - see <a href="commands.htm#map">here</a> for grub4dos output when entering the command <font class="command">help map</font>. Using the <font class="command">map</font> command it is possible to - 
+		<ul>
+		<li>Boot Windows from a non-first hard disk</li>
+		<li>Boot from hard disk images</li>
+		<li>Boot floppy disk images on a floppyless machine</li>
+		<li>Create virtual devices accessible from certain operating systems</li>
+		<li>Boot from ISO images (note - experimental)</li>
+		</ul>
+	</div>
+
+
+	<p>
+	There are two distinct types of mapping, direct and memory. Direct mapping is generally used for larger images/devices. If using direct mapping to create a virtual device from a disk image, then the image file must be contiguous (not fragmented). Either of the following programs can be used to defragment a file that is not contiguous - <a target="_blank" href="http://technet.microsoft.com/en-us/sysinternals/bb897428.aspx">contig</a> or <a target="_blank" href="http://wincontig.mdtzone.it/en/">wincontig</a>. Attempting to directly map a non-contiguous file will result in <font class="box2">&nbsp;Error 60: File for drive emulation must be in one contiguous disk area&nbsp;</font>, in which case memory mapping or defragmenting the file, and then retrying, should be attempted.
+	</p>
+
+	<p>
+Memory mapping, which copies the mapped device/image into memory, is generally used for smaller images - e.g. floppy disk images. In memory mapping the image file can be non-contiguous. Available system RAM will restrict the size of any image mapped to memory.
+	</p>
+
+	<p>
+	The "map" process is implemented using INT 13 - any disk emulation will remain accessible from an OS that uses compatible mode disk access, e.g. DOS and Windows 9x. The emulation can't however, be accessed from an OS which uses protected mode drivers (Windows NT/2000/XP/Vista, Linux, FreeBSD) once the protected mode kernel file(s) take control.
+	</p>
+
+	<div id="bullet">
+	The command line interface will be used throughout this section, which will cover - 
+	<ul>
+	<li><a href="#direct">Direct Mapping</a></li>
+	<li><a href="#indirect">Memory Mapping</a></li>
+	<li><a href="#hd32">Booting from .ISO Images</a></li>
+	<li><a href="#2xMap">Nested Mapping</a></li>
+	</ul>
+	</div> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="direct"></a>
+<h2>Direct Mapping</h2>
+
+
+
+	<div id="bullet">
+	The direct mapping section covers the following - 
+	<ul>
+	<li><a href="#image">Booting Disk Image Files</a></li>
+	<li><a href="#swap">Disk Swapping</a> (e.g. for booting Windows from a non-first hard disk</li>
+	</ul>
+	</div> 
+
+
+
+
+
+<a name="image"></a>
+<h3>Booting Disk Image Files</h3>
+
+
+	<p>
+	An example of direct mapping of a floppy disk image was given in the Boot Options section of this guide -		
+	</p>
+
+		<div id=box>
+		title Boot Disk Image <br />
+		map (hd0,0)/win98.ima (fd0) <br />
+		map --hook <br />
+		chainloader (fd0)+1 <br />
+		rootnoverify (fd0) <br />
+		map --floppies=1
+		</div>
+
+
+	<div id="bullet">
+	Breaking down these commands line by line, as they would be entered from the command line (above is from a configuration file entry) - 
+	<ul>
+	<li><font class="command">title Boot Disk Image</font> - description for configuration file entry. This would be omitted when using the command line.</li>
+
+	<li><font class="command">map (hd0,0)/win98.ima (fd0)</font> <b>[enter]</b> - this maps the image file (in this case <font class="file">win98.ima</font>, at the root of first partition on the first hard disk) to the first floppy (fd0).</li>
+
+	<li><font class="command">map --hook</font> <b>[enter]</b> - this command makes the mapping take place immediately. Until <font class="command">map --hook</font> is entered, all map commands are only recognised from the booted operating system. Once <font class="command">map --hook</font> is executed, mappings become "global" - they take effect even within Grub4dos. This in covered in more detail in the following section. If the floppy image fails to boot and you are returned to the command line interface (or menu) the mapping will remain in effect until the <font class="command">map --unhook</font> command is issued.</li>
+
+	<li><font class="command">chainloader (fd0)+1</font> <b>[enter]</b> - this tells grub4dos to chainload the first sector of the first floppy disk. As the image file has been mapped as (fd0) and the <font class="command">map --hook</font> command has been issued, this will boot the image file.</li>
+
+	<li><font class="command">rootnoverify (fd0)</font> <b>[enter]</b> - this tells grub4dos to make the first (mapped) floppy the ROOT device, without attempting to mount the device. As discussed previously, this can usually be substituted by the "normal" root command, at least for objects that have standard filesystems, like the floppy in this example.</li>
+
+	<li><font class="command">map --floppies=1</font> <b>[enter]</b> - this tells grub4dos that it must "show" just one floppy (the mapped one) to the OS - this can usually be omitted.
+</li>
+
+	The <font class="command">boot</font> command will also need to be executed when using the command line.
+	</ul>
+	</div> 
+
+	<p>
+	Grub4dos feedback when entering the above commands from the command line -		
+	</p>
+
+		<div id=box2>
+		grub> map (hd0,0)/win98.ima (fd0) <br />
+		FAT12 BPB found with 0xEB (jmp) leading the boot sector.<br />
+		<br />
+		probed C/H/S =80/2/18, probed total sectors = 2880<br />
+		<br />
+		floppies_orig=0, harddrives_orig=2, floppies_curr=1, harddrives_curr=2<br />
+		<br />
+		grub> map --hook<br />
+		<br />
+		grub> chainloader (fd0)+1<br />
+		<br />
+		grub> rootnoverify (fd0)<br />
+		<br />
+		grub> map --floppies=1<br />
+		<br />
+		grub> boot_
+		</div>
+
+
+
+
+	<div id="bullet">
+	Booting hard disk images uses the same principles required for booting a floppy disk image. E.g. to boot hard disk image <font class="file">PE.ima</font> from the first logical volume on the second hard disk -	
+	<ul>
+
+	<li><font class="command">map (hd1,4)/PE.ima (hd0)</font> <b>[enter]</b> - this maps the image file (in this case <font class="file">PE.img</font>, at the root of first logical volume on the second hard disk) as the first hard disk (hd0).</li>
+
+	<li><font class="command">map --hook</font> <b>[enter]</b> - same usage as in floppy disk image example above.</li>
+
+	<li><font class="command">chainloader (hd0)+1</font> <b>[enter]</b> - this tells grub4dos to chainload the MBR of the first hard disk. As the image file has been mapped as (hd0) and the <font class="command">map --hook</font> command has been issued, this will boot the MBR of the image file.</li>
+
+	<li><font class="command">rootnoverify (hd0)</font> <b>[enter]</b> - this tells grub4dos to make the first (mapped) hard disk the ROOT device, without attempting to mount the device. In this case the <font class="command">root</font> command cannot be used as the whole disk cannot be mounted. It would however be possible to use the <font class="command">root</font> command if chainloading a partition within the disk image - e.g. if chainloader command was <font class="command">chainloader (hd0,0)+1</font>, <font class="command">root (hd0,0)+1</font> could work, provided the partition type was supported.</li>
+
+	<li><font class="command">boot</font> <b>[enter]</b> - boot the chainloaded entry. 
+</li>
+
+	</ul>
+	</div> 
+
+
+
+	<p>
+	When directly mapping a hard disk image the image file must have a valid MBR. An image with multiple partitions should be mapped as a (hd) type device. If the hard disk image file is of a single partition (without MBR), then it should be mapped as a floppy disk. 	
+	</p>
+
+
+	<p>
+	There are a number of examples of direct mapping in the <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> file. 	
+	</p>
+
+
+
+
+<a name="swap"></a>
+<h3>Disk Swapping</h3>	
+
+
+
+	<p>
+	An example of when you might use the <font class="command">map</font> command to change the disk order occurs when booting from a USB device (e.g. flash drive, or external hard drive). As the BIOS settings are changed to boot from the USB bus, the internal hard disk would become (hd1). DOS and Windows 9x will not boot from a non-first hard disk, although Windows NT based systems will theoretically boot from a non-first disk the arcpaths in <font class="file">boot.ini</font> will have become invalid when booting from the USB device. If a windows OS is installed on the internal device it will therefore no longer boot. 
+	</p>
+
+
+	<p>
+	Another example would be adding a new hard disk to an existing system. If for example the old disk had Windows XP installed - and was moved from 'master' to 'slave' (becoming (hd1)), whilst the new disk was set as 'master' (hd0) and Windows Vista was installed to it, it would no longer be possible to boot Windows XP from the slave disk.
+	</p>
+
+
+	<p>
+	It is possible to boot these systems from a non-first hard disk by using the map command to change the disk order (e.g. remapping (hd1) to (hd0)). 
+	</p>
+
+
+		<div id=bullet>
+		In the test setup, the system has two hard disk drives - 
+		<ul>
+		<li>(hd0) - FAT, 300MB, Linux installed to (hd0,0)</li>
+		<li>(hd1) - FAT, 20MB, MS-DOS installed to (hd1,0)</li>
+		</ul>
+		</div>
+
+
+	<p>
+	(hd0,0) contains the marker file <font class="file">hd0.tag</font> and (hd1,0) contains the marker file <font class="file">hd1.tag</font>. The <a target="_blank" href="http://www.mbrwizard.com/">MBR Wizard</a> program has been added to (hd1,0), to check which disks are accessible from dos after using various <font class="command">map</font> commands.  
+	</p>
+
+		<div id=bullet>
+		Attempting to boot DOS from (hd1) without remapping the drive, using the commands - 
+		<ul>
+		<li><font class="command">root (hd1,0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader +1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+	<p>
+	results in the following error,
+	</p>
+	
+		<div id=box2>
+		Invalid system disk<br />
+		Replace the disk, and then press any key
+		</div>
+
+		<div id=bullet>
+		It is possible to "trick" the system into thinking that device (hd1) is the first hard disk by using the <font class="command">map</font> command. To remap (hd1) as (hd0) and chainload the DOS kernel <font class="file">io.sys</font>, use the commands -
+		<ul>
+		<li><font class="command">map (hd1) (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">root (hd1,0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader /io.sys</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	NOTE - using the above sequence of commands, the mapping of (hd1) to (hd0) does not take effect until after the <font class="command">boot</font> command has been issued. Although (hd1) has been mapped as (hd0), all references to the actual device remain (hd1) in Grub4dos. Entering the command <font class="command">find /hd0.tag</font> from the Grub4dos command line will return the device (hd0,0), whilst entering the command <font class="command">find /hd1.tag</font> from the Grub4dos command line will return the device (hd1,0) - see box below. 
+	</p>
+
+		<div id=box2>
+		grub> map (hd1) (hd0) <br />
+		<br />
+		grub> find /hd0.tag<br />
+		&emsp;(hd0,0)<br />
+		<br />
+		grub> find /hd1.tag<br />
+		&emsp;(hd1,0)<br />
+		<br />
+		grub> root (hd1,0)<br />
+		&emsp;Filesystem type is fat, partition type 0xe<br />
+		<br />
+		grub> chainloader /io.sys<br />
+		Will boot MS-DOS 7.x from drive=0x81, partition=0x0(hidden sectors=0x3f)<br />
+		<br />
+		grub> boot_
+		</div>
+
+	<p>
+	Note the output following the <font class="command">chainloader</font> command <font class="box2">...from drive=0x81</font>. After booting into DOS the command <font class="command">mbrwizd.exe /list</font> was executed. As you can see from the disk size and filesystem type parameters in figure 1. - the device (hd1) is listed as Disk:0 and Disk:1 - the device (hd0) is not visible.
+	</p>
+
+
+		<div id=img>
+		figure 1.
+		<IMG SRC="img/map1.jpg">
+		</div>
+
+
+		<div id=bullet>
+		As noted previously, when using the map command the mapping does not take place until after the <font class="command">boot</font> command is issued. Using the command <font class="command">map --hook</font> however, makes any <font class="command">map</font> commands take place immediately. This is best explained by the following example - 
+		<ul>
+		<li><font class="command">map (hd1) (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (hd0,0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader /io.sys</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	NOTE - using the above sequence of commands, the mapping of (hd1) to (hd0) takes effect immediately after the <font class="command">map --hook</font> command has been issued. Entering the command <font class="command">find /hd0.tag</font> from the Grub4dos command line will result in a "File not found" error, whilst entering the command <font class="command">find /hd1.tag</font> from the Grub4dos command line will return the devices (hd0,0) and (hd1,0) - see box below. 
+	</p>
+
+		<div id=box2>
+		grub> map (hd1) (hd0) <br />
+		<br />
+		grub> map --hook <br />
+		<br />
+		grub> find /hd0.tag<br />
+		Error 15: File not found<br />
+		<br />
+		grub> find /hd1.tag<br />
+		&emsp;(hd0,0)<br />
+		&emsp;(hd1,0)<br />
+		<br />
+		grub> root (hd0,0)<br />
+		&emsp;Filesystem type is fat, partition type 0xe<br />
+		<br />
+		grub> chainloader /io.sys<br />
+		Will boot MS-DOS 7.x from drive=0x80, partition=0x0(hidden sectors=0x3f)<br />
+		<br />
+		grub> boot_
+		</div>
+
+	<p>
+	Note the output following the <font class="command">chainloader</font> command <font class="box2">...from drive=0x80</font>. After booting into DOS the command <font class="command">mbrwizd.exe /list</font> was executed. The results were the same as in the previous example, with the device (hd1) listed as Disk:0 and Disk:1 - and the device (hd0) not visible.
+	</p>
+
+		<div id=bullet>
+		To make both hard disks visible in DOS, remap (hd1) as (hd0) and (hd0) as (hd1) by using the command -  
+		<ul>
+		<li><font class="command">map (hd1) (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">map (hd0) (hd1)</font><b> [enter]</b></li>
+		<li><font class="command">root (hd1,0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader /io.sys</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	NOTE - After entering the commands <font class="command">map (hd1) (hd0)</font> and <font class="command">map (hd0) (hd1)</font>, entering <font class="command">find /hd0.tag</font> from the Grub4dos command line will return the device (hd0). Entering <font class="command">find /hd1.tag</font> will return the device (hd1). Once DOS has booted both disks will be accessible, however the physical device (hd1) will be listed as Disk: 0, and the device (hd0) will be Disk: 1 - see figure 2.
+	</p>
+
+		<div id=img>
+		figure 2.
+		<IMG SRC="img/map2.jpg">
+		</div>
+
+		<div id=bullet>
+		The following commands, using <font class="command">map --hook</font>, can also be used -
+		<ul>
+		<li><font class="command">map (hd1) (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">map (hd0) (hd1)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (hd0,0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader /io.sys</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	Remember that disk emulation will only remain accessible from an OS that still uses INT 13. In the examples used above, Windows NT based systems would see device (hd0) as "disk 0" and device (hd1) as "disk 1", as soon as the boot process was complete.
+	</p>
+
+		<div id=bullet>
+		It is also possible to map an individual partition as a device, e.g. -
+		<ul>
+		<li><font class="command">map (hd1,0)+1 (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">map (hd0) (hd1)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (hd0,0)/io.sys</font><b> [enter]</b></li>
+		<li><font class="command">rootnoverify (hd0)</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	When mapping a partition the syntax (hdm,n)+1 is used to represent the whole partition (where m=disk number, and n=partition number), not just the first sector. 
+	</p>
+
+	<p>
+	Grub4dos feedback when mapping a partition using the above commands -  
+	</p>
+
+
+		<div id=box2>
+		grub> map (hd1,0)+1 (hd0) <br />
+		FAT16 BPB found with 0xEB (jmp) leading the boot sector.<br />
+		<br />
+		probed C/H/S =40/16/63, probed total sectors = 40257<br />
+		Try to locate extended partition (hd1)0+40320 for the virtual (hd0).<br />
+		<br />
+		probed C/H/S =40/16/63, probed total sectors = 40320<br />
+		<br />
+		grub> map (hd1) (hd0) <br />
+		<br />
+		grub> map --hook <br />
+		<br />
+		grub> chainloader /io.sys<br />
+		Will boot MS-DOS 7.x from drive=0x80, partition=0x0(hidden sectors=0x3f)<br />
+		<br />
+		grub> rootnoverify (hd0)<br />
+		<br />
+		grub> boot_
+		</div>
+
+
+		<div id=bullet>
+		Individual partitions can be mapped as a floppy device - this has an advantage in that the hard disks remain unchanged and will remain accessible from the booted operating system in their original order. E.g. -
+		<ul>
+		<li><font class="command">map (hd1,0)+1 (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (fd0)+1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+	<p>
+	A cautionary note from the <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> file 
+	<div id="quote">
+	"Counters for floppies and harddrives in the BIOS Data Area remain unchanged during the mapping. You should manually set them to proper values with `map --floppies=' and/or `map --harddrives=', especially, e.g., when there is no real floppy drive attached to the mother board. If not doing so, DOS might fail to start. `map --status' can report the values. Note also that `map --floppies=' and `map --harddrives=' can be used independently without the appearance of mappings."
+	</div>
+	</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="indirect"></a>
+<h2>Memory Mapping</h2>
+
+
+	<p>
+	Memory mapping uses the same command syntax as the direct mapping examples above, with the addition of the --mem switch. 
+	</p>
+
+		<div>
+		E.g. instead of -
+		<ul>
+		<li><font class="command">map (hd0,0)/win98.ima (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (fd0)+1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+		<div>
+		use, 
+		<ul>
+		<li><font class="command">map <u>--mem</u> (hd0,0)/win98.ima (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (fd0)+1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	When memory mapping is used the disk image file can be non-contiguous. Devices can also be mapped to memory - e.g. <font class="command">map <u>--mem</u> (hd0,0)+1 (fd0)</font> (as explained previously, the <font class="command">+1</font> notation is used in the <font class="command">map</font> command to denote the whole partition). If mapping a disk image of a partition without a MBR to memory, it can be mapped as a (hd) device as the MBR will be created within Grub4dos - based on the partition data.
+	</p>
+
+
+	<p>
+	Compressed images can also be used when memory mapping. The images must be compressed with gzip (.gz file extension), which is a freeware opensource compressor. Since many disk images are not "full", their contents can be compressed with a noticeable compression ratio. A standard floppy image (1440 Kb) can usually be reduced to a fraction of its original size. The use of compressed images is therefore recommended, as it allows for faster loading and less usage of disk space. 
+	</p>
+
+		<div>
+		Example use for Gzip'ed images -
+		<ul>
+		<li><font class="command">find --set-root /win98.ima.gz </font><b> [enter]</b></li>
+		<li><font class="command">map --mem /win98.ima.gz (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader +1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+	<p>
+	gzip can be downloaded from <a target="_blank" href="http://www.gzip.org/">here</a>. Using gzip to compress the floppy disk image <font class="file">bcdl201a.ima</font>, the image was compressed from 1440kb to 10.4kb. 
+	</p>
+
+
+	<p>
+	Although Grub4dos only supports the .gz format natively, the <font class="file">memdisk</font> kernel (part of the syslinux project) can be loaded to support .zip compressed images - e.g. the Winimage .imz format. The <font class="file">memdisk</font> kernel can be gzip'ed and loaded from Grub4dos.
+	</p>
+
+
+		<div>
+		Examples for using <font class="file">memdisk</font> (compressed using gzip) to boot a floppy disk image -
+		<ul>
+		<li><font class="command">find --set-root /memdisk.gz </font><b> [enter]</b></li>
+		<li><font class="command">kernel /memdisk.gz</font><b> [enter]</b></li>
+		<li><font class="command">initrd /win98.ima</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	or,
+	</p>
+
+		<div>
+		<ul>
+		<li><font class="command">find --set-root /memdisk.gz </font><b> [enter]</b></li>
+		<li><font class="command">kernel /memdisk.gz</font><b> [enter]</b></li>
+		<li><font class="command">initrd /win98.ima.gz</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	or,
+	</p>
+
+		<div>
+		<ul>
+		<li><font class="command">find --set-root /memdisk.gz </font><b> [enter]</b></li>
+		<li><font class="command">kernel /memdisk.gz</font><b> [enter]</b></li>
+		<li><font class="command">initrd /win98.ima.zip</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+	<p>
+	NOTE - in the above examples <font class="file">win98.ima</font> would need to be on the same partition as <font class="file">memdisk.gz</font>
+	</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="hd32"></a>
+<h2>Booting from .ISO Images</h2>
+
+
+	
+		<p>
+		It is possible to map and boot from <b><u>some</u></b> CD/DVD images using Grub4dos, however it should be noted that this feature is experimental. Remember -
+		</p>
+
+			<div id="quote">
+			"The "map" process is implemented using INT 13 - any disk emulation will remain accessible from an OS that uses compatible mode disk access, e.g. DOS and Windows 9x. The emulation can't however, be accessed from an OS which uses protected mode drivers (Windows NT/2000/XP/Vista, Linux, FreeBSD) once the protected mode kernel file(s) take control." 
+			</div>
+
+		<p>
+		This means that there is no way (at present) to install Windows using Grub4dos ISO emulation. Also, it is  not possible to boot a Windows PE (Preinstallation Environment) boot disc image, unless the image is RAM disk based. RAM disk based discs include Windows PE 2/2.1 and builds that utilise <font class="file">ramdisk.sys</font> and <font class="file">setupldr.bin</font> files from windows 2003 server SP1 source (see 
+
+<a target="_blank" href="http://www.911cd.net/forums//index.php?showtopic=10482">here</a> and <a target="_blank" href="http://www.911cd.net/forums//index.php?showtopic=19333">here</a>). 
+		</p>
+
+		<p>
+		The majority of Linux based CD images will also fail to work with Grub4dos ISO emulation. Linux distributions require <b>kernel</b> and <b>initrd</b> files to be specified, as soon as these files are loaded the protected mode kernel driver(s) take control and the virtual CD will no longer be accessible. If any other files are required from the CD/DVD they will be missing, resulting in boot error(s).
+ 		</p>
+
+		<p>
+		Linux distributions that only require <b>kernel</b> and <b>initrd</b> files function fully via iso emulation, as no other data needs accessing from the virtual CD/DVD drive once they have been loaded - INT 13 access works until these files are loaded and is then not required. 
+		</p>
+		
+
+		<div id=bullet>
+		Some CD/DVD-ROM (ISO9660) images (see exceptions above) can be mapped as the device (hd32), and booted using the following commands (replace <font class="command">(device)/path/file.iso</font> with the relevant path/filename) - 
+		<ul>
+		<li><font class="command">map (device)/path/file.iso (hd32)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (hd32)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (hd32)</font><b> [enter]</b> - this can be substituted with <font class="command">chainloader ()&nbsp;</font><b> [enter]</b>, as the root device was set in the previous command.</li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+	<p>
+	There are different types of CD boot emulation, including floppy emulation - in which the boot sector of the CD is a bootable floppy disk image. The boot sector is not accessible when viewing the CD in a file manager such as Windows Explorer and might appear to be a blank disk if no files are contained on the disc root. 
+	</p>
+
+
+
+	<p>
+	In the following test an image was taken of a CD containing a DOS boot disk based bootsector, with various DOS utilities on the CD (not in the boot sector image). When booting this setup from a real CD, the bootsector image is allocated as the A: drive, and the CD-ROM (and files at the root of the CD) is allocated the next available drive letter. The CD image file <font class="file">(hd0,0)/dos.iso</font> was booted using the commands above, this resulted in the following Grub4dos output -  
+	</p>
+
+
+		<div id=box2>
+		grub> map (hd0,0)/dos.iso (hd32) <br />
+		<br />
+		grub> map --hook<br />
+		<br />
+		grub> root (hd32)<br />
+		&emsp;Filesystem type is iso9660, using the whole disk<br />
+		<br />
+		grub> chainloader (hd32)<br />
+		<br />
+		Load segment: 0x0&nbsp;&nbsp;&nbsp;&nbsp;System Type: 0x0&nbsp;&nbsp;&nbsp;&nbsp;Sector Count: 0x1<br />
+		Load RBA: 0x3E&nbsp;&nbsp;&nbsp;&nbsp;Boot Type: 2 = 1.44M floppy<br />
+		<br />
+		grub> boot<br />
+		</div>
+
+
+	<p>
+	The CD appeared to boot normally. The CD bootsector image was loaded and allocated the A: drive letter and the CD-ROM was allocated as E: drive. Unfortunately attempting to access any files on the E: drive (the root of the CD image) resulted in an error. 
+	</p>
+
+
+
+<div>
+The <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> file suggests the following when using DOS - <br />
+<textarea cols="80" rows="10" align=left readonly>
+...google for ELTORITO.SYS and use it in CONFIG.SYS as a device driver for the virtual cdrom.
+
+Example usage of eltorito.sys in CONFIG.SYS:
+
+	device=eltorito.sys /D:oemcd001
+
+Corresponding MSCDEX command which can be placed in AUTOEXEC.BAT:
+
+	MSCDEX /D:oemcd001 /L:D
+
+</textarea>
+</div>
+
+
+	<p>
+	NOTE - if mkisofs <font class="command">–iso-level 4</font> command has been used to create the .iso image (as is normal with PE builds), <font class="file">MSCDEX.EXE</font> should not be used - replace with <font class="file">SHSUCDX</font> (see <a target="_blank" href="http://www.boot-land.net/forums/?showtopic=2267&st=3">here</a>).
+	</p>
+
+
+	<p>
+	Edited <font class="file">config.sys</font> and <font class="file">autoexec.bat</font> and injected the amended files (and <font class="file">eltorito.sys</font>) into the boot image, before rebuilding <font class="file">dos.iso</font>. The remastered CD-ROM was booted, as before the bootsector itself was accessible however the root of the CD was not. 
+	</p>
+
+
+		<div id=bullet>
+		<font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> also suggests replacing (hd32) with (0xFF), e.g. - 
+		<ul>
+		<li><font class="command">map (device)/path/file.iso (0xFF)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">root (0xFF)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader (0xFF)</font><b> [enter]</b> or <font class="command">chainloader ()&nbsp;</font><b> [enter]</b> as root has already been set.</li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+	<p>
+	When mapping the .iso containing <font class="file">eltorito.sys</font> in the bootsector as device (0xFF), the CD-ROM booted and both the bootsector image and the root of the CD were accessible.
+	</p>
+
+	<p>
+	The above example illustrates some of the complexities of CD-ROM Emulation. For working examples see this thread <a target="_blank" href="http://www.boot-land.net/forums/?showtopic=5041">here</a>
+	</p>
+
+
+
+
+
+
+
+
+<a name="2xMap"></a>
+<h2>Nested Mapping</h2>
+
+
+		<div id=bullet>
+		Using recent versions of Grub4dos it is possible to map an image from another mapped image - this is sometimes referred to as double mapping. The UBCD project, for example, utilises a bootable CD containing bootable floppy disk images. Using the CDROM Emulation discussed above, it is possible to map a UBCD .iso file as (hd32), then map a floppy image from (hd32) as device (fd0), then boot from the newly mapped floppy image. E.g. - 
+		<ul>
+		<li><font class="command">map --mem (hd0,0)/ubcd34-basic.iso (hd32)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">map --mem (hd32)/IMAGES/MAXBLAST.IGZ (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook<b></font> [enter]</b></li>
+		<li><font class="command">root (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader +1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+		<div id=bullet>
+		Note from Grub4dos author <b>tinybit</b> - there is no limit to the depth of the nest when using this form of mapping. Expanding on the example above, it would be possible to map another image from within the mapped device (fd0). E.g. - 
+		<ul>
+		<li><font class="command">map --mem (hd0,0)/ubcd34-basic.iso (hd32)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook</font><b> [enter]</b></li>
+		<li><font class="command">map --mem (hd32)/IMAGES/MAXBLAST.IGZ (fd0)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook<b></font> [enter]</b></li>
+		<li><font class="command">map --mem (fd0)/floppy.img.gz (fd1)</font><b> [enter]</b></li>
+		<li><font class="command">map --hook<b></font> [enter]</b></li>
+		<li><font class="command">root (fd1)</font><b> [enter]</b></li>
+		<li><font class="command">chainloader +1</font><b> [enter]</b></li>
+		<li><font class="command">boot</font><b> [enter]</b></li>
+		</ul>
+		</div>
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="pxe.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="examples.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+
+</body>
+</html>
+

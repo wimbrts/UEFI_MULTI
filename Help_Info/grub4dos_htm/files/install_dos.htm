@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Loading/Installing Grub4dos From DOS (and Windows 9x)</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Loading/Installing Grub4dos From DOS <br />(and Windows 9x)</h1>
+<hr />
+
+
+	<ul>
+	<li><a href="#dos1">Loading grub.exe</a>
+	<li><a href="#dos2">Loading grub.exe From config.sys (or autoexec.bat)</a>
+	<li><a href="#dos3">Installing Grub4dos to the MBR</a>
+	<li><a href="#dos4">Installing Grub4dos to the Partition Boot Sector</a>
+	</ul>
+
+
+<a name="dos1"></a><br>
+<h2>Loading grub.exe</h2>
+
+	<p>
+	Copy <font class="file">C:\Grub4dos\grub.exe</font> to the root of your boot drive/device. Boot from the device and wait for the DOS prompt, then type <font class="command">grub.exe</font> <b>[ENTER]</b> to load grub4dos. If using Windows 9x, press the <b>[F8]</b> key to enter the safe mode boot menu and choose option <b>Command prompt only</b> or <b>Safe mode command prompt only</b>, then type <font class="command">grub.exe</font> <b>[ENTER]</b>.
+	</p>
+
+
+
+
+
+
+
+
+<a name="dos2"></a><br>
+<h2>Loading grub.exe From config.sys (or autoexec.bat)</h2>
+
+	<p>
+	Copy <font class="file">C:\Grub4dos\grub.exe</font> to the root of your boot drive/device. Add an entry to <font class="file">config.sys</font> - to add an option to a Windows 98 (SE) boot disk menu, edit <font class="file">config.sys</font> (in a text editor such as notepad) and add the following entries (for changes to original <font class="file">config.sys</font> see <a href="dos_config.htm">here</a> - changes are in red text) -
+	</p>
+
+<div><textarea cols="80" rows="10" align=left readonly>
+[menu]
+menuitem=CD, Start computer with CD-ROM support.
+menuitem=NOCD, Start computer without CD-ROM support.
+menuitem=GRUB, Grub4dos Boot Loader.
+menuitem=HELP, View the Help file.
+menudefault=CD,30
+menucolor=7,0
+
+[GRUB]
+install=grub.exe
+
+[CD]
+device=himem.sys /testmem:off
+device=oakcdrom.sys /D:mscd001 
+device=btdosm.sys 
+device=flashpt.sys
+device=btcdrom.sys /D:mscd001
+device=aspi2dos.sys
+device=aspi8dos.sys
+device=aspi4dos.sys
+device=aspi8u2.sys
+device=aspicd.sys /D:mscd001
+
+[NOCD]
+device=himem.sys /testmem:off
+
+[HELP]
+device=himem.sys /testmem:off
+
+[COMMON]
+files=10
+buffers=10
+dos=high,umb
+stacks=9,256
+devicehigh=ramdrive.sys /E 2048
+lastdrive=z
+</textarea></div>
+
+	<p>
+	A sample <font class="file">config.sys</font> is included in the Grub4dos download, this can be used to replace <font class="file">config.sys</font> on your boot device - if using the sample file you will be prompted to press the <b>[space]</b> bar to start Grub4dos. 
+	<p>
+
+
+	<p>
+	<font class="file">Autoexec.bat</font> can also be used to launch Grub4dos - simply edit the file and add entry <font class="command">grub.exe</font>.
+	</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="dos3"></a>
+<h2>Installing Grub4dos to the MBR</h2>
+	<p>
+	To install grub4dos code to a hard disks MBR via DOS, copy <font class="file">C:\Grub4dos\BOOTLACE.COM</font> to the root of a DOS bootable drive/disk. Now reboot your PC and boot into DOS. If using Windows 9x <font class="file">BOOTLACE.COM</font> can be executed from a dos box (start > run > type <font class="command">command</font> <b>[enter]</b>).
+	</p>
+
+	<p>
+To install Grub4dos code to the MBR of the first hard disk (usually the first hard disk set to boot within the BIOS settings) use command -
+	</p>
+		<div id=box>
+		BOOTLACE.COM 0x80
+		</div>
+
+	<p>
+	To install Grub4dos code to the MBR of the second hard disk use command -
+	</p>
+		<div id=box>
+		BOOTLACE.COM 0x81
+		</div>
+	<p>
+	To avoid installing Grub4dos to the wrong disk use a third party tool such as <font class="file">MBRWizD.exe</font> (available <a target="_blank" href="http://www.mbrwizard.com/">here</a>) to check the disk order. Copy <font class="file">MBRWizD.exe</font> to the root of the DOS bootable device and type <font class="command">MBRWizD.exe /List</font> - you should be able to identify the correct disk from the attributes outputted by the command (to install to disk 0 - use command <font class="command">BOOTLACE.COM 0x80</font>; to install to disk 1 - use command <font class="command">BOOTLACE.COM 0x81</font>; etc.). You will also need to copy <font class="file">grldr</font> and <font class="file">menu.lst</font> to the root of a (supported) local drive/disk. 
+	</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a name="dos4"></a>
+<h2>Installing Grub4dos to the Partition Boot Sector</h2>
+
+	<p>
+	Using the Grubinst package, it is possible to install Grub4dos code to the partition boot sector. Although this feature is documented in <font class="file">bootlace.com</font>, attempting to install to the bootsector (using the command <font class="command">bootlace.com --install-partition=0 0x80</font>) results in the following - 
+	</p>
+
+		<div id=box2>
+		C:\>bootlace.com --install-partition=0 0x80<br>
+		<br>
+		Sorry! --install-partition not yet implemented with this release<br>
+		</div>
+
+
+	<p>
+	Use instead the DOS version of grubinst tool - at the time of writing this guide the  most recent version available is version is <b>grubinst-1.1-bin-dos-2008-01-01</b> (file name <font class="file">grbins16.exe</font>). Use command syntax <font class="command">grbins16.exe -p=n [device]</font> or <font class="command">grbins16.exe --install-partition=n [device]</font> (where <font class="command"> n </font> = partition number, starting from 0 for first partition. e.g. <font class="command">grbins16.exe -p=0 (hd0)</font>. If using Windows 9x, run <font class="file">grbins16.exe</font> from a dos box (start > run > type <font class="command">command</font> <b>[enter]</b>).
+	</p>
+
+	<p>
+	<font class="file">grldr</font> must be copied to the partition on which the bootsector was installed, and the partition must be active. See <a href="links.htm">here</a> for Grubinst download.
+	</p>
+
+
+
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="install.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="grldrmbr.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+</body>
+</html>

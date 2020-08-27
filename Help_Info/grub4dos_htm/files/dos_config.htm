@@ -1,0 +1,49 @@
+<html>
+
+<head>
+</head>
+
+<body>
+
+
+[menu]<br>
+menuitem=CD, Start computer with CD-ROM support.<br>
+menuitem=NOCD, Start computer without CD-ROM support.<br>
+<font color="red"><b>menuitem=GRUB, Grub4dos Boot Loader.</b></font><br>
+menuitem=HELP, View the Help file.<br>
+menudefault=CD,30<br>
+menucolor=7,0<br>
+<br>
+<font color="red"><b>[GRUB]<br>
+install=grub.exe<br></b></font>
+<br>
+[CD]<br>
+device=himem.sys /testmem:off<br>
+device=oakcdrom.sys /D:mscd001 <br>
+device=btdosm.sys <br>
+device=flashpt.sys<br>
+device=btcdrom.sys /D:mscd001<br>
+device=aspi2dos.sys<br>
+device=aspi8dos.sys<br>
+device=aspi4dos.sys<br>
+device=aspi8u2.sys<br>
+device=aspicd.sys /D:mscd001<br>
+<br>
+[NOCD]<br>
+device=himem.sys /testmem:off<br>
+<br>
+[HELP]<br>
+device=himem.sys /testmem:off<br>
+<br>
+[COMMON]<br>
+files=10<br>
+buffers=10<br>
+dos=high,umb<br>
+stacks=9,256<br>
+devicehigh=ramdrive.sys /E 2048<br>
+lastdrive=z<br>
+
+
+
+</body>
+</html>

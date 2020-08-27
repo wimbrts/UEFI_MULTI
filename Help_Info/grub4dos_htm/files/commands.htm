@@ -1,0 +1,981 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Commands</title>
+</head>
+
+<body>
+<h1>APPENDIX - Commands</h1>
+<hr />
+
+	<p>
+	Use caution when following the built in help information - it is based on GNU GRUB and contains some legacy commands (and information) that do not always apply to Grub4dos. The following example is the output from typing <font class="command">help default</font> -  
+	</p>
+
+		<div id=box2>
+		grub> help default <br />
+		default: default [NUM ¦ 'saved' ¦ FILE] <br />
+		&emsp;&emsp;&emsp;set the default entry to entry number NUM (if not specified, it is 0, <br />
+		&emsp;&emsp;&emsp;the first entry), or to the entry number saved by savedefault if the <br />
+		&emsp;&emsp;&emsp;key word 'saved' is specified, or to the entry number previously saved <br />
+		&emsp;&emsp;&emsp;in the specified file FILE. When FILE is specified, all subsequent <br />
+		&emsp;&emsp;&emsp;'savedefault' commands will save default entry numbers into FILE.
+		</div>
+
+	<p>
+	Although the <font class="command">default [NUM]</font> parameter works within a configuration file, using <font class="command">default saved</font> does not. In addition the <font class="command">default [FILE]</font> command only works with the <font class="file">default</font> file included in the grub4dos download - e.g. <font class="command">default /default</font>.
+	</p>
+
+
+
+	<p>
+	The following (66) commands are all recognised by Grub4dos - version 0.4.4 (build 2009-03-31)
+	</p>
+<ul>
+<li><a href="#background">background</a></li>
+<li><a href="#blocklist">blocklist</a></li>
+<li><a href="#boot">boot</a></li>
+<li><a href="#cat">cat</a></li>
+<li><a href="#cdrom">cdrom</a></li>
+<li><a href="#chainloader">chainloader</a></li>
+<li><a href="#checkrange">checkrange</a></li>
+<li><a href="#checktime">checktime</a></li>
+<li><a href="#clear">clear</a></li>
+<li><a href="#cmp">cmp</a></li>
+<li><a href="#color">color</a></li>
+<li><a href="#commandline">commandline</a></li>
+<li><a href="#configfile">configfile</a></li>
+<li><a href="#dd">dd</a></li>
+<li><a href="#debug">debug</a></li>
+<li><a href="#default">default</a></li>
+<li><a href="#displaymem">displaymem</a></li>
+<li><a href="#embed">embed</a></li>
+<li><a href="#errnum">errnum</a></li>
+<li><a href="#errorcheck">errorcheck</a></li>
+<li><a href="#fallback">fallback</a></li>
+<li><a href="#find">find</a></li>
+<li><a href="#foreground">foreground</a></li>
+<li><a href="#fstest">fstest</a></li>
+<li><a href="#geometry">geometry</a></li>
+<li><a href="#halt">halt</a></li>
+<li><a href="#help">help</a></li>
+<li><a href="#hiddenflag">hiddenflag</a></li>
+<li><a href="#hide">hide</a></li>
+<li><a href="#initrd">initrd</a></li>
+<li><a href="#install">install</a> - Note that this command will be removed soon – use utility bootlace.com instead.</li>
+<li><a href="#is64bit">is64bit</a></li>
+<li><a href="#kernel">kernel</a></li>
+<li><a href="#lock">lock</a></li>
+<li><a href="#ls">ls</a></li>
+<li><a href="#makeactive">makeactive</a></li>
+<li><a href="#map">map</a></li>
+<li><a href="#md5crypt">md5crypt</a></li>
+<li><a href="#module">module</a></li>
+<li><a href="#modulenounzip">modulenounzip</a></li>
+<li><a href="#outline">outline</a></li>
+<li><a href="#pager">pager</a></li>
+<li><a href="#partnew">partnew</a></li>
+<li><a href="#parttype">parttype</a></li>
+<li><a href="#password">password</a></li>
+<li><a href="#pause">pause</a></li>
+<li><a href="#pxe">pxe</a></li>
+<li><a href="#quit">quit</a></li>
+<li><a href="#read">read</a></li>
+<li><a href="#reboot">reboot</a></li>
+<li><a href="#root">root</a></li>
+<li><a href="#rootnoverify">rootnoverify</a></li>
+<li><a href="#savedefault">savedefault</a></li>
+<li><a href="#serial">serial</a></li>
+<li><a href="#setkey">setkey</a></li>
+<li><a href="#setup">setup</a> - Note that this command will be removed soon – use utility bootlace.com instead.</li>
+<li><a href="#setvbe">setvbe</a></li>
+<li><a href="#splashimage">splashimage</a></li>
+<li><a href="#terminal">terminal</a></li>
+<li><a href="#terminfo">terminfo</a></li>
+<li><a href="#testvbe">testvbe</a></li>
+<li><a href="#tpm">tpm</a></li>
+<li><a href="#unhide">unhide</a></li>
+<li><a href="#uuid">uuid</a></li>
+<li><a href="#vbeprobe">vbeprobe</a></li>
+<li><a href="#write">write</a></li>
+</ul>
+
+
+
+
+
+<a name="background"></a><br>
+<h2>background</h2>
+
+		<div id=box2>
+		grub> help  background<br />
+		background: background RRGGBB <br />
+		&emsp;&emsp;&emsp;Sets the background color when in graphics mode. RR is red, GG is green, <br />
+		&emsp;&emsp;&emsp;and BB blue. Numbers must be in hexadecimal. <br />
+		</div>
+
+
+<a name="blocklist"></a><br>
+<h2>blocklist</h2>
+
+		<div id=box2>
+		grub> help blocklist <br />
+		blocklist: blocklist FILE <br />
+		&emsp;&emsp;&emsp;Print the blocklist notation of the file FILE. <br />
+		</div>
+
+
+<a name="boot"></a><br>
+<h2>boot</h2>
+
+		<div id=box2>
+		grub> help  boot<br />
+		boot: boot <br />
+		&emsp;&emsp;&emsp; Boot the OS/chain-loader which has been loaded.
+		</div>
+
+
+<a name="cat"></a><br>
+<h2>cat </h2>
+
+		<div id=box2>
+		grub> help cat <br />
+		cat: cat [--hex] [--skip=S] [--length=L] [--locate=STRING] FILE <br />
+		&emsp;&emsp;&emsp; Print the contents of the file FILE, or print the locations of the <br />
+		&emsp;&emsp;&emsp; string STRING in file.<br />
+		</div>
+
+
+<a name="cdrom"></a><br>
+<h2>cdrom</h2>
+
+		<div id=box2>
+		grub> help cdrom <br />
+		cdrom: cdrom --add-io-ports=P ¦ --init ¦ --stop <br />
+		&emsp;&emsp;&emsp; Initialise/stop atapi cdroms or set additional I/O ports for a possible<br />
+		&emsp;&emsp;&emsp; atapi cdrom device. The high word of P specifies the base register of<br />
+		&emsp;&emsp;&emsp; the control block registers, and the low word of P specifies the base <br />
+		&emsp;&emsp;&emsp; register of the command block registers. <br />
+		</div>
+
+
+<a name="chainloader"></a><br>
+<h2>chainloader</h2>
+
+		<div id=box2>
+		grub> help chainloader <br />
+		chainloader: chainloader [--force] [--load-segment=LS] [--load offset=LO] <br />
+		&emsp;[--load-length=LL] [--skip-length=SL] [--boot-cs=CS] [--boot-ip=IP] <br />
+		&emsp;[--ebx=EBX] [--edx=EDX] [--sdi] [--disable-a20] FILE <br />
+		&emsp;&emsp;&emsp; Load the chain-loader FILE. If --force is specified, then load it<br />
+		&emsp;&emsp;&emsp; forcibly, whether the boot loader signature is present or not. LS:LO<br />
+		&emsp;&emsp;&emsp; specifies the load address other than 0000:7C00. LL specifies the<br />
+		&emsp;&emsp;&emsp; length of the boot image(between 512 and 640k). CS:IP specifies the<br />
+		&emsp;&emsp;&emsp; address where the boot image will gain control. EBX/EDX specifies the<br />
+		&emsp;&emsp;&emsp; EBX/EDX register value when the boot image gets control. Use --sdi if<br />
+		&emsp;&emsp;&emsp; FILE is a System Deployment Image, which is of the Windows XP RAM boot<br />
+		&emsp;&emsp;&emsp; file format. Use --disable-a20 if you wish to turn off A20 when<br />
+		&emsp;&emsp;&emsp; transferring control to the boot image. SL specifies length in bytes at<br />
+		&emsp;&emsp;&emsp; the beginning of the image to be skipped when loading. <br />
+		</div>
+
+
+<a name="checkrange"></a><br>
+<h2>checkrange</h2>
+
+		<div id=box2>
+		grub> help checkrange <br />
+		checkrange: checkrange RANGE COMMAND <br />
+		&emsp;&emsp;&emsp; Return true if the return value of COMMAND is in RANGE and false <br />
+		&emsp;&emsp;&emsp; otherwise.
+		</div>
+
+
+
+<a name="checktime"></a><br>
+<h2>checktime</h2>
+
+		<div id=box2>
+		grub> help checktime <br />
+		checktime: checktime min hour dom month dow <br />
+		&emsp;&emsp;&emsp; Check time.
+		</div>
+
+
+
+<a name="clear"></a><br>
+<h2>clear</h2>
+
+		<div id=box2>
+		grub> help clear <br />
+		clear: clear <br />
+		&emsp;&emsp;&emsp; Clear the screen <br />
+		</div>
+
+
+<a name="cmp"></a><br>
+<h2>cmp</h2>
+
+		<div id=box2>
+		grub> help cmp <br />
+		cmp: cmp FILE1 FILE2 <br />
+		&emsp;&emsp;&emsp; Compare the file FILE1 with the file FILE2 and inform the different values<br />
+		&emsp;&emsp;&emsp; if any.<br />
+		</div>
+
+
+<a name="color"></a><br>
+<h2>color</h2>
+
+		<div id=box2>
+		grub> help color <br />
+		color: color NORMAL [HIGHLIGHT [HELPTEXT [HEADING]]] <br />
+		&emsp;&emsp;&emsp;Change the menu colors. The color NORMAL is used for most lines in the<br />
+		&emsp;&emsp;&emsp;menu, and the color HIGHLIGHT is used to highlight the line where the<br />
+		&emsp;&emsp;&emsp;cursor points. If you omit HIGHLIGHT, then the inverted color of NORMAL<br />
+		&emsp;&emsp;&emsp;is used for the highlighted line. If you omit HELPTEXT and/or HEADING,<br />
+		&emsp;&emsp;&emsp;then NORMAL is used. The format of a color is "FG/BG". FG and BG are<br />
+		&emsp;&emsp;&emsp;symbolic color names. A symbolic color name must be one of these:<br />
+		&emsp;&emsp;&emsp;black, blue, green, cyan, red, magenta, brown, light-grey, dark-gray,<br />
+		&emsp;&emsp;&emsp;light-blue, light-green, light-cyan, light-red, light-magenta, yellow <br />
+		&emsp;&emsp;&emsp;and white. You can prefix "blink-" to FG if you want a blinking <br />
+		&emsp;&emsp;&emsp;foreground color.<br />
+		</div>
+
+
+<a name="commandline"></a><br>
+<h2>commandline</h2>
+
+		<div id=box2>
+		grub> help commandline <br />
+		commandline: commandline <br />
+		&emsp;&emsp;&emsp;Enter the command-line prompt mode.
+		</div>
+
+
+<a name="configfile"></a><br>
+<h2>configfile</h2>
+
+		<div id=box2>
+		grub> help configfile <br />
+		configfile: configfile FILE<br />
+		&emsp;&emsp;&emsp; Load FILE as the configuration file. <br />
+		</div>
+
+
+<a name="debug"></a><br>
+<h2>debug</h2>
+
+		<div id=box2>
+		grub> help debug <br />
+		debug: debug [on ¦ off ¦ normal ¦ status ¦ INTERGER]<br />
+		&emsp;&emsp;&emsp; Turn on/off or display/set the debug level.
+		</div>
+
+
+<a name="dd"></a><br>
+<h2>dd</h2>
+
+		<div id=box2>
+		grub> help dd <br />
+		dd: dd if=IF of=OF [bs=BS] [count=C] [skip=IN] [seek=OUT] [buf=ADDR] [buflen=SI<br />
+		ZE] <br />
+		&emsp;&emsp;&emsp; Copy file IF to OF. BS is blocksize, default to 512. C is blocks to <br />
+		&emsp;&emsp;&emsp; copy, default is total blocks in IF. IN specifies number of blocks to <br />
+		&emsp;&emsp;&emsp; skip when read, default is 0. OUT specifies number of blocks to skip <br />
+		&emsp;&emsp;&emsp; when write, default is 0. Skipped blocks are not touched. Both IF and <br />
+		&emsp;&emsp;&emsp; OF must exist. dd can neither enlarge nor reduce the size OF, the <br />
+		&emsp;&emsp;&emsp; leftover tail of IF will be discarded. OF cannot be a gzipped file. If <br />
+		&emsp;&emsp;&emsp; IF is a gzipped file, it will be decompressed automatically when <br />
+		&emsp;&emsp;&emsp; copying. dd is dangerous, use at your own risk. To be on the safe side, <br />
+		&emsp;&emsp;&emsp; you should only use dd to write a file in memory. ADDR and SIZE are <br />
+		&emsp;&emsp;&emsp; used for user-defined buffer. 
+		</div>
+
+
+<a name="default"></a><br>
+<h2>default</h2>
+
+		<div id=box2>
+		grub> help default <br />
+		default: default [NUM ¦ 'saved' ¦ FILE] <br />
+		&emsp;&emsp;&emsp;set the default entry to entry number NUM (if not specified, it is 0, <br />
+		&emsp;&emsp;&emsp;the first entry), or to the entry number saved by savedefault if the <br />
+		&emsp;&emsp;&emsp;key word 'saved' is specified, or to the entry number previously saved <br />
+		&emsp;&emsp;&emsp;in the specified file FILE. When FILE is specified, all subsequent <br />
+		&emsp;&emsp;&emsp;'savedefault' commands will save default entry numbers into FILE.
+		</div>
+
+
+<a name="displaymem"></a><br>
+<h2>displaymem</h2>
+
+		<div id=box2>
+		grub> help displaymem <br />
+		displaymem: displaymem <br />
+		&emsp;&emsp;&emsp;Display what GRUB thinks the system address space map of the machine <br />
+		&emsp;&emsp;&emsp;is, including all regions of physical RAM installed.
+		</div>
+
+
+<a name="embed"></a><br>
+<h2>embed</h2>
+
+		<div id=box2>
+		grub> help embed <br />
+		embed: embed STAGE1_5 DEVICE <br />
+		&emsp;&emsp;&emsp;Embed the Stage 1.5 STAGE1_5 in the sectors after MBR if DEVICE is a <br />
+		&emsp;&emsp;&emsp;drive, or in the "bootloader" area if DEVICE is a FFS partition. Print <br />
+		&emsp;&emsp;&emsp;the number of sectors which STAGE1_5 occupies if successful. <br />
+		</div>
+
+
+<a name="errnum"></a><br>
+<h2>errnum</h2>
+
+		<div id=box2>
+		grub> help errnum <br />
+		errnum: errnum <br />
+		&emsp;&emsp;&emsp;Return the error number.
+		</div>
+
+
+<a name="errorcheck"></a><br>
+<h2>errorcheck</h2>
+
+		<div id=box2>
+		grub> help errorcheck <br />
+		errorcheck: errorcheck [on ¦ off ¦ status]<br />
+		&emsp;&emsp;&emsp;Turn on/off or display the error check mode, or toggle it if no<br />
+		&emsp;&emsp;&emsp;argument.<br />
+		</div>
+
+
+<a name="fallback"></a><br>
+<h2>fallback</h2>
+
+		<div id=box2>
+		grub> help fallback <br />
+		fallback: fallback NUM... <br />
+		&emsp;&emsp;&emsp;Go into unattended boot mode: if the default boot entry has any errors, <br />
+		&emsp;&emsp;&emsp;instead of waiting for the user to do anything, it immediately starts <br />
+		&emsp;&emsp;&emsp;over using the NUM entry (same numbering as the 'default' command). <br />
+		&emsp;&emsp;&emsp;This obviously won't help if the machine was rebooted by a kernel that <br />
+		&emsp;&emsp;&emsp;GRUB loaded. <br />
+		</div>
+
+
+<a name="find"></a><br>
+<h2>find</h2>
+
+		<div id=box2>
+		grub> help find <br />
+		find: find [--set-root[=DIR]] [--ignore-floppies] [--ignore-cd] FILENAME [CON <br />
+		DITION] <br />
+		&emsp;&emsp;&emsp;Search for the filename FILENAME in all partitions and print the <br />
+		&emsp;&emsp;&emsp;list of the devices which contain the file and suffice CONDITION. <br /> 
+		&emsp;&emsp;&emsp;CONDITION is a normal grub command, which return non-zero for TRUE and <br />
+		&emsp;&emsp;&emsp;zero for FALSE. If option --set-root is used and FILENAME is found <br />
+		&emsp;&emsp;&emsp;on a device, then stop the find immediately and set the sevice as new <br />
+		&emsp;&emsp;&emsp;root. If the option --ignore-floppies is present, the search will <br /> 
+		&emsp;&emsp;&emsp;bypass all floppies. And --ignore-cd will skip (cd). <br />
+		</div>
+
+
+<a name="foreground"></a><br>
+<h2>foreground</h2>
+
+		<div id=box2>
+		grub> help foreground <br />
+		foreground: foreground RRGGBB <br />
+		&emsp;&emsp;&emsp;Sets the foreground color when in graphics mode. RR is red, GG is green, <br />
+		&emsp;&emsp;&emsp;and BB blue. Numbers must be in hexadecimal. <br />
+		</div>
+
+
+<a name="fstest"></a><br>
+<h2>fstest</h2>
+
+		<div id=box2>
+		grub> help fstest <br />
+		fstest: fstest [on ¦ off ¦ status] <br />
+		&emsp;&emsp;&emsp;Turn on/off or display the fstest mode, or toggle it if no argument.
+		</div>
+
+
+<a name="geometry"></a><br>
+<h2>geometry</h2>
+
+		<div id=box2>
+		grub> help geometry <br />
+		geometry: geometry [--tune] [--sync] [DRIVE]<br />
+		&emsp;&emsp;&emsp;Print the information for drive DRIVE or the current root device if  <br />
+		&emsp;&emsp;&emsp;DRIVE is not specified. If --tune is specified, the geometry will  <br />
+		&emsp;&emsp;&emsp;change to the tuned value. If --sync is specified, the C/H/S values in  <br />
+		&emsp;&emsp;&emsp;partition table of DRIVE and H/S values in BPD of each primary  <br />
+		&emsp;&emsp;&emsp;partition of DRIVE(or BPB of floppy DRIVE) will be updated according to  <br />
+		&emsp;&emsp;&emsp;the current geometry of DRIVE in use.   <br />
+		</div>
+
+
+<a name="halt"></a><br>
+<h2>halt</h2>
+
+		<div id=box2>
+		grub> help halt <br />
+		halt: halt [--no-apm] <br />
+		&emsp;&emsp;&emsp;Halt your system. If APM is available on it, turn off the power using <br />
+		&emsp;&emsp;&emsp;the APM BIOS, unless you specify the option '--no-apm'.<br />
+		</div>
+
+
+<a name="help"></a><br>
+<h2>help</h2>
+
+		<div id=box2>
+		grub> help help <br />
+		help: help [--all] [PATTERN...] <br />
+		&emsp;&emsp;&emsp;Display helpful information about builtin commands. Not all commands <br />
+		&emsp;&emsp;&emsp;aren't shown without the option '--all'. <br />
+		</div>
+
+
+<a name="hiddenflag"></a><br>
+<h2>hiddenflag</h2>
+
+		<div id=box2>
+		grub> help hiddenflag <br />
+		hiddenflag: hiddenflag [--set ¦ --clear] [PARTITION] <br />
+		&emsp;&emsp;&emsp;Hide/unhide PARTITION by setting/clearing the "hidden" bit in its <br />
+		&emsp;&emsp;&emsp;partition type code, or report the hidden status. The default partition <br />
+		&emsp;&emsp;&emsp;is the current root device. <br />
+		</div>
+
+
+<a name="hide"></a><br>
+<h2>hide</h2>
+
+		<div id=box2>
+		grub> help hide <br />
+		hide: hide [PARTITION]<br />
+		&emsp;&emsp;&emsp;Hide PARTITION by setting the "hidden" bit in its partition type code. <br />
+		&emsp;&emsp;&emsp;The default partition is the current root device. 
+		</div>
+
+
+<a name="initrd"></a><br>
+<h2>initrd</h2>
+
+		<div id=box2>
+		grub> help initrd <br />
+		initrd: initrd FILE [FILE...] <br />
+		&emsp;&emsp;&emsp;Load an initial ramdisk FILE for a Linux format boot image and set the <br />
+		&emsp;&emsp;&emsp;appropriate parameters in the Linux setup area in memory. For Linux <br />
+		&emsp;&emsp;&emsp;2.6+ kernels, multiple cpio files can be loaded. <br />
+		</div>
+
+
+<a name="install"></a><br>
+<h2>install</h2>
+
+		<div id=box2>
+		grub> help install <br />
+		install: install [--stage2=STAGE2_FILE] [--force-lba] STAGE1 [d] DEVICE <br />
+		&emsp;STAGE2 [ADDR] [p] [CONFIG_FILE] [REAL_CONFIG_FILE] <br />
+		&emsp;&emsp;&emsp;Install STAGE1 on DEVICE and install a blocklist for loading STAGE2 as <br />
+		&emsp;&emsp;&emsp;a Stage 2. If the option 'd' is present, the Stage 1 will always look <br />
+		&emsp;&emsp;&emsp;for the disk where the STAGE2 was installed, rather than using the booting <br />
+		&emsp;&emsp;&emsp;drive. The Stage 2 will be loaded at address ADDR, which will be <br />
+		&emsp;&emsp;&emsp;determined automatically if you don't specify it. If the option 'p' or <br />
+		&emsp;&emsp;&emsp;CONFIG_FILE is present, then the first block of Stage 2 is patched with <br />
+		&emsp;&emsp;&emsp;new values of the partition and name of the configuration file used by <br />
+		&emsp;&emsp;&emsp;the true Stage 2 (for a Stage 1.5, this is the name of the true Stage <br />
+		&emsp;&emsp;&emsp;2) at boot time. If STAGE2 is a Stage 1.5 and REAL_CONFIG_FILE is <br />
+		&emsp;&emsp;&emsp;present, then the Stage 2 CONFIG_FILE is patched with the configuration <br />
+		&emsp;&emsp;&emsp;filename REAL_CONFIG_FILE. If the option '--force-lba' is specified, <br />
+		&emsp;&emsp;&emsp;disable some sanity checks for LBA mode. If the option '--stage2' is <br />
+		&emsp;&emsp;&emsp;specified, rewrite the Stage 2 via your OS's filesystem instead of the <br />
+		&emsp;&emsp;&emsp;raw device. <br />
+		</div>
+
+
+<a name="is64bit"></a><br>
+<h2>is64bit</h2>
+
+		<div id=box2>
+		grub> help is64bit <br />
+		is64bit: is64bit <br />
+		&emsp;&emsp;&emsp;Return true if CPU is 64-bit and false if not. <br />
+		</div>
+
+
+<a name="kernel"></a><br>
+<h2>kernel</h2>
+
+		<div id=box2>
+		grub> help kernel <br />
+		&emsp;kernel: kernel [--no-mem-option] [--type=TYPE] FILE [ARG...]<br />
+		&emsp;&emsp;&emsp;Attempt to load the primary boot image from FILE. The rest of the line <br />
+		&emsp;&emsp;&emsp;is passed verbatim as the "kernel command line". Any modules must be <br />
+		&emsp;&emsp;&emsp;reloaded after using this command. The option --type is used to suggest <br />
+		&emsp;&emsp;&emsp;what type of kernel to be loaded. TYPE must be either of "netbsd", <br />
+		&emsp;&emsp;&emsp;"freebsd", "openbsd", "linux", "biglinux" and "multiboot". The option <br />
+		&emsp;&emsp;&emsp;--no-mem-option tells GRUB not to pass a Linux's mem option <br />
+		&emsp;&emsp;&emsp;automatically. <br />
+		</div>
+
+
+<a name="lock"></a><br>
+<h2>lock</h2>
+
+		<div id=box2>
+		grub> help lock <br />
+		lock: lock<br />
+		&emsp;&emsp;&emsp;Break a command execution unless the user is authenticated. <br />
+		</div>
+
+
+<a name="ls"></a><br>
+<h2>ls</h2>
+
+		<div id=box2>
+		grub> help ls <br />
+		ls: ls [FILE_OR_DIR]<br />
+		&emsp;&emsp;&emsp; List file or directory. <br />
+		</div>
+
+
+<a name="makeactive"></a><br>
+<h2>makeactive</h2>
+
+		<div id=box2>
+		grub> help makeactive <br />
+		makeactive: makeactive [--status] [PART]<br />
+		&emsp;&emsp;&emsp;Activate the partition PART. PART defaults to the current root device. <br />
+		&emsp;&emsp;&emsp;This command is limited to _primary_ PC partitions on a hard disk. <br />
+		</div>
+
+
+<a name="map"></a><br>
+<h2>map</h2>
+
+		<div id=box2>
+		grub> help map <br />
+		map: map [--status] [--mem[=RESERV]] [--hook] [--unhook] [--unmap=DRIVES]  <br />
+		&emsp;[--rehook] [--floppies=M] [harddrives=N] [--memdisk-raw=RAW]   <br />
+		&emsp;[--a20-keep-on=AKO] [--safe-mbr-hook=SMH] [--int13-scheme=SCH]   <br />
+		&emsp;[--ram-drive=RD] [--rd-base=ADDR] [--rd-size=SIZE] [[--read-only]   <br />
+		&emsp;[--fake-write] [--unsafe-boot] [--disable-chs-mode] [--disable-lba-mode]   <br />
+		&emsp;[--heads=H] [--sectors-per-track=S] TO_DRIVE FROM_DRIVE]  <br />
+		&emsp;&emsp;&emsp;Map the drive FROM_DRIVE to the drive TO_DRIVE. This is necessary when  <br />
+		&emsp;&emsp;&emsp;you chain-load some operating systems, such as DOS, if such an OS  <br />
+		&emsp;&emsp;&emsp;resides at a non-first drive. TO_DRIVE can be a disk file, this  <br />
+		&emsp;&emsp;&emsp;indicates a disk emulation. If --read-only is given, the emulated drive  <br />
+		&emsp;&emsp;&emsp;will be write-protected. If --fake-write is given, any write operations  <br />
+		&emsp;&emsp;&emsp;to the emulated drive are allowed but the data written will be  <br />
+		&emsp;&emsp;&emsp;discarded. The --unsafe-boot switch enables the write to the Master and  <br />
+		&emsp;&emsp;&emsp;DOS boot sectors of the emulated disk. If --disable-chs-mode is given,  <br />
+		&emsp;&emsp;&emsp;CHS access to the emulated drive will be refused. If --disable-lba-mode  <br />
+		&emsp;&emsp;&emsp;is given, LBA access to the emulated drive will be refused. If RAW=1,  <br />
+		&emsp;&emsp;&emsp;all memdrives will be accessed without using int15/ah=87h. If RAW=0,  <br />
+		&emsp;&emsp;&emsp;then int15/ah=87h will be used to access memdrives. If one of --status,  <br />
+		&emsp;&emsp;&emsp;--hook, --unhook, --rehook, --floppies, --harddrives, memdisk-raw,  <br />
+		&emsp;&emsp;&emsp;--a20-keep-on, --safe-mbr-hook, --int13-scheme, --ram-drive, --rd-base  <br />
+		&emsp;&emsp;&emsp;or --rd-size is given, then any other command-line arguments will be  <br />
+		&emsp;&emsp;&emsp;ignored. The --mem option indicates a drive in memory. if RESERV is <br />
+		&emsp;&emsp;&emsp;used and &lt;= 0, the minimum memory occupied by the memdrive is (-RESERV)  <br />
+		&emsp;&emsp;&emsp;in 512-byte-sectors. if RESERV is used and > 0, the memdrive will <br />
+		&emsp;&emsp;&emsp;occupy the mem area starting at absolute physical address RESERV in  <br />
+		&emsp;&emsp;&emsp;512-byte-sectors and ending at the end of this mem block(usually the  <br />
+		&emsp;&emsp;&emsp;end of physical mem). 
+		</div>
+
+
+<a name="md5crypt"></a><br>
+<h2>md5crypt</h2>
+
+		<div id=box2>
+		grub> help md5crypt <br />
+		md5crypt: md5crypt <br />
+		&emsp;&emsp;&emsp;Generate a password in MD5 format. <br />
+		</div>
+
+
+<a name="module"></a><br>
+<h2>module</h2>
+
+		<div id=box2>
+		grub> help module <br />
+		module: module FILE [ARG...] <br />
+		&emsp;&emsp;&emsp;Load a boot module FILE for a Multiboot format boot image (no<br />
+		&emsp;&emsp;&emsp;interpretation of the file contents is made, so users of this command <br />
+		&emsp;&emsp;&emsp;must know what the kernel in question expects). The rest of the line is <br />
+		&emsp;&emsp;&emsp;passed as the "module command line", like the 'kernel' command. 
+		</div>
+
+
+<a name="modulenounzip"></a><br>
+<h2>modulenounzip</h2>
+
+		<div id=box2>
+		grub> help modulenounzip <br />
+		modulenounzip: modulenounzip FILE [ARG...] <br />
+		&emsp;&emsp;&emsp;The same as 'module', except that automatic decompression is disabled.<br />
+		</div>
+
+
+<a name="outline"></a><br>
+<h2>outline</h2>
+
+		<div id=box2>
+		grub> help outline <br />
+		outline: outline [on ¦ off ¦ status]<br />
+		&emsp;&emsp;&emsp;Turn on/off or display the outline mode, or toggle it if no argument. <br />
+		</div>
+
+
+<a name="pager"></a><br>
+<h2>pager</h2>
+
+		<div id=box2>
+		grub> help pager <br />
+		pager: pager [on ¦ off ¦ status]<br />
+		&emsp;&emsp;&emsp;Turn on/off or display the pager mode, or toggle it if no argument. <br />
+		</div>
+
+
+<a name="partnew"></a><br>
+<h2>partnew</h2>
+
+		<div id=box2>
+		grub> help partnew <br />
+		partnew: partnew [--active] PART TYPE START [LEN] <br />
+		&emsp;&emsp;&emsp;Create a primary partition at the starting address START with the <br />
+		&emsp;&emsp;&emsp;length LEN, with the type TYPE. START and LEN are in sector units. If <br />
+		&emsp;&emsp;&emsp;--active is used, the new partition will be active. START can be a <br />
+		&emsp;&emsp;&emsp;contiguous file that will be used as the content/data of the new <br />
+		&emsp;&emsp;&emsp;partition, in which case the LEN parameter is ignored, and TYPE can be <br />
+		&emsp;&emsp;&emsp;either 0x00 for auto or 0x10 for hidden-auto. <br />
+		</div>
+
+
+<a name="parttype"></a><br>
+<h2>parttype</h2>
+
+		<div id=box2>
+		grub> help parttype <br />
+		parttype: parttype [PART] [TYPE] <br />
+		&emsp;&emsp;&emsp;Change the type of the partition PART to TYPE. If TYPE is omitted,  <br />
+		&emsp;&emsp;&emsp;return the partition type of the specified device(instead of changing <br />
+		&emsp;&emsp;&emsp;it). PART default to the current root device. <br />
+		</div>
+
+
+<a name="password"></a><br>
+<h2>password</h2>
+
+		<div id=box2>
+		grub> help password <br />
+		password: password [--md5] PASSWD [FILE] <br />
+		&emsp;&emsp;&emsp;If used in the first section of a menu file, disable all interactive <br />
+		&emsp;&emsp;&emsp;editing control (menu entry editor and command line). If the password <br />
+		&emsp;&emsp;&emsp;PASSWRD is entered, it loads the FILE as a new config file and restarts <br />
+		&emsp;&emsp;&emsp;the GRUB Stage 2. If you omit the argument FILE, then GRUB just unlocks <br />
+		&emsp;&emsp;&emsp;privileged instructions. You can also use it in the script section, in <br />
+		&emsp;&emsp;&emsp;which case it will ask for the password, before continueing. The option <br />
+		&emsp;&emsp;&emsp;--md5 tells GRUB that PASSWD is encrypted with md5crypt. <br />
+		</div>
+
+
+<a name="pause"></a><br>
+<h2>pause</h2>
+
+		<div id=box2>
+		grub> help pause <br />
+		pause: pause [--wait=T] [MESSAGE...] <br />
+		&emsp;&emsp;&emsp;Print MESSAGE, then wait until a key is pressed or T seconds has passed. <br />
+		</div>
+
+
+<a name="pxe"></a><br>
+<h2>pxe</h2>
+
+		<div id=box2>
+		grub> help pxe <br />
+		pxe: pxe [cmd] [parameters] <br />
+		&emsp;&emsp;&emsp;Call PXE command. <br />
+		</div>
+
+
+<a name="quit"></a><br>
+<h2>quit</h2>
+
+		<div id=box2>
+		grub> help quit <br />
+		quit: quit [--disable-a20] <br />
+		&emsp;&emsp;&emsp; Go back to DOS if GRUB was previously launched from DOS.<br />
+		</div>
+
+
+<a name="read"></a><br>
+<h2>read</h2>
+
+		<div id=box2>
+		grub> help read <br />
+		read: read ADDR<br />
+		&emsp;&emsp;&emsp;Read a 32-bit value from memory at address ADDR and display it in hex <br />
+		&emsp;&emsp;&emsp;format. <br />
+		</div>
+
+
+<a name="reboot"></a><br>
+<h2>reboot</h2>
+
+		<div id=box2>
+		grub> help reboot <br />
+		reboot: reboot <br />
+		&emsp;&emsp;&emsp;Reboot your system. <br />
+		</div>
+
+
+<a name="root"></a><br>
+<h2>root</h2>
+
+		<div id=box2>
+		grub> help root <br />
+		root: root [DEVICE [HDBIAS]]<br />
+		&emsp;&emsp;&emsp;Set the current "root device" to the device DEVICE, then attempt to  <br />
+		&emsp;&emsp;&emsp;mount it to get the partition size (for passing the partition <br />
+		&emsp;&emsp;&emsp;descripter in 'ES:ESI', used by some chain-loaded bootloaders), the BSD <br />
+		&emsp;&emsp;&emsp;drive-type (for booting BSD kernels using their native boot format), <br />
+		&emsp;&emsp;&emsp;and correctly determine the PC partition where a BSD sub-partition is <br />
+		&emsp;&emsp;&emsp;located. The optional HDBIAS parameter is a number to tell a BSD kernel <br />
+		&emsp;&emsp;&emsp;how many BIOS drive numbers are on controllers befor the current one.  <br />
+		&emsp;&emsp;&emsp;For example, if there is an IDE disk and a SCSI disk, and your FreeBSD <br />
+		&emsp;&emsp;&emsp;root partition is on the SCSI disk, then use a '1' for HDBIAS. <br />
+		</div>
+
+
+<a name="rootnoverify"></a><br>
+<h2>rootnoverify</h2>
+
+		<div id=box2>
+		grub> help rootnoverify <br />
+		rootnoverify: rootnoverify [DEVICE [HDBIAS]] <br />
+		&emsp;&emsp;&emsp;similar to 'root', but don't atttempt to mount the partition. This is <br />
+		&emsp;&emsp;&emsp;useful for when an OS is outside the area of the disk that GRUB can <br />
+		&emsp;&emsp;&emsp;read, but setting the correct root device is still desired. Note that <br />
+		&emsp;&emsp;&emsp;the items mentioned in 'root' which derived from attempting the mount <br />
+		&emsp;&emsp;&emsp;will NOT work correctly. <br />
+		</div>
+
+
+<a name="savedefault"></a><br>
+<h2>savedefault</h2>
+
+		<div id=box2>
+		grub> help savedefault <br />
+		savedefault: savedefault[--wait=T] [NUM ¦ 'fallback'] <br />
+		&emsp;&emsp;&emsp;Save the current entry as the default boot entry if no argument is <br />
+		&emsp;&emsp;&emsp;specified. If a number is specified, this number is saved. If <br />
+		&emsp;&emsp;&emsp;'fallback' is used, next fallback entry is saved. If T is not 0, prompt <br />
+		&emsp;&emsp;&emsp;the user to confirm the write operation by pressing the Y key, and if <br />
+		&emsp;&emsp;&emsp;no key-press detected within T seconds, the write will be discarded. <br />
+		</div>
+
+
+<a name="serial"></a><br>
+<h2>serial</h2>
+
+		<div id=box2>
+		grub> help serial <br />
+		serial: serial [--unit=UNIT] [--port=PORT] [--speed=SPEED] [--word=WORD]<br />
+		&emsp;[parity=PARITY] [--stop=STOP] [--device=DEV] <br />
+		&emsp;&emsp;&emsp;Initialise a serial device. UNIT is a digit that specifies which serial <br />
+		&emsp;&emsp;&emsp;device is used (e.g. 0 == COM1). If you need to specify the port <br />
+		&emsp;&emsp;&emsp;number, set it by --port. SPEED is the DTE-DTE speed. WORD is the word <br />
+		&emsp;&emsp;&emsp;length, PARITY is the type of parity, which is one of 'no', 'odd' and  <br />
+		&emsp;&emsp;&emsp;'even'. STOP is the length of stop bit(s). The option --device can be <br />
+		&emsp;&emsp;&emsp;used only in the grub shell, which specifies the file name of a tty <br />
+		&emsp;&emsp;&emsp;device. The default values are COM1, 9600, 8N1. <br />
+		</div>
+
+<a name="setkey"></a><br>
+<h2>setkey</h2>
+
+		<div id=box2>
+		grub> help setkey <br />
+		setkey: setkey [TO_KEY FROM_KEY]<br />
+		&emsp;&emsp;&emsp; Change the keyboard map. The key FROM_KEY is mapped to the key TO_KEY. <br />
+		&emsp;&emsp;&emsp; A key must be an alphabet, a digit, or one of these: escape, exclam, <br />
+		&emsp;&emsp;&emsp; at, numbersign, dollar, percent, caret, ampersand, asterisk, parenleft, <br />
+		&emsp;&emsp;&emsp; parenright, minus, underscore, equal, plus, backspace, tab, <br />
+		&emsp;&emsp;&emsp; bracketleft, braceleft, bracketright, braceright, enter, control,  <br />
+		&emsp;&emsp;&emsp; semicolon, colon, quote, doublequote, backquote, tilde, shift,  <br />
+		&emsp;&emsp;&emsp; backslash, bar, comma, less, period, greater, slash, question, alt, <br />
+		&emsp;&emsp;&emsp; spcae, capslock, FX (X is a digit), and delete. If no argument is <br />
+		&emsp;&emsp;&emsp; specified, reset key mappings.  <br />
+		</div>
+
+
+<a name="setup"></a><br>
+<h2>setup</h2>
+
+		<div id=box2>
+		grub> help setup<br />
+		setup: setup [--prefix=DIR] [--stage2=STAGE2_FILE] [--force-lba] <br />
+		&emsp;INSTALL_DEVICE [IMAGE_DEVICE] <br />
+		&emsp;&emsp;&emsp;Set up the installation of GRUB automatically. This command uses the  <br />
+		&emsp;&emsp;&emsp;more flexible command "install" in the backend and installs GRUB into <br />
+		&emsp;&emsp;&emsp;the device INSTALL_DEVICE. If IMAGE_DEVICE is specified, then find the <br />
+		&emsp;&emsp;&emsp;GRUB images in the device IMAGE_DEVICE, otherwise use the current "root <br />
+		&emsp;&emsp;&emsp;device", which can be set by the command "root". If you know that your <br />
+		&emsp;&emsp;&emsp;BIOS should support LBA but GRUB doesn't work in LBA mode, specify the <br />
+		&emsp;&emsp;&emsp;option '--force-lba'. If you install GRUB under the grub shell and you <br />
+		&emsp;&emsp;&emsp;cannot unmount the partition where GRUB images reside, specify the <br />
+		&emsp;&emsp;&emsp;option '--stage2' to tell GRUB the file name under your OS. <br />
+		</div>
+
+
+<a name="setvbe"></a><br>
+<h2>setvbe</h2>
+
+		<div id=box2>
+		grub> help setvbe <br />
+		setvbe: setvbe MODE_3D <br />
+		&emsp;&emsp;&emsp;Set the VBE mode MODE_3D(which is of the form 1024x768x32) for each <br />
+		&emsp;&emsp;&emsp;subsequent kernel command-line. If no argument is specified, <br />
+		&emsp;&emsp;&emsp;clear(nullify, invalidate) the video option string setup by the <br />
+		&emsp;&emsp;&emsp;previous setvbe command. <br />
+		</div>
+
+
+<a name="splashimage"></a><br>
+<h2>splashimage</h2>
+
+		<div id=box2>
+		grub> help splashimage <br />
+		splashimage: splashimage FILE <br />
+		&emsp;&emsp;&emsp;Load FILE as the background image when in graphics mode. <br />
+		</div>
+
+
+
+<a name="terminal"></a><br>
+<h2>terminal</h2>
+
+		<div id=box2>
+		grub> help terminal <br />
+		terminal: terminal [--dumb] [--no-echo] [--no-edit] [--timeout=SECS] <br />
+		&emsp;[--lines=LINES] [--silent] [console] [serial] [hercules] [graphics] <br />
+		&emsp;&emsp;&emsp;Select a terminal. When multiple terminals are specified, wait until <br />
+		&emsp;&emsp;&emsp;you push any key to continue. If both console and serial are specified, <br />
+		&emsp;&emsp;&emsp;the terminal to which you input a key first will be selected. If no <br />
+		&emsp;&emsp;&emsp;argument is specified, print current setting. The option --dumb <br />
+		&emsp;&emsp;&emsp;specifies that your terminal is dumb, otherwise, vt100-compatibility is <br />
+		&emsp;&emsp;&emsp;assumed. If you specify --no-echo, input characters won't be echoed. If <br />
+		&emsp;&emsp;&emsp;you specify --no-edit, the BASH-like deiting feature will be disabled. <br />
+		&emsp;&emsp;&emsp;If --timeout is present, this command will wait at most for SECS <br />
+		&emsp;&emsp;&emsp;seconds. The option --lines specifies the maximum number of lines. The <br />
+		&emsp;&emsp;&emsp;option --silent is used to suppress messages. <br />
+		</div>
+
+<a name="terminfo"></a><br>
+<h2>terminfo</h2>
+
+		<div id=box2>
+		grub> help terminfo <br />
+		terminfo: terminfo [--name=NAME --cursor-address=SEQ [--clear-screen=SEQ] <br />
+		&emsp; [--enter-standout-mode=SEQ] [--exit-standout-mode=SEQ]]<br />
+		&emsp;&emsp;&emsp; Define the capabilities of your terminal. Use this command to define<br />
+		&emsp;&emsp;&emsp; escape sequences, if it is not vt100-compatible. You may use \e for ESC<br />
+		&emsp;&emsp;&emsp; and ^X for a control character. If no option is specified, the current<br />
+		&emsp;&emsp;&emsp; settings are printed.<br />
+		</div>
+
+
+<a name="testvbe"></a><br>
+<h2>testvbe</h2>
+
+		<div id=box2>
+		grub> help testvbe <br />
+		testvbe: testvbe MODE <br />
+		&emsp;&emsp;&emsp; Test the VBE mode MODE. Hit any key to return. <br />
+		</div>
+
+
+<a name="tpm"></a><br>
+<h2>tpm</h2>
+
+		<div id=box2>
+		grub> help tpm <br />
+		tpm: tpm --init <br />
+		&emsp;&emsp;&emsp; Initialise TPM <br />
+		</div>
+
+
+
+<a name="unhide"></a><br>
+<h2>unhide</h2>
+
+		<div id=box2>
+		grub> help unhide <br />
+		unhide: unhide [PARTITION]<br />
+		&emsp;&emsp;&emsp; Unhide PARTITION by setting the "hidden" bit in its partition type <br />
+		&emsp;&emsp;&emsp; code. The default partition is the current root device. 
+		</div>
+
+
+
+<a name="uuid"></a><br>
+<h2>uuid</h2>
+
+		<div id=box2>
+		grub> help uuid <br />
+		uuid: uuid [DEVICE] [UUID] <br />
+		&emsp;&emsp;&emsp; If DEVICE is not specified, search for filesystem with UUID in all <br />
+		&emsp;&emsp;&emsp; partitions and set the partition containing the filesystem as new <br />
+		&emsp;&emsp;&emsp; root (if UUID is specified), or just list uuid's of all filesystems on <br />
+		&emsp;&emsp;&emsp; all devices (if UUID is not specified). If DEVICE is specified, return <br />
+		&emsp;&emsp;&emsp; true or false according to whether or not the DEVICE matches the <br />
+		&emsp;&emsp;&emsp; specified UUID (if UUID is specified), or just the uuid of <br />
+		&emsp;&emsp;&emsp; DEVICE (if UUID is not specified). <br />
+		</div>
+
+
+
+<a name="vbeprobe"></a><br>
+<h2>vbeprobe</h2>
+
+		<div id=box2>
+		grub> help vbeprobe <br />
+		vbeprobe: vbeprobe [MODE]<br />
+		&emsp;&emsp;&emsp; Probe VBE information. If the mode number MODE is specified, show only <br />
+		&emsp;&emsp;&emsp; the information about only the mode. <br />
+		</div>
+
+
+
+<a name="write"></a><br>
+<h2>write</h2>
+
+		<div id=box2>
+		grub> help write <br />
+		write: write [--offset=SKIP] ADDR_OR_FILE INTEGER_OR_STRING<br />
+		&emsp;&emsp;&emsp; Write a 32-bit value to memory or write a string to file (or device!). <br />
+		</div>
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="multiboot.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="bootlace.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+</body>
+</html>
+

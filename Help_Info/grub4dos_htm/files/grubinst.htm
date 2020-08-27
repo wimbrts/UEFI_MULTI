@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>APPENDIX - grubinst commands</title>
+</head>
+
+<body>
+<h1>APPENDIX - grubinst commands</h1>
+<hr />
+
+<p>
+Following is output from running command <font class="command">grubinst -h</font> (version <b>grubinst-1.1-bin-w32-2008-01-01</b> used).
+</p>
+
+<div><textarea cols="80" rows="120" align=left readonly>
+Usage:
+        grubinst  [OPTIONS]  DEVICE_OR_FILE
+
+OPTIONS:
+
+        --help,-h               Show usage information
+
+        --pause                 Pause before exiting
+
+        --version               Show version information
+
+        --verbose,-v            Verbose output
+
+        --list-part,-l          List all logical partitions in DEVICE_OR_FILE
+
+        --save=FN,-s=FN         Save the orginal MBR/BS to FN
+
+        --restore=FN,-r=FN      Restore MBR/BS from previously saved FN
+
+        --restore-prevmbr,-r    Restore previous MBR saved in the second sector
+                                of DEVICE_OR_FILE
+
+        --read-only,-t          do everything except the actual write to the
+                                specified DEVICE_OR_FILE. (test mode)
+
+        --no-backup-mbr         do not copy the old MBR to the second sector of
+                                DEVICE_OR_FILE.
+
+        --force-backup-mbr      force the copy of old MBR to the second sector
+                                of DEVICE_OR_FILE.(default)
+
+        --mbr-enable-floppy     enable the search for GRLDR on floppy.(default)
+
+        --mbr-disable-floppy    disable the search for GRLDR on floppy.
+
+        --mbr-enable-osbr       enable the boot of PREVIOUS MBR with invalid
+                                partition table (usually an OS boot sector).
+                                (default)
+
+        --mbr-disable-osbr      disable the boot of PREVIOUS MBR with invalid
+                                partition table (usually an OS boot sector).
+
+        --duce                  disable the feature of unconditional entrance
+                                to the command-line.
+
+        --boot-prevmbr-first    try to boot PREVIOUS MBR before the search for
+                                GRLDR.
+
+        --boot-prevmbr-last     try to boot PREVIOUS MBR after the search for
+                                GRLDR.(default)
+
+        --preferred-drive=D     preferred boot drive number, 0 <= D < 255.
+
+        --preferred-partition=P preferred partition number, 0 <= P < 255.
+
+        --time-out=T,-t=T       wait T seconds before booting PREVIOUS MBR. if
+                                T is 0xff, wait forever. The default is 5.
+
+        --hot-key=K,-k=K        if the desired key K is pressed, start GRUB
+                                before booting PREVIOUS MBR. K is a word
+                                value, just as the value in AX register
+                                returned from int16/AH=1. The high byte is the
+                                scan code and the low byte is ASCII code. The
+                                default is 0x3920 for space bar.
+
+        --key-name=S            Specify the name of the hot key.
+
+        --floppy,-f             if DEVICE_OR_FILE is floppy, use this option.
+
+        --floppy=N              if DEVICE_OR_FILE is a partition on a hard
+                                drive, use this option. N is used to specify
+                                the partition number: 0,1,2 and 3 for the
+                                primary partitions, and 4,5,6,... for the
+                                logical partitions.
+
+        --sectors-per-track=S   specifies sectors per track for --floppy.
+                                1 <= S <= 63, default is 63.
+
+        --heads=H               specifies number of heads for --floppy.
+                                1 <= H <= 256, default is 255.
+
+        --start-sector=B        specifies hidden sectors for --floppy=N.
+
+        --total-sectors=C       specifies total sectors for --floppy.
+                                default is 0.
+
+        --lba                   use lba mode for --floppy. If the floppy BIOS
+                                has LBA support, you can specify --lba here.
+                                It is assumed that all floppy BIOSes have CHS
+                                support. So you would rather specify --chs.
+                                If neither --chs nor --lba is specified, then
+                                the LBA indicator(i.e., the third byte of the
+                                boot sector) will not be touched.
+
+        --chs                   use chs mode for --floppy. You should specify
+                                --chs if the floppy BIOS does not support LBA.
+                                We assume all floppy BIOSes have CHS support.
+                                So it is likely you want to specify --chs.
+                                If neither --chs nor --lba is specified, then
+                                the LBA indicator(i.e., the third byte of the
+                                boot sector) will not be touched.
+
+        --install-partition=I   Install the boot record onto the boot area of
+        -p=I                    partition number I of the specified hard drive
+                                or harddrive image DEVICE_OR_FILE.
+
+        --boot-file=F,-b=F      Change the name of boot file.
+
+        --load-seg=S            Change load segment for boot file.
+
+        --grub2,-2              Load grub2 kernel g2ldr instead of grldr.
+
+        --output,-o             Save embeded grldr.mbr to DEVICE_OR_FILE.
+
+        --edit,-e               Edit external grldr/grldr.mbr.
+
+        --skip-mbr-test         Skip chs validity test in mbr.
+
+        --copy-bpb              Don't copy bpb of the first partition to mbr.
+</textarea></div>
+
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="bootlace.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="testing.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+
+</body>
+</html>
+

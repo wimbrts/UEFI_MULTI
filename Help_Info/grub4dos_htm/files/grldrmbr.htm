@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Renaming grldr</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Renaming <font class="file">grldr</font></h1>
+<hr />
+
+
+
+
+	<p>
+	If loading <font class="file">grldr</font> via the Windows NT/2000/XP loader (<font class="file">ntldr</font>), changing the <font class="file">grldr</font> filename will result in Grub4dos failing to boot. Note from <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> - "...ntldr only loads the startup code of grldr (i.e., the leading 16 sectors of grldr), not the whole grldr file". The embedding settings in the startup code consequently scans for <font class="file">grldr</font> in all available drives - if the file was renamed it will no longer be found. The following test was carried out on a dual boot system containing Windows Vista on (hd0,0) and Windows XP on (hd0,1). (hd0,1) was set as the active partition and <font class="file">mygrldr</font> (renamed <font class="file">grldr</font>) was loaded via <font class="command">C:\mygrldr="Grub4Dos"</font> entry in <font class="file">boot.ini</font>. This resulted in the following output - 
+	</p>
+
+		<div id=box2>
+		Try (hd0,0): NTFS5: No grldr <br />
+		Try (hd0,1): NTFS5: No grldr <br />
+		Try (hd0,3): invalid or null <br />
+		Try (hd0,4): invalid or null <br />
+		Try (fd0): invalid or null <br />
+		Error: Cannot find grldr in all drives. Press Ctrl+Alt+Del to restart._
+		</div>
+	
+	<p>
+	It is possible to change the embedded setting to search for a different file by using the grubinst/grubutil tool. The procedure is outlined in <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> - 
+	</p>
+
+
+
+
+<div><textarea cols="80" rows="10" align=left readonly>
+******************************************************************************
+***                      How to rename grldr                               ***
+******************************************************************************
+
+grldr and grldr.mbr use internal boot file name to decide which file to load,
+so if you want to change the name, you must also change the embeded setting.
+You can do this with the help of grubinst, which can be downloaded at:
+
+http://download.gna.org/grubutil/
+
+grubinst can generate customized grldr.mbr:
+
+	grubinst -o -b=mygrldr C:\mygrldr.mbr
+
+grubinst can also edit existing grldr/grldr.mbr:
+
+	grubinst -e -b=mygrldr C:\mygrldr
+
+	grubinst -e -b=mygrldr C:\mygrldr.mbr
+
+In this case, you must use a grubinst that is compatible with the version of
+grub4dos, otherwise the edit will fail.
+
+So, in order to load mygrldr instead of grldr, you can use one of the
+following methods:
+
+1. Use customized grldr.mbr to load mygrldr. In this case, you need to change
+the embeded boot file name in grldr.mbr. The name of grldr.mbr can be changed
+at will.
+
+2. Use mygrldr directly. In this case, you need to change the embeded boot
+file name in mygrldr to match its new name.
+
+Notice: The boot file name must conform to the 8.3 naming convention.
+</textarea></div>
+
+
+
+
+	<div id=bullet>
+		<ul>
+			<li>Download the latest version of grubinst/grubutil (see <a href="links.htm">here</a>). </li> <br />
+
+			<li>Copy <font class="file">grldr</font> to <font class="file">C:\</font> drive and rename as <font class="file">C:\mygrldr</font></li> <br />
+
+			<li>Open a command prompt and run the command <font class="command">grubinst -o -b=mygrldr C:\grldr.mbr</font> - where <font class="command">-b=mygrldr</font> will replace the embedded reference to <font class="file">grldr</font> with <font class="file">mygrldr</font> in the created file <font class="file">C:\grldr.mbr</font>. Note - you can use any name for the file <font class="file">C:\grldr.mbr</font>, however make sure you use the 8.3 naming convention.</li> <br />
+
+			<li>Now load <font class="file">C:\grldr.mbr</font> from Windows NT/2K/XP by adding <font class="command">C:\grldr.mbr="Grub4Dos"</font> to your <font class="file">boot.ini</font> file.</li> <br />
+
+		</ul>
+	</div>
+
+
+
+
+
+	<div id=bullet>
+		Alternatively, grubinst/grubutil can be used to edit an existing <font class="file">grldr</font> and/or <font class="file">grldr.mbr</font> file. This will require a compatible version of grubinst. 
+		<ul>
+			<li>Copy <font class="file">grldr.mbr</font> to <font class="file">C:\</font> drive and rename this file if required (making sure that you use the 8.3 naming convention). Run the command <font class="command">grubinst -e -b=mygrldr C:\grldr.mbr</font> to replace the embedded reference to <font class="file">grldr</font> with <font class="file">mygrldr</font>. Now add entry <font class="command">C:\grldr.mbr="Grub4Dos"</font> to <font class="file">boot.ini</font></li> <br />
+
+			<li>Alternatively, copy <font class="file">grldr</font> to <font class="file">C:\</font> drive and rename the file to mygrldr. Run the command <font class="command">grubinst -e -b=mygrldr C:\mygrldr</font> to replace the embedded reference to <font class="file">grldr</font> with <font class="file">mygrldr</font>. Now add entry <font class="command">C:\mygrldr="Grub4Dos"</font> in <font class="file">boot.ini</font></li> <br />
+		</ul>
+	</div>
+
+
+	<p>
+	Unfortunately, at the time of testing, the latest version of grubinst (grubinst-1.1-bin-w32-2008-01-01) is not compatible with Grub4dos build 2009-02-05. Running command <font class="command">grubinst -e -b=mygrldr C:\grldr.mbr</font> results in <font class="box2">grubinst: Invalid input file</font> error and <font class="command">grubinst -e -b=mygrldr C:\grldr</font> results in <font class="box2">grubinst: Version number mismatched (old=4 new=2)</font> error. 
+	</p>
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="install.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="syntax.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+
+
+</body>
+</html>
+

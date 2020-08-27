@@ -1,0 +1,193 @@
+body { 
+width: 530px; 
+background: #FFFFFF; 
+font-family: arial; 
+font-size: 11px; 
+text-align: justify
+} 
+
+
+p {
+width: 530px
+}
+
+
+hr { 
+border: 0; 
+width: 530px; 
+align: center;
+height: 2px; 
+color: #000000; 
+background-color: #000000; 
+}
+
+
+h1 {
+width: 530px; 
+font-family: arial;
+font-size: 14px; 
+text-align: center;
+}
+
+
+h2 {
+font-family: arial;
+font-size: 12px; 
+text-decoration: underline; 
+text-align: left;
+padding-top: 30px;
+}
+
+
+h3 {
+font-family: arial;
+font-size: 11px; 
+text-decoration: underline; 
+text-align: left;
+padding-top: 30px;
+}
+
+
+#box { 
+width: 530px; 
+background-color: #FFFFFF; 
+border-style:solid; 
+border-width: 1px; 
+border-color: #9370BB; 
+font-size: 11px; 
+padding: 5px;  
+}
+
+
+#box2 { 
+width: 530px; 
+background-color: #D3D3D3; 
+border-style:solid; 
+border-width: 0px; 
+border-color: black; 
+font-family: times new roman; 
+font-size: 11px; 
+font-weight: bold;
+color: 696969;
+padding: 5px;  
+padding-left: 5px;
+padding-right: 5px;
+padding-top: 5px;
+padding-bottom: 15px;
+}
+
+
+.box2 {
+color: 696969;
+background-color: #D3D3D3; 
+}
+
+
+#img { 
+width: 530px; 
+background-color: #FFFFFF; 
+border-style:solid; 
+border-width: 1px; 
+border-color: #9370BB; 
+text-align: left; 
+font-family: arial; 
+font-size: 12px; 
+padding-left: 15px;  
+padding-bottom: 15px;
+}
+
+
+#bullet {
+width: 530px;
+padding-top: 10px;
+}
+
+
+#bullet2 {
+width: 530px;
+padding-bottom: 20px;
+}
+
+#quote {
+width: 450px;
+padding-left: 40px;
+}
+
+
+table#sample {
+background-color:#FFFFFF;
+border: solid #000 1px;
+width: 400px;
+}
+
+table#sample td {
+padding: 5px;
+border: solid #000 1px;
+}
+
+.data {
+color: #000000;
+text-align: left;
+background-color: white;
+}
+
+.toprow {
+font-style: italic;
+font-weight: bold;
+color: white;
+text-align: center;
+background-color: #9370BB;
+}
+
+.leftcol {
+font-weight: bold;
+text-align: center;
+width: 70px;
+background-color: white;
+}
+
+.file {
+color: black;
+background-color: #CC99FF;
+border-style:solid; 
+border-width: 1px; 
+border-color: #F8F8FF; 
+}
+
+.command {
+color: black;
+background-color: #99FFFF;
+border-style:solid; 
+border-width: 1px; 
+border-color: #F8F8FF; 
+}
+
+
+textarea {
+font-size: 11px; 
+}
+
+
+
+
+
+.footer {
+  background-color: #FFFFFF;
+  font-weight: bold;
+  border-style:solid; 
+  border-width: 1px; 
+  border-color: #CC99FF; 
+}
+
+.footer a {
+  text-decoration: none;
+  color: #660099;
+}
+
+.footer a:hover {
+  color: #FFFFFF;
+  background-color: #CC99FF;
+  font-weight: bold;
+}
+
+

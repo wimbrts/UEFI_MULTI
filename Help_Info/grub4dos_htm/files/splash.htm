@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Creating a Splash Image</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Creating a Splash Image</h1>
+<hr />
+
+<p>
+The following information has been adapted from <a target="_blank" href="http://www.msfn.org/board/index.php?s=&showtopic=69211&view=findpost&p=505946">here</a>
+</p>
+
+	<div id=bullet>
+	To create a Grub4dos compatible splash image using Windows you will need to download and install the following (freeware) tools - 
+		<ul>
+		<li><a target="_blank" href="http://www.gimp.org/windows/">GIMP</a> (portable app version available <a target="_blank" href="http://portableapps.com/apps/graphics_pictures/gimp_portable">here</a>)</li>
+		<li><a target="_blank" href="http://www.imagemagick.org/script/index.php">ImageMagick</a></li>
+		</ul>
+	</div>
+
+	<div id=bullet>
+	As previously stated in the guide the splash image must meet the following requirements -
+		<ul>
+		<li>Image <b><u>must</u></b> be 640x480 pixels in size.</li>
+		<li>Image <b><u>must</u></b> not contain more than 14 colours.</li>
+		<li>Image <b><u>must</u></b> use the .xpm file format, which can be compressed with gzip (.gz).</li>
+		</ul>
+	</div>
+
+
+<p>
+The first step is to create a Windows Bitmap Image (.bmp) of your chosen picture - the following examples will convert <font class="file">C:\splash.jpg</font> (image is 1024x768). Start GIMP and open the file (or alternatively make your own image using GIMP).
+</p>
+
+<p>
+To resize the image goto the <font class="command"><u>I</u>mage</font> Menu <font class="command"><u>S</u>cale Image...</font> option.
+</p>
+
+<p>
+GIMP will, by default, keep the same aspect ratio when resizing images. To disable this you will need to click on the icon next to the Width: and Height: boxes (see figure 1.) until it displays a broken link (see figure 2.).
+		<div id=img>
+		figure 1.<br />
+		<IMG SRC="img/gimp1.jpg">
+		</div><br />
+
+		<div id=img>
+		figure 2.<br />
+		<IMG SRC="img/gimp2.jpg">
+		</div>
+</p>
+
+
+
+
+<p>
+Ensure that the Width: and Height: is set to 640 x 480, then click on the <b><u>S</u>cale</b> button. Now goto the <font class="command"><u>F</u>ile</font> Menu <font class="command">Save <u>A</u>s...</font> option, and save the image as a Windows Bitmap Image (.bmp file extension) - e.g. <font class="command">Save As</font> <font class="file">C:\splash.bmp</font>.
+</p>
+
+<p>
+To set the maximum number of colours - goto the <font class="command"><u>I</u>mage</font> Menu &mdash;&gt;<font class="command"><u>M</u>ode</font>&mdash;&gt;<font class="command"><u>I</u>ndexed</font> option. Change the maximum number of colors to 14 and click on the <b>C<u>o</u>nvert</b> button (although <font class="file">convert.exe</font> (ImageMagick tool) can also be used to limit the maximum number of colours to 14 - the palette will not be optimised and the image is likely to be of poor quality. Using GIMP as outlined above will result in a much better image). 
+</p>
+
+<p>
+Although GIMP supports .xpm files, the Windows 32 port of the Gimp saves in an .xpm format that is <b><u>not</u></b> compatible with GRUB. Goto <font class="command"><u>F</u>ile</font> Menu, and <font class="command"><u>S</u>ave</font> - retaining .bmp format. We have now finished with GIMP. 
+</p>
+
+<p>
+To convert the image to a Grub4dos compatible .xpm file, use the command line ImageMagick tool <font class="file">convert.exe</font> with the syntax <font class="command">convert picture.bmp picture.xpm.gz</font>. Open a command prompt in the ImageMagick install directory and enter the command <font class="command">convert.exe C:\splash.bmp C:\splash.xpm.gz</font>.
+</p>
+
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="embedded.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="gfxmenu.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+
+
+
+</body>
+</html>
+

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Using grldr as no-emulation bootsector on CD/DVD</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Using grldr as no-emulation bootsector on CD/DVD</h1>
+<hr />
+
+
+
+	<p>
+	To Install grub4dos to CDROM you will need the command line tool mkisofs - place it in the <font class="file">C:\Grub4dos</font> folder. Using mkisofs will create a disc image (.ISO format) - the image file will need to be burnt to a CD using a third party tool (e.g. ImgBurn or Nero). The following information has been taken from <font class="file"><a target="_blank" href="README_GRUB4DOS.txt">README_GRUB4DOS.txt</a></font> (included with Grub4dos download). Create directory <font class="file">C:\Grub4dos\iso_root</font>. Copy <font class="file">C:\Grub4dos\grldr</font> and 
+<font class="file">menu.lst</font> (if using a configuration file) to the root of <font class="file">C:\Grub4dos\iso_root</font> folder. Two different commands can be used to create a Grub4dos CD/DVD. Open a command prompt and use the command <font class="command">CD C:\Grub4dos</font>  to set <font class="file">C:\Grub4dos</font> as the working directory. Then enter either the command - 
+	</p>
+		<div id=box>
+		mkisofs -R -b grldr -no-emul-boot -boot-load-size 4 -o grldr.iso iso_root
+		</div>
+
+	<p>
+	or - 
+	</p>
+		<div id=box>
+		mkisofs -R -b grldr -no-emul-boot -boot-load-seg 0x1000 -o bootable.iso iso_root
+		</div>
+
+	<p>
+	The first method is the safest to use as it should be compatible with older BIOS's - it will load the first sector of <font class="file">grldr</font>, the program then loads the rest from CD. Method 2 will attempt to load the whole of <font class="file">grldr</font>. 
+	</p>
+
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="install.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="grldrmbr.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+</body>
+</html>

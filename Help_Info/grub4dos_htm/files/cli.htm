@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<link type="text/css" rel="stylesheet" href="style1.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="printstyle1.css" media="print" /> 
+<title>Grub4dos Guide - Command Line</title>
+</head>
+
+<body>
+<h1>Grub4dos Guide - Command Line</h1>
+<hr />
+
+<p>
+Please read the previous section first, as this also covers some command line usage. For a full list of commands and usage, see <a href="commands.htm">here</a>.
+</p>
+
+
+<p>
+To drop into a command shell press <b>[c]</b> if a boot menu is displayed – this is useful for debugging <font class="file">menu.lst</font> entries. As stated earlier, if the configuration file is not found a command shell is loaded by default.
+</p>
+
+
+
+<p>
+To view available commands type <font class="command">help --all</font> when in the command shell – this will list all commands (see figure 1. below). 
+</p>
+
+		<div id=img>
+		figure 1.
+		<IMG SRC="img/cli1.jpg">
+		</div>
+
+
+
+
+<p>
+For help with individual commands type <font class="command">help [command]</font> – e.g. <font class="command">help chainloader</font> will display chainloader command usage.
+</p>
+
+
+<div id=bullet>
+The auto complete feature was discussed briefly in the preceding section. The following examples illustrate its versatility (output is from a test system with two hard disks and one cd attached) -
+	<ul>
+	<li>Entering <font class="command">&nbsp;f&nbsp;</font> <b>[tab]</b> will list all possible completions for commands beginning with the letter "f" - </li>
+
+		<div id=box2>
+		grub> f<br />
+		&emsp; Possible commands are: fallback find foreground fstest<br />
+		</div>
+	</ul>
+</div>
+
+
+
+	<div id=bullet>
+	<ul>
+	<li>Adding <font class="command">&nbsp;i&nbsp;</font> <b>[tab]</b> will auto complete from <font class="box2">&nbsp;grub> fi&nbsp;</font> to the following, as there are no other possible completions for a command beginning with "fi" - </li>
+
+		<div id=box2>
+		grub> find _<br />
+		</div>
+	</ul>
+	</div>
+
+
+	<div id=bullet>
+	<ul>
+	<li>Adding <font class="command">&nbsp;(&nbsp;</font> <b>[tab]</b> will list all possible devices. E.g. - </li>
+
+		<div id=box2>
+		grub> find (<br />
+		&emsp; Possible disks are: hd0 hd1 rd cd<br />
+		</div>
+	</ul>
+	</div>
+
+
+	<div id=bullet>
+	<ul>
+	<li>Adding <font class="command">&nbsp;hd0&nbsp;</font> <b>[tab]</b> will auto complete to -</li>
+
+		<div id=box2>
+		grub> find (hd0,_<br />
+		</div>
+	</ul>
+	</div>
+
+
+	<div id=bullet>
+	<ul>
+	<li>Pressing <b>[tab]</b> again will display possible partitions, if more than one partition is present. E.g. -  </li>
+
+		<div id=box2>
+		grub> find (hd0,<br />
+		&emsp; Possible partitions are: <br />
+		&emsp;&emsp; Partition num: 0, active, Filesystem type is fat, partition type 0x01<br />
+		&emsp;&emsp; Partition num: 1, Filesystem type unknown, partition type 0x07<br />
+		&emsp;&emsp; Partition num: 4, Filesystem type is fat, partition type 0x04<br />
+		</div>
+	</ul>
+	</div>
+
+
+	<div id=bullet>
+	<ul>
+	<li>Adding <font class="command">&nbsp;0&nbsp;</font> <b>[tab]</b> will auto complete to -  </li>
+
+		<div id=box2>
+		grub> find (hd0,0)_<br />
+		</div>
+	</ul>
+	</div>
+
+	<div id=bullet>
+	<ul>
+	<li>Adding <font class="command">&nbsp;/&nbsp;</font> <b>[tab]</b> will list all files/directories at the root of the device. E.g. -  </li>
+
+		<div id=box2>
+		grub> find (hd0,0)/<br />
+		&emsp; Possible files are: io.sys msdos.sys command.com<br />
+		</div>
+	</ul>
+	</div>
+
+<p>
+Expanding on one of the above examples, the <b>[tab]</b> feature provides a quick method of finding which devices are available. Typing a relevant command followed by <font class="command">&nbsp;(&nbsp;</font> <b>[tab]</b> (e.g. <font class="command">root (&nbsp;</font>, <font class="command">chainloader (&nbsp;</font>, etc) will list all possible completions for the devices starting with <font class="command">&nbsp;(&nbsp;</font> - basically all devices. E.g. -  
+		<div id=box2>
+		grub> chainloader (<br />
+		&emsp; Possible disks are: hd0 hd1 rd cd<br />
+		</div>
+</p>
+
+
+<p>
+<a name="find1"></a><br>
+By adding a (unique) tag/marker file to the root of a device it is possible to use the <font class="command">find</font> command to identify the name of the device as allocated via grub4dos. For example, typing <font class="command">find /hdd.tag</font> will search the root of all supported partitions for the file <font class="file">hdd.tag</font> and will return the name of the device containing the file - e.g. (hd0,0). If the file is present on more than one device, then the other devices will also be displayed. As reported earlier, devices are searched in the order (hd), then (cd), then (fd). Using the same method it is possible to use relative paths in menu entries by using the <font class="command">find --set-root</font> command - see <a href="menu.htm#find">here</a>. 
+</p>
+
+
+
+<br />
+<div id="footer">
+<font class="footer"><a href="basics.htm">&nbsp;PREV&nbsp;</a></font><font class="footer"><a href="../Grub4dos.htm">&nbsp;HOME&nbsp;</a></font><font class="footer"><a href="menu.htm">&nbsp;NEXT&nbsp;</a></font>		
+</div>
+
+
+</body>
+</html>
+
