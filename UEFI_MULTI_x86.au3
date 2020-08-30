@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  August 25, 2020
+ Author:        WIMB  -  August 30, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 4.8 in rule 189
+ Program:       UEFI_MULTI_x64.exe - Version 4.8 in rule 189
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -104,10 +104,10 @@ Global $OS_drive = StringLeft(@WindowsDir, 2)
 Global $str = "", $bt_files[13] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
 "\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt", "\makebt\grub.exe"]
 
-If @OSArch <> "X86" Then
-   MsgBox(48, "ERROR - Environment", "In x64 environment use UEFI_MULTI_x64.exe ")
-   Exit
-EndIf
+;~ 	If @OSArch <> "X86" Then
+;~ 	   MsgBox(48, "ERROR - Environment", "In x64 environment use UEFI_MULTI_x64.exe ")
+;~ 	   Exit
+;~ 	EndIf
 
 For $str In $bt_files
 	If Not FileExists(@ScriptDir & $str) Then
@@ -180,7 +180,7 @@ _Mount_EFI()
 ; HotKeySet("{ESC}", "TogglePause")
 
 ; Creating GUI and controls
-$hGuiParent = GUICreate(" UEFI_MULTI x86 - Make Multi-Boot USB ", 400, 430, -1, -1, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
+$hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, -1, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
@@ -231,25 +231,25 @@ GUICtrlSetTip($Menu_Type, " Select Boot Menu Type for VHD - IMG file " & @CRLF _
 & " Make Grub4dos Menu for XP or Win7/8/10 VHD " & @CRLF _
 & " with WinVBlock or FiraDisk or SVBus Driver ")
 
-$Upd_MBR = GUICtrlCreateCheckbox("", 214, 138, 17, 17)
-GUICtrlCreateLabel( "Update MBR Boot Code", 238, 140)
+$Upd_MBR = GUICtrlCreateCheckbox("", 204, 138, 17, 17)
+GUICtrlCreateLabel( "Update MBR Boot Code", 228, 140)
 GUICtrlSetTip($Upd_MBR, @CRLF &  " *** Force Update MBR Boot Code - Applied Only for USB-Disk *** " _
 & @CRLF & @CRLF & "  Windows 10 MBR Boot Code is applied and Replaces Grub4dos code by using bootsect.exe " _
 & @CRLF & @CRLF & "  BIOS: Win XP Format BootSector will invoke NTLDR as BootLoader with boot.ini Menu " _
 & @CRLF & "  BIOS: Win 7/8/10 Format will invoke BOOTMGR as BootLoader with Boot Manager Menu " & @CRLF _
 & @CRLF & "  UEFI: Win 8/10 x64 file EFI\Boot\bootx64.efi on FAT32 gives EFI Boot Manager Menu " & @CRLF)
 
-$Boot_w8 = GUICtrlCreateCheckbox("", 214, 163, 17, 17)
+$Boot_w8 = GUICtrlCreateCheckbox("", 204, 163, 17, 17)
 GUICtrlSetTip($Boot_w8, " Make Boot Manager Menu for Win 7/8/10 System" & @CRLF _
 & " Use bcdboot to make BCD entry in EFI and  Boot " & @CRLF _
 & " Requires in Win 7/8 OS User Account Control = OFF ")
-GUICtrlCreateLabel( "Add 7/8/10 to Boot Man", 238, 165)
+GUICtrlCreateLabel( "Add 7/8/10 to Boot Manager", 228, 165)
 
-$grldrUpd = GUICtrlCreateCheckbox("", 214, 188, 17, 17)
+$grldrUpd = GUICtrlCreateCheckbox("", 204, 188, 17, 17)
 GUICtrlSetTip($grldrUpd, " Update Grub4dos grldr Version on Boot Drive " & @CRLF _
 & " Forces Update grldr.mbr for Grub4dos in Boot Manager Menu " & @CRLF _
 & " Forces Update a1ive Grub2 File Manager grubfm.iso ")
-GUICtrlCreateLabel( "Update Grub4dos grldr", 238, 190)
+GUICtrlCreateLabel( "Update Grub4dos grldr", 228, 190)
 
 $Boot_vhd = GUICtrlCreateCheckbox("", 32, 163, 17, 17)
 GUICtrlSetTip($Boot_vhd, " Make Boot Manager Menu for 7/8/10 VHD " & @CRLF _
@@ -270,15 +270,21 @@ GUICtrlSetTip($xp_bcd, " Add Start XP to Boot Manager Menu - BIOS mode " & @CRLF
 & " In 7/8 Requires User Account Control = OFF ")
 GUICtrlCreateLabel( "Add XP  to Boot Manager", 56, 215, 130, 15)
 
-$refind = GUICtrlCreateCheckbox("", 214, 213, 17, 17)
+$refind = GUICtrlCreateCheckbox("", 204, 213, 17, 17)
 GUICtrlSetTip($refind, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux ISO " & @CRLF _
 & " - Mint   UEFI - Only for some Linux ISO Files in images folder " & @CRLF _
 & " - Super UEFI - use Addon with a1ive Grub2 File Manager " & @CRLF _
 & "   and Grub2 Live ISO Multiboot Menu for All Linux in iso folder " & @CRLF _
 & " - MBR - use Addon to Install a1ive Grub2 Boot Manager - All Linux ISO ")
 GUICtrlCreateLabel( "Grub2 M", 328, 215)
-$Combo_EFI = GUICtrlCreateCombo("", 238, 212, 80, 24, $CBS_DROPDOWNLIST)
-GUICtrlSetData($Combo_EFI,"Mint   UEFI|Super UEFI|Mint + MBR|Sup + MBR|MBR  Only", "Mint   UEFI")
+$Combo_EFI = GUICtrlCreateCombo("", 228, 212, 90, 24, $CBS_DROPDOWNLIST)
+
+If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg\grub.cfg") _
+		Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") Then
+	GUICtrlSetData($Combo_EFI,"Mint   UEFI", "Mint   UEFI")
+Else
+	GUICtrlSetData($Combo_EFI,"Mint   UEFI|Super UEFI|Mint + MBR|Super + MBR|MBR  Only", "Mint   UEFI")
+EndIf
 GUICtrlSetTip($Combo_EFI, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux ISO " & @CRLF _
 & " - Mint   UEFI - Only for some Linux ISO Files in images folder " & @CRLF _
 & " - Super UEFI - use Addon with a1ive Grub2 File Manager " & @CRLF _
@@ -2109,17 +2115,17 @@ Func _Go()
 	GUICtrlSetData($ProgressAll, 5)
 	DisableMenus(1)
 
-	If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") _
-		Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") And GUICtrlRead($refind) = $GUI_CHECKED And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then
-		MsgBox(16, "  STOP - Addon is Missing", "Addon for Grub2 Manager is Missing " & @CRLF & @CRLF _
-		& "Download UEFI_MULTI-Nr-addon-glim-agFM.zip from https://github.com/wimbrts " & @CRLF & @CRLF _
-		& "Use R-mouse 7-zip menu and Extract here to Add to UEFI_MULTI-Nr   folder " & @CRLF & @CRLF _
-		& "Confirm 4x Overwrites with Yes and use UEFI_MULTI again with Addon ")
-		_GUICtrlStatusBar_SetText($hStatus," First Select Target Drives and then Sources", 0)
-		GUICtrlSetData($ProgressAll, 0)
-		DisableMenus(0)
-		Return
-	EndIf
+;~ 		If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") _
+;~ 			Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") And GUICtrlRead($refind) = $GUI_CHECKED And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then
+;~ 			MsgBox(16, "  STOP - Addon is Missing", "Addon for Grub2 Manager is Missing " & @CRLF & @CRLF _
+;~ 			& "Download UEFI_MULTI-Nr-addon-glim-agFM.zip from https://github.com/wimbrts " & @CRLF & @CRLF _
+;~ 			& "Use R-mouse 7-zip menu and Extract here to Add to UEFI_MULTI-Nr   folder " & @CRLF & @CRLF _
+;~ 			& "Confirm 4x Overwrites with Yes and use UEFI_MULTI again with Addon ")
+;~ 			_GUICtrlStatusBar_SetText($hStatus," First Select Target Drives and then Sources", 0)
+;~ 			GUICtrlSetData($ProgressAll, 0)
+;~ 			DisableMenus(0)
+;~ 			Return
+;~ 		EndIf
 
 	If DriveStatus($WinDrvDrive) <> "READY" Then
 		MsgBox(48, "ERROR - USB Boot Drive NOT Ready", "Drive NOT READY - First Format USB Boot Drive ", 3)
@@ -2677,7 +2683,7 @@ Func _Go()
 			If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootx64.efi") Then
 				FileMove($TargetDrive & "\efi\boot\bootx64.efi", $TargetDrive & "\efi\boot\org-bootx64.efi", 1)
 			EndIf
-			If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Sup + MBR" And FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootia32.efi") Then
+			If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" And FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootia32.efi") Then
 				FileMove($TargetDrive & "\efi\boot\bootia32.efi", $TargetDrive & "\efi\boot\org-bootia32.efi", 1)
 			EndIf
 			If Not FileExists($TargetDrive & "\efi\microsoft\boot\bootmgfw.efi") And @OSArch = "X64" Then
@@ -2692,18 +2698,20 @@ Func _Go()
 				FileMove($TargetDrive & "\efi\boot\grub.cfg", $TargetDrive & "\efi\boot\org-grub.cfg", 1)
 			EndIf
 		EndIf
-		; Settings "Mint   UEFI|Super UEFI|Mint + MBR|Sup + MBR|MBR  Only"
+		; Settings "Mint   UEFI|Super UEFI|Mint + MBR|Super + MBR|MBR  Only"
 		If GUICtrlRead($Combo_EFI) = "Mint   UEFI" Or GUICtrlRead($Combo_EFI) = "Mint + MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding Linux Mint Grub2 EFI Manager - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi_mint", $TargetDrive & "\efi", 1)
 			; If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
-		ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Sup + MBR" Then
+		ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding Super Grub2 EFI Manager - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\efi\grub\x86_64-efi", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\efi\grub\i386-efi", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\efi\grub\locale", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\efi\grub\fonts", 1)
+			If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\efi\grub\x86_64-efi", 1)
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\efi\grub\i386-efi", 1)
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\efi\grub\locale", 1)
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\efi\grub\fonts", 1)
+			EndIf
 			;	If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
 			;		GUICtrlSetData($ProgressAll, 75)
 			;		_GUICtrlStatusBar_SetText($hStatus," Adding Grub2Win for BIOS mode - wait .... ", 0)
@@ -2717,7 +2725,7 @@ Func _Go()
 		EndIf
 
 		; MBR BIOS mode cases - Install Grub2 in MBR
-		If GUICtrlRead($Combo_EFI) = "Mint + MBR" Or GUICtrlRead($Combo_EFI) = "Sup + MBR" Or GUICtrlRead($Combo_EFI) = "MBR  Only" And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") And $inst_disk <> "" Then
+		If GUICtrlRead($Combo_EFI) = "Mint + MBR" Or GUICtrlRead($Combo_EFI) = "Super + MBR" Or GUICtrlRead($Combo_EFI) = "MBR  Only" And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") And $inst_disk <> "" Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding a1ive Grub2 Manager in MBR - wait .... ", 0)
 			$g2_inst = RunWait(@ComSpec & " /c UEFI_MAN\grub_a1\grub-install.exe  --boot-directory=" & $TargetDrive & "\ --target=i386-pc //./PHYSICALDRIVE" & $inst_disk, @ScriptDir, @SW_HIDE)
 			;	MsgBox(48, "Grub2 in MBR", "Grub2 Installed in MBR - $g2_inst = " & $g2_inst & @CRLF & @CRLF _
@@ -2757,7 +2765,7 @@ Func _Go()
 			EndIf
 		EndIf
 		; MBR BIOS mode Grub2 System support
-		If Not FileExists($TargetDrive & "\grub\core.img") And FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg\core.img") Then
+		If Not FileExists($TargetDrive & "\grub\core.img") Or Not FileExists($TargetDrive & "\grub\grub.cfg") And FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg\grub.cfg") Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding MBR BIOS a1ive Grub2 System - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg", $TargetDrive & "\grub", 1)
 			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-pc", $TargetDrive & "\grub\i386-pc", 1)
