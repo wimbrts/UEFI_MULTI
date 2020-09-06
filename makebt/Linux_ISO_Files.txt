@@ -1,4 +1,4 @@
-USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-08-27
+USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-09-05
 
 How to make USB Drive booting with Linux ISO files in MBR BIOS and in UEFI Secure mode ?
 
@@ -10,11 +10,10 @@ A. Linux Mint UEFI Manager - Addon is Not needed - Support for some Linux ISO fi
    Copy  Linux ISO to folder images on USB Boot - Rename as linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso - kali-linux.iso
    Linux Mint UEFI Secure - Grub2 Menu from \Boot\grub\grub.cfg and \Boot\grub\grub_Linux.cfg - Linux Mint bootx64.efi and grubx64.efi of 15-05-2018
    MBR BIOS mode - Grub4dos Menu booting with menu.lst and menu_Linux.lst
-   a1ive Grub2 File Manager from Addon can be used in UEFI Grub2 Menu and always in MBR BIOS Grub4dos Menu to boot a lot of Linux ISO files
 
 B. Super UEFI Manager - use addon-glim-agFM - support for a lot of Linux ISO files
    Copy Your Linux ISO to folder \iso\YourLinux on FAT32 USB Boot drive U-BOOT
-   Super UEFI Secure - Grub2 Menu from \EFI\grub\grub.cfg and grub_Linux.cfg with GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim
+   Super UEFI Secure - Grub2 Menu from \grub\grub.cfg and x86_64-efi folder and grub_Linux.cfg with GRUB2 Live ISO Multiboot menu in folder \grub\glim
    MBR BIOS mode - a1ive Grub2 Menu from \grub\grub.cfg and grub_Linux.cfg with GRUB2 Live ISO Multiboot menu from \grub\glim\main.cfg and inc-linux.cfg files
    a1ive Grub2 File Manager from agFM Addon can be used in UEFI Secure Grub2 and MBR BIOS Grub4dos Menu to select a lot of Linux ISO files
 
@@ -28,13 +27,13 @@ The Sup + MBR setting is Super UEFI + MBR
 The Mint + MBR setting is Linux Mint UEFI + MBR
 
 Linux ISO files renamed in images folder - Only for linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso - kali-linux.iso
-UEFI mode - Linux Mint Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \Boot\grub\grub.cfg and grub_Linux.cfg Menu
-UEFI mode - Super UEFI Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI and \EFI\grub\grub.cfg  and grub_Linux.cfg Menu
-MBR BIOS  - a1ive Grub2 Boot Manager installed in MBR Or Grub4dos > Grub2 Menu using grub\core.img - booting with \grub\grub.cfg and grub_Linux.cfg Menu
+UEFI mode - Linux Mint Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI             and \Boot\grub\grub.cfg and grub_Linux.cfg Menu
+UEFI mode - Super UEFI Grub2 booting with FAT32 file \EFI\Boot\BOOTx64.EFI             and \grub\grub.cfg and grub_Linux.cfg Menu and x86_64-efi folder
+MBR BIOS  - a1ive Grub2 installed in MBR Or Grub4dos > Grub2 Menu using \grub\core.img and \grub\grub.cfg and grub_Linux.cfg Menu and i386-pc folder 
 MBR BIOS  - Grub4dos Menu booting with menu.lst and menu_Linux.lst
 
 All Linux ISO files with original fullname in subfolder of iso folder - addon-glim-agFM required
-UEFI mode - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \EFI\grub\glim\main.cfg and inc-linux.cfg files
+UEFI mode - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
 MBR BIOS  - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
 
 Download Linux ISO file:
@@ -57,6 +56,10 @@ Thanks to:
 More Info on UEFI Secure booting - https://habr.com/ru/post/446238/
 The Super UEFI setting uses Super UEFI shim combined with alive Grub2 Boot Manager - Addon with a1ive Grub2 Boot Manager is required
 
-Grub2 MBR BIOS mode involves Install of a1ive Grub2 in MBR Or Grub4dos > Grub2 Menu using grub\core.img - Addon with a1ive Grub2 Boot Manager is required
+Grub2 MBR BIOS mode involves Install of a1ive Grub2 in MBR Or Grub4dos > Grub2 Menu using \grub\core.img - Addon with a1ive Grub2 Boot Manager is required
 
-
+How to Boot from USB with AIO Boot - AIO Boot - AIO Info - More Info Win10_Inst_Eng.pdf
+- Download AIOBoot-v0.9.9.8.7z - Unpack and Copy content of folder AIOBoot-v0.9.9.8 to USB FAT32 and overwrite existing UEFI Boot files 
+- On USB run  AIOCreator.exe - Select Integration Linux OS and your Linux ISO - Linux Mint - Knoppix Live - Ubuntu - Kali Linux 64-bit Live
+- UEFI_MULTI will Keep AIO UEFI files and Add a1ive Grub2 File Manager to AIO\grubfm and Add Boot Manager entry \AIO\grub\grub2win 
+AIO Menu has item Search Grub2 configfile that will find \grub\grub.cfg file for Grub2 Menu items of USB_FORMAT and UEFI_MULTI
