@@ -1,4 +1,4 @@
-USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-09-05
+USB_FORMAT and UEFI_MULTI - Booting Linux ISO Files - 2020-09-09
 
 How to make USB Drive booting with Linux ISO files in MBR BIOS and in UEFI Secure mode ?
 
@@ -63,3 +63,18 @@ How to Boot from USB with AIO Boot - AIO Boot - AIO Info - More Info Win10_Inst_
 - On USB run  AIOCreator.exe - Select Integration Linux OS and your Linux ISO - Linux Mint - Knoppix Live - Ubuntu - Kali Linux 64-bit Live
 - UEFI_MULTI will Keep AIO UEFI files and Add a1ive Grub2 File Manager to AIO\grubfm and Add Boot Manager entry \AIO\grub\grub2win 
 AIO Menu has item Search Grub2 configfile that will find \grub\grub.cfg file for Grub2 Menu items of USB_FORMAT and UEFI_MULTI
+
+
+Linux with Persistence - Keep the changes in writable file with ext3 filesystem
+- Disable Windows Defender
+- On Make_Ext-E.zip use R-mouse 7-zip menu to Extract here using password=bootwimb gives folder Make_Ext
+- Use Make_Ext.exe to make writable file with ext3 filesystem and size 500 MB located in subfolder of folder images
+
+Linux Distro   - images sub - File name - Volume Name
+Linux Mint Cin - linuxmint  - writable  - writable
+Ubuntu Desktop - ubuntu     - writable  - writable
+Porteus x86_64 - porteus    - data.img
+
+Kali Linux     - kali-linux - persistence - persistence
+Instead of using Make_Ext.exe let AIO Creator make the persistence file that must contain persistence.conf file with text: /union
+Kali persistance See https://www.kali.org/docs/usb/kali-linux-live-usb-persistence/

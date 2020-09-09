@@ -48,6 +48,9 @@ set iso_drive=(hd0,1)
 find --set-root /menu_Linux.lst
 configfile /menu_Linux.lst
 
+iftitle [if exist %iso_drive%/AIO/Menu/Grub4dos.lst] AIO Grub4dos Menu - %iso_drive%/AIO/Menu/Grub4dos.lst
+configfile %iso_drive%/AIO/Menu/Grub4dos.lst
+
 iftitle [if exist (hd1,0)/bootmgr] Boot Windows from first primary partition of first hard disk 
 chainloader (hd1,0)/bootmgr
 
