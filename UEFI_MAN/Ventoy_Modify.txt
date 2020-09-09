@@ -1,0 +1,87 @@
+September 08-09-2020
+
+- UEFI_MULTI is compatible with Ventoy USB Drive that was modified to have unhidden 130 MB FAT32 EFI Drive
+- requires to adjust VTOYEFI file grub\grub.cfg to make Ventoy Boot Menu with added Boot options for Windows Boot Manager and for Grub4dos and Grub2 Menu
+ 
+USB Portable SSD - MultiBoot Ventoy Drive with support for booting VHD and WIM files in Windows BootManager Menu and booting Grub4dos Menu and Grub2 Menu
+ 
+Download:
+Ventoy - https://github.com/ventoy/Ventoy/releases
+UEFI_MULTI - https://github.com/wimbrts/UEFI_MULTI/releases
+ 
+How to modify Ventoy USB Drive to have unhidden 130 MB FAT32 EFI Drive
+ 
+1. Ventoy2Disk.exe is used first to Format USB Portable SSD
+2. Ventoy Hidden VTOYEFI Drive on USB must be made visible
+-  In Windows 10x64 use DiskPart > list vol and than select vol of VTOYEFI (in my case nr 14) - assign - VTOYEFI drive is mounted as e.g. Q:
+-  Also possible is: After booting with Win10XPE from RAMDISK the Hidden VTOYEFI Drive is auto mounted
+3. Copy folders and files from VTOYEFI drive to folder e.g. VTOYEFI on your harddisk
+4. In Windows Explorer Format Ventoy and VTOYEFI drive with NTFS FileSystem
+5. In Windows Disk Management Remove VTOYEFI partition
+6. Reduce Size of Ventoy NTFS drive by 100 MB
+7. In unused space Create New simple Volume with Label VTOYEFI and Size 130 MB and Format with FAT32 FileSystem
+8. Copy folders and files from VTOYEFI folder back to your new created VTOYEFI partition
+9. Modify or Replace on VTOYEFI drive file grub\grub.cfg as indicated above
+10. Copy some Linux ISO file and / or Win10XPE_x64.ISO and WinPE.iso file and folder Win10XPE with WIM file to Ventoy NTFS drive
+11. Use UEFI_MULTI_x64.exe in Win10x64 OS - Select VTOYEFI drive as Boot Drive and Ventoy drive as System drive
+12. Use UEFI_MULTI_x64.exe in Win10x64 OS - Select PE WIM e.g. boot.wim or Win10XPE.wim file Or Win10x64.vhd as Boot Image file
+13. Click GO to make MultiBoot Ventoy Drive booting with WIM and VHD file in Windows BootManager and booting with Grub4dos Menu and Grub2 Menu
+14. Boot from USB - after beep use F8 or other HotKey - in Menu - Select UEFI 2nd partition of USB - Or Select USB Drive for MBR BIOS mode
+
+USB HotKey Boot Menu - https://www.disk-image.com/faq-bootmenu.htm
+
+VTOYEFI file grub\grub.cfg - Modified grub.cfg given in UEFI_MULTI-50\UEFI_MAN\ventoy-1.0.20\grub folder
+
+.....
+
+#colect all image files (iso files)
+set ventoy_img_count=0
+vt_list_img $vtoy_iso_part ventoy_img_count
+
+#Main menu
+if [ $ventoy_img_count -gt 0 ]; then
+    if [ $VTOY_DEFAULT_MENU_MODE -eq 0 ]; then
+        vt_dynamic_menu 0 0 
+    else
+        vt_dynamic_menu 0 1
+    fi
+
+    if [ "${grub_platform}" == "efi" ] -a [ -e "/EFI/Microsoft/Boot/bootmgfw.efi" ]; then
+    menuentry "Windows EFI BootManager" {
+      chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+    }
+    fi
+
+    if [ "${grub_platform}" == "pc" ] -a [ -e "/bootmgr" ]; then
+    menuentry "Windows BootManager" {
+      chainloader +1
+    }
+    fi
+
+    if [ "${grub_platform}" == "pc" ] -a [ -e "/grub.exe" ]; then
+    menuentry "Grub4dos Menu" {
+        linux /grub.exe
+    }
+    fi
+
+    if [ -e /grub_Linux.cfg ] -a [ -e "(hd0,msdos1)/images" ]; then
+    menuentry "Grub2 Menu" {
+      set iso_drive=(hd0,msdos1)
+      export iso_drive
+      configfile /grub_Linux.cfg
+    }
+    fi
+
+else
+    if [ -n "$VTOY_NO_ISO_TIP" ]; then
+        NO_ISO_MENU="No ISO files found, $VTOY_NO_ISO_TIP"
+    elif [ -n "$VTOY_DEFAULT_SEARCH_ROOT" ]; then
+        NO_ISO_MENU="No ISO files found, please check VTOY_DEFAULT_SEARCH_ROOT"
+    else
+        NO_ISO_MENU="No ISO files found"
+    fi
+    menuentry "$NO_ISO_MENU (Press enter to reboot ...)" {
+        echo -e "\n    Rebooting ... "
+        reboot
+    }
+fi
