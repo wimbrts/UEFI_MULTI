@@ -3,7 +3,7 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  September 05, 2020
+ Author:        WIMB  -  September 09, 2020
 
  Program:       UEFI_MULTI_x64.exe - Version 5.0 in rule 189
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
@@ -2383,10 +2383,18 @@ Func _Go()
 		If $PartStyle = "MBR" Then
 			If Not FileExists($TargetDrive & "\images") Then DirCreate($TargetDrive & "\images")
 			If Not FileExists($TargetDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $TargetDrive & "\images\", 1)
+			If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
+			If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
+			If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
+			If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
 		EndIf
 	Else
 		If Not FileExists($WinDrvDrive & "\images") Then DirCreate($WinDrvDrive & "\images")
 		If Not FileExists($WinDrvDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $WinDrvDrive & "\images\", 1)
+		If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
+		If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
+		If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
+		If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
 		FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\", 8)
 	EndIf
 
@@ -2777,6 +2785,10 @@ Func _Go()
 		; make folder images for Linux ISO files
 		If Not FileExists($TargetDrive & "\images") Then DirCreate($TargetDrive & "\images")
 		If Not FileExists($TargetDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $TargetDrive & "\images\", 1)
+		If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
+		If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
+		If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
+		If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
 		; Add \AIO\grub\grub2win to \Boot\BCD Menu for BIOS support of Grub2
 		If FileExists($TargetDrive & "\AIO\grub\grub2win") Then
 			_bcd_grub2()

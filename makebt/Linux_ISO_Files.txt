@@ -10,6 +10,7 @@ A. Linux Mint UEFI Manager - Addon is Not needed - Support for some Linux ISO fi
    Copy  Linux ISO to folder images on USB Boot - Rename as linuxmint.iso - runtimelivecd.iso - knoppix.iso - ubuntu.iso - Porteus.iso - kali-linux.iso
    Linux Mint UEFI Secure - Grub2 Menu from \Boot\grub\grub.cfg and \Boot\grub\grub_Linux.cfg - Linux Mint bootx64.efi and grubx64.efi of 15-05-2018
    MBR BIOS mode - Grub4dos Menu booting with menu.lst and menu_Linux.lst
+   Folder images contains subfolders with 7-zip compr. files with ext3 filesystem - Expand to 500 MB writable file for persistence support
 
 B. Super UEFI Manager - use addon-glim-agFM - support for a lot of Linux ISO files
    Copy Your Linux ISO to folder \iso\YourLinux on FAT32 USB Boot drive U-BOOT
@@ -37,14 +38,15 @@ UEFI mode - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\gl
 MBR BIOS  - Grub2 Menu - GRUB2 Live ISO Multiboot (glim) menu in folder \grub\glim\main.cfg and inc-linux.cfg files
 
 Download Linux ISO file:
-Linux Mint Cinnamon - https://linuxmint.com/download.php
-Knoppix Runtime Live CD - https://www.runtime.org/data-recovery-live-cd.htm
-Ubuntu Desktop - https://ubuntu.com/download/desktop
-Porteus x86_64 PassWord = toor - http://www.porteus.org/ and http://porteus.org/porteus-mirrors.html and http://www.mirrorservice.org/sites/dl.porteus.org/
-Kali Linux - 64-bit Live - https://www.kali.org/downloads/
-Download USB_FORMAT and addon-glim-agFM - https://github.com/wimbrts/USB_FORMAT/releases
-Download UEFI_MULTI and addon-glim-agFM - https://github.com/wimbrts/UEFI_MULTI/releases
-wimb GitHub - https://github.com/wimbrts - More Info - https://msfn.org/board/topic/181311-usb-format-tool-and-uefi_multi/
+Linux Mint Cinnamon      - Windows like user interface with Libre Office - https://linuxmint.com/download.php
+Knoppix Runtime Live CD  - with Wine for Windows PRG Support             - https://www.runtime.org/data-recovery-live-cd.htm
+Ubuntu Desktop           - General purpose Linux                         - https://ubuntu.com/download/desktop
+Porteus x86_64 pw = toor - Small size for fast loading                   - http://www.porteus.org/ and http://www.mirrorservice.org/sites/dl.porteus.org/
+Kali Linux - 64-bit Live - Forensic tasks and Password cracking Ophcrack - https://www.kali.org/downloads/
+
+Download USB_FORMAT and addon-glim-agFM  - https://github.com/wimbrts/USB_FORMAT/releases
+Download UEFI_MULTI and addon-glim-agFM  - https://github.com/wimbrts/UEFI_MULTI/releases
+wimb GitHub - https://github.com/wimbrts - https://msfn.org/board/topic/181311-usb-format-tool-and-uefi_multi/
 
 Thanks to:
 - a1ive for making Grub2 Boot Manager - https://github.com/a1ive/grub/releases
@@ -52,6 +54,7 @@ Thanks to:
 - ValdikSS for making Super UEFIinSecureBoot Disk v3 - https://github.com/ValdikSS/Super-UEFIinSecureBoot-Disk/releases
 - Matthias Saou - thias - for making glim - https://github.com/thias/glim
 - chenall for making Grub4dos - https://github.com/chenall/grub4dos/releases and http://grub4dos.chenall.net/categories/downloads/
+- steve6375 for Make_Ext - https://www.easy2boot.com/
 
 More Info on UEFI Secure booting - https://habr.com/ru/post/446238/
 The Super UEFI setting uses Super UEFI shim combined with alive Grub2 Boot Manager - Addon with a1ive Grub2 Boot Manager is required
@@ -64,8 +67,7 @@ How to Boot from USB with AIO Boot - AIO Boot - AIO Info - More Info Win10_Inst_
 - UEFI_MULTI will Keep AIO UEFI files and Add a1ive Grub2 File Manager to AIO\grubfm and Add Boot Manager entry \AIO\grub\grub2win 
 AIO Menu has item Search Grub2 configfile that will find \grub\grub.cfg file for Grub2 Menu items of USB_FORMAT and UEFI_MULTI
 
-
-Linux with Persistence - Keep the changes in writable file with ext3 filesystem
+Linux with Persistence - How to make writable file with ext3 filesystem for persistence support
 - Disable Windows Defender
 - On Make_Ext-E.zip use R-mouse 7-zip menu to Extract here using password=bootwimb gives folder Make_Ext
 - Use Make_Ext.exe to make writable file with ext3 filesystem and size 500 MB located in subfolder of folder images
@@ -73,8 +75,7 @@ Linux with Persistence - Keep the changes in writable file with ext3 filesystem
 Linux Distro   - images sub - File name - Volume Name
 Linux Mint Cin - linuxmint  - writable  - writable
 Ubuntu Desktop - ubuntu     - writable  - writable
-Porteus x86_64 - porteus    - data.img
-
+Porteus x86_64 - porteus    - data.img  - writable
 Kali Linux     - kali-linux - persistence - persistence
 Instead of using Make_Ext.exe let AIO Creator make the persistence file that must contain persistence.conf file with text: /union
 Kali persistance See https://www.kali.org/docs/usb/kali-linux-live-usb-persistence/
