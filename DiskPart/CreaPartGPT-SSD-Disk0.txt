@@ -12,13 +12,11 @@ convert gpt
 rem === 1. Recovery partition NTFS 1000 MB ======== Size also Suitable for Win10XPE =====
 create partition primary size=1000
 format quick fs=ntfs label="Recovery"
-assign
 set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac"
 gpt attributes=0x8000000000000001
 rem == 2. EFI Boot partition FAT32 300 MB ==========================
 create partition efi size=300
 format quick fs=fat32 label="0_EFI"
-assign
 rem == 3. Microsoft Reserved (MSR) partition =======
 create partition msr size=16
 rem == 4. Windows 10 partition NTFS ========================
