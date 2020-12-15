@@ -1,0 +1,45 @@
+color white/blue  black/light-gray white/black white/black
+timeout 10
+default 0
+
+title Win10XPE - (hd3,1)/Win10XPE/Win10XPE_x64.ISO
+map (hd3,1)/Win10XPE/Win10XPE_x64.ISO (0xff)
+chainloader (0xff)
+
+title Win10XPE - Find Win10XPE/Win10XPE_x64.ISO
+find --set-root /Win10XPE/Win10XPE_x64.ISO
+map /Win10XPE/Win10XPE_x64.ISO (0xff)
+chainloader (0xff)
+
+title grubfm x64 EFI Boot Manager of a1ive
+find --set-root /efi/boot/grubfmx64.efi
+chainloader /efi/boot/grubfmx64.efi
+
+title Grub2 Commandline - chainloader /efi/boot/grubx64_real.efi
+find --set-root /grub/grub.cfg
+chainloader /efi/boot/grubx64_real.efi
+
+title Return to Boot Manager
+chainloader
+
+title commandline
+commandline
+
+title Exit grub4dos
+exit_g4d
+
+title reboot
+reboot
+
+title halt
+halt
+
+title VHD/10_XPE.vhd - Win10XPE Flat VHD FILEDISK 2GB for UEFI boot
+find --set-root /VHD/10_XPE.vhd
+map /VHD/10_XPE.vhd (hd)
+chainloader (hd-1)
+
+title VHD/10_XPE.vhd - Win10XPE Flat VHD RAMDISK 2GB for UEFI boot
+find --set-root /VHD/10_XPE.vhd
+map --mem /VHD/10_XPE.vhd (hd)
+chainloader (hd-1)
