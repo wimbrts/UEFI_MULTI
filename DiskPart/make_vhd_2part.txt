@@ -1,0 +1,23 @@
+rem ==
+rem == Make VHD with MBR and 2 partitions FAT32 + NTFS needed for booting with Grub2 Or Grub4dos in UEFI mode from RAMDISK
+rem ==
+rem == make_vhd_2part.txt == adjust drive letters - path and filename - size and label to your needs
+rem ==
+create vdisk file="D:\VHD\Mini10_SV.vhd" maximum=3000 type=fixed
+select vdisk file="D:\VHD\Mini10_SV.vhd"
+attach vdisk
+create partition primary size=100
+format quick fs=fat32 label="VHD_1_F32"
+assign
+active
+create partition primary
+format quick fs=ntfs label="VHD_2_Mini10"
+assign
+list volume
+exit
+rem ==
+rem == Info https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-uefigpt-based-hard-drive-partitions
+rem == Info https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/configure-biosmbr-based-hard-drive-partitions
+rem ==
+rem == In admin command window use: DiskPart /s G:\DiskPart\make_vhd_2part.txt
+rem ==
