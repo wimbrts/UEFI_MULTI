@@ -1,0 +1,31 @@
+1 VERSIONINFO
+FILEVERSION 1,2,0,0
+PRODUCTVERSION 1,2,0,0
+FILEOS 0x40000
+FILETYPE 0x3
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904B0"
+		{
+			VALUE "CompanyName", "Kai Schtrom"
+			VALUE "FileDescription", "SVBus Installer"
+			VALUE "FileVersion", "1.2.0.0"
+			#ifdef _X86_
+			VALUE "InternalName", "instx86.exe"
+			VALUE "OriginalFilename", "instx86.exe"
+			#else
+			VALUE "InternalName", "instx64.exe"
+			VALUE "OriginalFilename", "instx64.exe"
+			#endif
+			VALUE "ProductName", "SVBus Installer"
+			VALUE "ProductVersion", "1.2.0.0"
+			VALUE "LegalCopyright", "Copyright © Kai Schtrom 2020"
+		}
+	}
+
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409 0x04B0
+	}
+}

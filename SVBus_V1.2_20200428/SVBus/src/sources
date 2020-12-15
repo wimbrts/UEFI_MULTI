@@ -1,0 +1,9 @@
+!IF ("$(386)" == "1")
+TARGETNAME = svbusx86
+!ELSE
+TARGETNAME = svbusx64
+!ENDIF
+TARGETTYPE = DRIVER
+TARGETPATH = obj
+MSC_WARNING_LEVEL = /W4 /WX
+SOURCES = svbus.c resource.rc

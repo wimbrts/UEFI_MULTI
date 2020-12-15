@@ -1,0 +1,27 @@
+[Disks]
+disk1 = "SVBus Virtual SCSI Host Adapter Driver Diskette", \svbus.inf, \
+
+[Defaults]
+SCSI = svbusx86
+
+[SCSI]
+svbusx86 = "SVBus Virtual SCSI Host Adapter x86"
+svbusx64 = "SVBus Virtual SCSI Host Adapter x64"
+
+[Files.SCSI.svbusx86]
+driver  = disk1, svbusx86.sys, svbusx86
+inf     = disk1, svbus.inf
+catalog = disk1, svbus.cat
+
+[Files.SCSI.svbusx64]
+driver  = disk1, svbusx64.sys, svbusx64
+inf     = disk1, svbus.inf
+catalog = disk1, svbus.cat
+
+[HardwareIds.SCSI.svbusx86]
+id = "ROOT\svbusx86", "svbusx86"
+id = "DETECTED\svbusx86", "svbusx86"
+
+[HardwareIds.SCSI.svbusx64]
+id = "ROOT\svbusx64", "svbusx64"
+id = "DETECTED\svbusx64", "svbusx64"

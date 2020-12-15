@@ -1,0 +1,32 @@
+
+
+Changes V1.2
+--------------
+
+- Microsoft bug in esent.dll solved for Windows 10 x64 Build 1803 and later
+  We now set a serial number offset and a serial number in the structure
+  STORAGE_DEVICE_DESCRIPTOR. This solves the esent bug. Details are listed
+  in the ReadMe.txt topic named "Application and Service Crashes on Windows
+  10 x64 Build 1909 with SVBus version 1.1".
+- mode page caching added for MODE SENSE (6) command
+  The virtual HDD needs MODE PAGE CACHING to display the tab Policies in the
+  Properties of the HDD in device manager.
+- repacked due to heuristical virus detection
+  We see a false positive heuristical virus detection on www.virustotal.com
+  in 9 out of 70 checks for svbusx64.sys. Even sourceforge does show a warning
+  for the download of our archive file. The 64 bit driver is detected as a
+  malware named Gen.Variant.Johnnie.208251. After we changed the build path to
+  something other than svbus we are not detected anymore.
+
+
+Changes V1.1
+--------------
+
+- TrueCrypt V7.1a full system disk encryption is now supported
+  SVBus V1.0 was not working in combination with TrueCrypt V7.1a full system disk
+  encryption. We changed the way SVBus V1.1 searches the GRUB4DOS signature string.
+  If we can not find the GRUB4DOS signature inside the actual INT13 handler we try
+  to search the entire 640 KB RAM area. This way we can even detect the GRUB4DOS
+  loader if INT13 got hooked by another program.
+
+ 

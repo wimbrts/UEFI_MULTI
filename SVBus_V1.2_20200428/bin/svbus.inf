@@ -1,0 +1,70 @@
+;------------------------------------------------------------------------------
+;
+; Copyright © Kai Schtrom 2020
+;
+;------------------------------------------------------------------------------
+[Version]
+Signature   = "$Windows NT$"
+Class       = SCSIAdapter
+ClassGUID   = {4D36E97B-E325-11CE-BFC1-08002BE10318}
+Provider    = %MANUFACTURER%
+CatalogFile = svbus.cat
+DriverVer   = 04/28/2020,1.2.0.0
+
+[SourceDisksNames]
+1 = %DISKNAME%,,,
+
+[SourceDisksFiles]
+svbusx86.sys = 1
+svbusx64.sys = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%MANUFACTURER% = Models, NTx86, NTamd64
+
+[Models]
+%ADAPTERNAME% = svbusx86, "ROOT\svbusx86", "DETECTED\svbusx86"
+
+[Models.NTx86]
+%ADAPTERNAME% = svbusx86, "ROOT\svbusx86", "DETECTED\svbusx86"
+
+[Models.NTamd64]
+%ADAPTERNAME% = svbusx64, "ROOT\svbusx64", "DETECTED\svbusx64"
+
+[svbusx86]
+CopyFiles = @svbusx86.sys
+
+[svbusx64]
+CopyFiles = @svbusx64.sys
+
+[svbusx86.Services]
+AddService = svbusx86, %SPSVCINST_ASSOCSERVICE%, Service.NTx86
+
+[svbusx64.Services]
+AddService = svbusx64, %SPSVCINST_ASSOCSERVICE%, Service.NTamd64
+
+[Service.NTx86]
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_BOOT_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\svbusx86.sys
+LoadOrderGroup = "SCSI Miniport"
+
+[Service.NTamd64]
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_BOOT_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\svbusx64.sys
+LoadOrderGroup = "SCSI Miniport"
+
+[Strings]
+DISKNAME               = "SVBus Virtual SCSI Host Adapter Driver Diskette"
+MANUFACTURER           = "Kai Schtrom"
+ADAPTERNAME            = "SVBus Virtual SCSI Host Adapter"
+SPSVCINST_ASSOCSERVICE = 0x00000002
+SERVICE_KERNEL_DRIVER  = 1
+SERVICE_BOOT_START     = 0
+SERVICE_ERROR_NORMAL   = 1
+REG_DWORD              = 0x00010001

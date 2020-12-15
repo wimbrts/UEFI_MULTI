@@ -1,0 +1,14 @@
+!IF ("$(386)" == "1")
+TARGETNAME = instx86
+!ELSE
+TARGETNAME = instx64
+!ENDIF
+TARGETTYPE = PROGRAM
+TARGETPATH = obj
+TARGETLIBS = $(SDK_LIB_PATH)\setupapi.lib $(SDK_LIB_PATH)\newdev.lib
+MSC_WARNING_LEVEL = /W4 /WX
+SOURCES = installer.c resource.rc
+USE_MSVCRT = 1
+UMTYPE = console
+UMENTRY = main
+INCLUDES = $(DDK_INC_PATH)
