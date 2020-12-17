@@ -3,7 +3,7 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  December 15, 2020
+ Author:        WIMB  -  December 16, 2020
 
  Program:       UEFI_MULTI_x86.exe - Version 5.1 in rule 194
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
@@ -87,7 +87,7 @@ Opt("TrayIconHide", 1)
 Global $TargetDrive="", $ProgressAll, $Paused, $g4d_vista=1, $ntfs_bs=1, $bs_valid=0, $g4d_w7vhd_flag=1, $Firmware = "UEFI", $PartStyle = "MBR", $SysStyle = "MBR"
 Global $btimgfile="", $pe_nr=1, $hStatus, $pausecopy=0, $TargetSpaceAvail=0, $TargetSize, $TargetFree, $FSvar_WinDrvDrive="", $g4d=0, $bm_flag = 0, $g4dmbr=0
 Global $hGuiParent, $GO, $EXIT, $SourceDir, $Source, $TargetSel, $Target, $image_file="", $img_fext="", $grldrUpd, $g4d_bcd, $xp_bcd, $g4d_default = 0
-Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_BS=1, $refind, $Menu_Type, $g2_inst=1
+Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_BS=1, $refind, $Menu_Type, $g2_inst=1, $Add_Grub2_Sys
 Global $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = "", $FSvar_TargetDrive=""
 Global $vhdfolder = "", $vhdfile_name = "", $vhdfile_name_only = "", $img_folder = "", $PSize = "1.5 GB", $Part12_flag = 0
 
@@ -246,18 +246,18 @@ GUICtrlSetTip($Upd_MBR, @CRLF &  " *** Force Update MBR Boot Code - Applied Only
 & @CRLF & "  BIOS: Win 7/8/10 Format will invoke BOOTMGR as BootLoader with Boot Manager Menu " & @CRLF _
 & @CRLF & "  UEFI: Win 8/10 x64 file EFI\Boot\bootx64.efi on FAT32 gives EFI Boot Manager Menu " & @CRLF)
 
-$Boot_w8 = GUICtrlCreateCheckbox("", 204, 163, 17, 17)
+$Boot_w8 = GUICtrlCreateCheckbox("", 204, 113, 17, 17)
 GUICtrlSetTip($Boot_w8, " Make Boot Manager Menu for Win 7/8/10 System" & @CRLF _
 & " Use bcdboot to make BCD entry in EFI and  Boot " & @CRLF _
 & " Requires in Win 7/8 OS User Account Control = OFF ")
-GUICtrlCreateLabel( "Add 7/8/10 to Boot Manager", 228, 165)
+GUICtrlCreateLabel( "Add 7/8/10 to Boot Manager", 228, 115)
 
-$grldrUpd = GUICtrlCreateCheckbox("", 204, 188, 17, 17)
+$grldrUpd = GUICtrlCreateCheckbox("", 204, 163, 17, 17)
 GUICtrlSetTip($grldrUpd, " Update Grub4dos grldr Version on Boot Drive " & @CRLF _
 & " Forces Update grldr.mbr for Grub4dos in Boot Manager Menu " & @CRLF _
 & " Forces Update a1ive Grub2 File Manager grubfm.iso " & @CRLF _
 & " Forces Update a1ive UEFI Grub2 and UEFI Grub4dos ")
-GUICtrlCreateLabel( "Update Grub4dos UEFI Grub2", 228, 190)
+GUICtrlCreateLabel( "Update Grub4dos UEFI Grub2", 228, 165)
 
 $Boot_vhd = GUICtrlCreateCheckbox("", 32, 163, 17, 17)
 GUICtrlSetTip($Boot_vhd, " Make Boot Manager Menu for 7/8/10 VHD " & @CRLF _
@@ -277,6 +277,13 @@ GUICtrlSetTip($xp_bcd, " Add Start XP to Boot Manager Menu - BIOS mode " & @CRLF
 & " Boot Drive booting with bootmgr " & @CRLF _
 & " In 7/8 Requires User Account Control = OFF ")
 GUICtrlCreateLabel( "Add XP  to Boot Manager", 56, 215, 130, 15)
+
+$Add_Grub2_Sys = GUICtrlCreateCheckbox("", 204, 188, 17, 17)
+GUICtrlSetTip($Add_Grub2_Sys, " Add Grub2 System Folder 12 MB - 1000 Files Often Unneeded " _
+& @CRLF & "    x64     UEFI - Add grub\x86_64-efi " _
+& @CRLF & "    ia32    UEFI - Add grub\i386-efi " _
+& @CRLF & " Legacy MBR - Add grub\i386-pc ")
+GUICtrlCreateLabel( "Add Grub2 System Folder", 228, 190)
 
 $refind = GUICtrlCreateCheckbox("", 204, 213, 17, 17)
 GUICtrlSetTip($refind, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux ISO " & @CRLF _
@@ -361,6 +368,11 @@ GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
 
 GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
+If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+	GUICtrlSetState($Add_Grub2_Sys, $GUI_UNCHECKED + $GUI_ENABLE)
+Else
+	GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
+EndIf
 GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 
 GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
@@ -2387,6 +2399,7 @@ Func _Go()
 	; Keep Ventoy MBR and Ventoy Grub2
 	If $ventoy Then
 		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 	EndIf
 
@@ -2837,11 +2850,11 @@ Func _Go()
 			ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" Then
 				_GUICtrlStatusBar_SetText($hStatus," Adding Super Grub2 EFI Manager - wait .... ", 0)
 				DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
-				If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+				If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") And GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED Then
 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\grub\x86_64-efi", 1)
 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\grub\i386-efi", 1)
-;~ 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
-;~ 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
+					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
+ 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
 				EndIf
 				;	If FileExists(@ScriptDir & "\UEFI_MAN\grub2") Then
 				;		GUICtrlSetData($ProgressAll, 75)
@@ -2868,17 +2881,18 @@ Func _Go()
 			If Not FileExists($TargetDrive & "\efi\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\efi\memtest86") Then
 				DirCopy(@ScriptDir & "\UEFI_MAN\efi\memtest86", $TargetDrive & "\efi\memtest86", 1)
 			EndIf
-			If Not FileExists($TargetDrive & "\grub\x86_64-efi") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+			If Not FileExists($TargetDrive & "\grub\x86_64-efi") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") And GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED  Then
 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\grub\x86_64-efi", 1)
 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\grub\i386-efi", 1)
-;~ 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
-;~ 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
+ 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
+ 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
 			EndIf
 		EndIf
 
 		; MBR BIOS mode cases - Install Grub2 in MBR
 		If GUICtrlRead($Combo_EFI) = "Mint + MBR" Or GUICtrlRead($Combo_EFI) = "Super + MBR" Or GUICtrlRead($Combo_EFI) = "MBR  Only" And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") And $inst_disk <> "" Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding a1ive Grub2 Manager in MBR - wait .... ", 0)
+			; Grub2 Install OK if $g2_inst = 0
 			$g2_inst = RunWait(@ComSpec & " /c UEFI_MAN\grub_a1\grub-install.exe  --boot-directory=" & $TargetDrive & "\ --target=i386-pc //./PHYSICALDRIVE" & $inst_disk, @ScriptDir, @SW_HIDE)
 			;	MsgBox(48, "Grub2 in MBR", "Grub2 Installed in MBR - $g2_inst = " & $g2_inst & @CRLF & @CRLF _
 			;	& "Target Drive = " & $TargetDrive & "   HDD = " & $inst_disk & @CRLF & @CRLF & "Bus Type = " & $BusType & "   Drive Type = " & $DriveType)
@@ -2892,11 +2906,13 @@ Func _Go()
 			DirCopy(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg", $TargetDrive & "\grub", 1)
 		EndIf
 		; MBR BIOS mode Grub2 System support
-		If Not FileExists($TargetDrive & "\grub\i386-pc") Or Not FileExists($TargetDrive & "\grub\fonts") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+		If $g2_inst = 0 Or GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED And Not FileExists($TargetDrive & "\grub\i386-pc") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
 			_GUICtrlStatusBar_SetText($hStatus," Adding MBR BIOS a1ive Grub2 System - wait .... ", 0)
 			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-pc", $TargetDrive & "\grub\i386-pc", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
+			If Not FileExists($TargetDrive & "\grub\fonts") Then
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\locale", $TargetDrive & "\grub\locale", 1)
+				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
+			EndIf
 		EndIf
 		If Not FileExists($TargetDrive & "\iso") And FileExists(@ScriptDir & "\UEFI_MAN\iso") Then DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
 		; make folder images for Linux ISO files
@@ -2914,6 +2930,7 @@ Func _Go()
 		;		_bcd_grub2win()
 		;	EndIf
 	Else
+		GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 	EndIf
 
@@ -3082,6 +3099,7 @@ Func _Go()
 
 		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED)
 		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED)
+		GUICtrlSetState($Add_Grub2_Sys, $GUI_UNCHECKED)
 		GUICtrlSetState($refind, $GUI_UNCHECKED)
 
 		GUICtrlSetState($TargetSel, $GUI_ENABLE)
@@ -3419,6 +3437,7 @@ Func DisableMenus($endis)
 			GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+			GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 			GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 		Else
@@ -3427,10 +3446,16 @@ Func DisableMenus($endis)
 			GUICtrlSetState($xp_bcd, $endis)
 			If $BusType <> "USB" Then
 				GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+				GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 				GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 				GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 			Else
 				GUICtrlSetState($Upd_MBR, $endis)
+				If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
+					GUICtrlSetState($Add_Grub2_Sys, $endis)
+				Else
+					GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
+				EndIf
 				GUICtrlSetState($refind, $endis)
 				GUICtrlSetState($Combo_EFI, $endis)
 			EndIf
@@ -3445,6 +3470,7 @@ Func DisableMenus($endis)
 		GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 	EndIf
@@ -3452,6 +3478,7 @@ Func DisableMenus($endis)
 	; Keep Ventoy MBR and Ventoy Grub2
 	If $ventoy Then
 		GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
+		GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 		GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 		GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 	EndIf
