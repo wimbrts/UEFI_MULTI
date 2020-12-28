@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  December 16, 2020
+ Author:        WIMB  -  December 28, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 5.1 in rule 194
+ Program:       UEFI_MULTI_x86.exe - Version 5.2 in rule 195
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -106,9 +106,10 @@ Global $inst_disk="", $inst_part="", $sys_disk="", $sys_part="", $usbsys=0, $usb
 
 Global $OS_drive = StringLeft(@WindowsDir, 2)
 
-Global $str = "", $bt_files[21] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
+Global $str = "", $bt_files[24] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
 "\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt", "\makebt\grub.exe", _
-"\UEFI_MAN\EFI\grub\menu.lst", "\UEFI_MAN\grub\grub.cfg", "\UEFI_MAN\grub\grub_Linux.cfg", "\UEFI_MAN\grub\core.img", _
+"\WofCompress\x64\WofCompress.exe", "\WofCompress\x86\WofCompress.exe", _
+"\UEFI_MAN\EFI\grub\menu.lst", "\UEFI_MAN\grub\grub.cfg", "\UEFI_MAN\grub\grub_Linux.cfg", "\UEFI_MAN\grub\core.img", "\UEFI_MAN\EFI\grub\ntfs_x64.efi", _
 "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", "\UEFI_MAN\EFI\Boot\grubx64_real.efi", "\UEFI_MAN\EFI\Boot\grubia32_real.efi"]
 
 If @OSArch <> "X86" Then
@@ -191,9 +192,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x86 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 5.1  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.2  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 5.1  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.2  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
@@ -279,10 +280,11 @@ GUICtrlSetTip($xp_bcd, " Add Start XP to Boot Manager Menu - BIOS mode " & @CRLF
 GUICtrlCreateLabel( "Add XP  to Boot Manager", 56, 215, 130, 15)
 
 $Add_Grub2_Sys = GUICtrlCreateCheckbox("", 204, 188, 17, 17)
-GUICtrlSetTip($Add_Grub2_Sys, " Add Grub2 System Folder 12 MB - 1000 Files Often Unneeded " _
+GUICtrlSetTip($Add_Grub2_Sys, " Add a1ive Grub2 System Folder 12 MB - 1000 Files Often Unneeded " _
 & @CRLF & "    x64     UEFI - Add grub\x86_64-efi " _
 & @CRLF & "    ia32    UEFI - Add grub\i386-efi " _
-& @CRLF & " Legacy MBR - Add grub\i386-pc ")
+& @CRLF & " Legacy MBR - Add grub\i386-pc " _
+& @CRLF & " Grub2 System Not available in case of Mint UEFI ")
 GUICtrlCreateLabel( "Add Grub2 System Folder", 228, 190)
 
 $refind = GUICtrlCreateCheckbox("", 204, 213, 17, 17)
@@ -295,8 +297,7 @@ GUICtrlSetTip($refind, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux 
 GUICtrlCreateLabel( "Grub2 M", 328, 215)
 $Combo_EFI = GUICtrlCreateCombo("", 228, 212, 90, 24, $CBS_DROPDOWNLIST)
 
-If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg\grub.cfg") _
-		Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") Then
+If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") Then
 	GUICtrlSetData($Combo_EFI,"Mint   UEFI", "Mint   UEFI")
 Else
 	GUICtrlSetData($Combo_EFI,"Mint   UEFI|Super UEFI|Mint + MBR|Super + MBR|MBR  Only", "Mint   UEFI")
@@ -368,11 +369,7 @@ GUICtrlSetState($Boot_w8, $GUI_UNCHECKED + $GUI_DISABLE)
 
 GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
-If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
-	GUICtrlSetState($Add_Grub2_Sys, $GUI_UNCHECKED + $GUI_ENABLE)
-Else
-	GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
-EndIf
+GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
 GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 
 GUICtrlSetState($TargetSel, $GUI_ENABLE + $GUI_FOCUS)
@@ -1938,7 +1935,7 @@ Func _vhd_menu()
 		$g4d_w7vhd_flag=1
 	Else
 		$driver_flag = 0
-		$g4d_w7vhd_flag=0
+		$g4d_w7vhd_flag=1
 	EndIf
 
 	If FileExists($tmpdrive & $WinFol & "\system32\drivers\vhdmp.sys") Then
@@ -2047,9 +2044,9 @@ Func _vhd_menu()
 				EndIf
 				Sleep(1000)
 			EndIf
-			; Rename NTFS folder EFI and Boot as x-EFI and x-Boot needed to prevent boot_image)handle Not found in booting UEFI Grub4dos
-			If FileExists($tmpdrive & "\EFI") Then DirMove($tmpdrive & "\EFI", $tmpdrive & "\x-EFI", 1)
-			If FileExists($tmpdrive & "\Boot") Then DirMove($tmpdrive & "\Boot", $tmpdrive & "\x-Boot", 1)
+			; Rename NTFS folder EFI and Boot as x-EFI and x-Boot needed to prevent boot_image)handle Not found in booting UEFI Grub4dos - better UnCompress with WofCompress
+			; If FileExists($tmpdrive & "\EFI") Then DirMove($tmpdrive & "\EFI", $tmpdrive & "\x-EFI", 1)
+			; If FileExists($tmpdrive & "\Boot") Then DirMove($tmpdrive & "\Boot", $tmpdrive & "\x-Boot", 1)
 		EndIf
 	EndIf
 
@@ -2523,7 +2520,7 @@ Func _Go()
 		;	FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
 		;	FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
 		If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
-		If FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg\core.img") And $ventoy=0 Then DirCopy(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg", $TargetDrive & "\grub", 1)
+		If FileExists(@ScriptDir & "\UEFI_MAN\grub\core.img") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub", 1)
 	EndIf
 	; Force Update UEFI Grub2 and UEFI Grub4dos
 	If GUICtrlRead($grldrUpd) = $GUI_CHECKED Then
@@ -2541,7 +2538,7 @@ Func _Go()
 		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\menu_Win_ISO.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Win_ISO.lst", $TargetDrive & "\", 1)
 		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\grub\core.img") Then
+		If Not FileExists($TargetDrive & "\grub\core.img") And $ventoy=0 Then
 			FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub\", 9)
 		EndIf
 	EndIf
@@ -2557,10 +2554,13 @@ Func _Go()
 	If Not FileExists($TargetDrive & "\EFI\Boot\grubia32_real.efi") Then
 		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubia32_real.efi", $TargetDrive & "\EFI\Boot\", 9)
 	EndIf
+	If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") And Not FileExists($TargetDrive & "\EFI\grub\ntfs_x64.efi") Then
+		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\ntfs_x64.efi", 9)
+	EndIf
 
 	; support UEFI Grub4dos
 	If Not FileExists($TargetDrive & "\EFI\grub\menu.lst") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\menu.lst", $TargetDrive & "\EFI\grub\", 9)
+		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\menu.lst", $TargetDrive & "\EFI\grub\menu.lst", 9)
 	EndIf
 	If Not FileExists($TargetDrive & "\EFI\Boot\bootx64_g4d.efi") Then
 		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
@@ -2825,8 +2825,8 @@ Func _Go()
 				If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64_win.efi") Then
 					FileMove($TargetDrive & "\efi\boot\bootx64.efi", $TargetDrive & "\efi\boot\bootx64_win.efi", 1)
 				EndIf
-				If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" And FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\org-bootia32.efi") Then
-					FileMove($TargetDrive & "\efi\boot\bootia32.efi", $TargetDrive & "\efi\boot\org-bootia32.efi", 1)
+				If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" And FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\bootia32_win.efi") Then
+					FileMove($TargetDrive & "\efi\boot\bootia32.efi", $TargetDrive & "\efi\boot\bootia32_win.efi", 1)
 				EndIf
 				If Not FileExists($TargetDrive & "\efi\microsoft\boot\bootmgfw.efi") And @OSArch = "X64" Then
 					If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\efi\microsoft\boot\bcd") Then
@@ -2849,7 +2849,13 @@ Func _Go()
 				; If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
 			ElseIf GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" Then
 				_GUICtrlStatusBar_SetText($hStatus," Adding Super Grub2 EFI Manager - wait .... ", 0)
-				DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
+				; DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
+				DirCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot", $TargetDrive & "\EFI\Boot", 1)
+				If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\ntfs_x64.efi", 9)
+				If Not FileExists($TargetDrive & "\efi\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\efi\memtest86") Then
+					DirCopy(@ScriptDir & "\UEFI_MAN\efi\memtest86", $TargetDrive & "\efi\memtest86", 1)
+				EndIf
+
 				If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") And GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED Then
 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\grub\x86_64-efi", 1)
 					DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\i386-efi", $TargetDrive & "\grub\i386-efi", 1)
@@ -2899,11 +2905,17 @@ Func _Go()
 			$grub2=1
 		EndIf
 
-		If FileExists(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg") Then
-			If FileExists($TargetDrive & "\grub\grub.cfg") And Not FileExists($TargetDrive & "\grub\org-grub.cfg") Then
-				FileMove($TargetDrive & "\grub\grub.cfg", $TargetDrive & "\grub\org-grub.cfg", 1)
-			EndIf
-			DirCopy(@ScriptDir & "\UEFI_MAN\grub_mbr_cfg", $TargetDrive & "\grub", 1)
+		; Add Grub2 System not available or not needed
+		If GUICtrlRead($Combo_EFI) = "Mint   UEFI" And $g2_inst = 1 Then
+			GUICtrlSetState($Add_Grub2_Sys, $GUI_DISABLE + $GUI_UNCHECKED)
+		EndIf
+
+		; If FileExists($TargetDrive & "\grub\grub.cfg") And Not FileExists($TargetDrive & "\grub\org-grub.cfg") Then
+		; 	FileMove($TargetDrive & "\grub\grub.cfg", $TargetDrive & "\grub\org-grub.cfg", 1)
+		; EndIf
+
+		If FileExists(@ScriptDir & "\UEFI_MAN\grub_glim") And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then
+			DirCopy(@ScriptDir & "\UEFI_MAN\grub_glim", $TargetDrive & "\grub", 1)
 		EndIf
 		; MBR BIOS mode Grub2 System support
 		If $g2_inst = 0 Or GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED And Not FileExists($TargetDrive & "\grub\i386-pc") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") Then
@@ -2914,7 +2926,7 @@ Func _Go()
 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\fonts", $TargetDrive & "\grub\fonts", 1)
 			EndIf
 		EndIf
-		If Not FileExists($TargetDrive & "\iso") And FileExists(@ScriptDir & "\UEFI_MAN\iso") Then DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
+		If Not FileExists($TargetDrive & "\iso") And FileExists(@ScriptDir & "\UEFI_MAN\iso") And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then DirCopy(@ScriptDir & "\UEFI_MAN\iso", $TargetDrive & "\iso", 1)
 		; make folder images for Linux ISO files
 		If Not FileExists($TargetDrive & "\images") Then DirCreate($TargetDrive & "\images")
 		If Not FileExists($TargetDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $TargetDrive & "\images\", 1)
@@ -3063,6 +3075,16 @@ Func _Go()
 ;~ 			& " Get from Win 8/10 x86 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
 ;~ 			& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
 ;~ 		EndIf
+
+
+	If $driver_flag = 0 And StringRight($vhdfile_name, 4) = ".vhd" Then
+		MsgBox(48, "WARNING - SVBus Driver Missing ", " SVBus driver is needed for booting from RAMDISK " & @CRLF _
+		& @CRLF & " First Boot as FILEDISK from Windows Boot Manager " & @CRLF _
+		& @CRLF & " 1. Install SVBus EVRootCA Registry Fix in runnung Windows " & @CRLF _
+		& @CRLF & " 2. Install SVBus Driver as Admin " & @CRLF _
+		& @CRLF & " - use R-mouse on instx64.exe in SVBus-signed_2 folder " & @CRLF _
+		& @CRLF & " - Reboot first as FILEDISK from Windows Boot Manager ")
+	EndIf
 
 	_GUICtrlStatusBar_SetText($hStatus," End of Program Or Again ?", 0)
 	$ikey = MsgBox(48+4+256, " END OF PROGRAM Or Again ? ", " End of Program  - OK - Enter to Finish " & @CRLF _
@@ -3687,7 +3709,7 @@ Func _g4d_hdd_img_menu()
 		EndIf
 
 	ElseIf GUICtrlRead($Menu_Type) = "10 - SVBus" Then
-		If  $driver_flag = 3 Then
+		If  $driver_flag = 3 Or $driver_flag = 0 Then
 			If $DriveSysType="Removable" Or $usbsys Then
 				If $FSvar_WinDrvDrive="NTFS" Then
 					FileWriteLine($TargetDrive & "\menu.lst",@CRLF & "iftitle [if exist (hd0,0)/" & $entry_image_file & "] (hd0,0)/" & $entry_image_file & " - SVBus  FILEDISK - " & $BTIMGSize & " MB - map as (hd-1) for WIMBOOT")
@@ -3830,6 +3852,32 @@ Func _UEFI_RAMOS()
 		If $driver_flag = 3 Or $driver_flag = 0 Then
 			_GUICtrlStatusBar_SetText($hStatus," Making UEFI Grub2 Menu on Target Boot Drive " & $TargetDrive, 0)
 			FileWriteLine($TargetDrive & "\grub\grub.cfg", @CRLF & "menuentry " & '"' & "Boot /" & $entry_image_file & " - UEFI Grub2  SVBus  RAMDISK  - " & $PSize & '"' & " {")
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  search --file --set=vhd_drive --no-floppy /" & $entry_image_file)
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  map --mem --rt ($vhd_drive)/" & $entry_image_file)
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  boot")
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", "}")
+		EndIf
+	EndIf
+
+	; UEFI booting from RAMDISK needs fixed vhd with 1 partition
+	If StringRight($vhdfile_name, 4) = ".vhd" And FileExists($TargetDrive & "\EFI\grub\menu.lst") And $Part12_flag = 1 Then
+
+		If $driver_flag = 3 Or $driver_flag = 0 Then
+			_GUICtrlStatusBar_SetText($hStatus," Making UEFI Grub4dos Menu on Target Boot Drive " & $TargetDrive, 0)
+			FileWriteLine($TargetDrive & "\EFI\grub\menu.lst", @CRLF & "title Boot  /" & $entry_image_file & " - UEFI Grub4dos  SVBus  RAMDISK  - " & $PSize)
+			FileWriteLine($TargetDrive & "\EFI\grub\menu.lst", "load /EFI/grub/ntfs_x64.efi")
+			FileWriteLine($TargetDrive & "\EFI\grub\menu.lst", "find --set-root --ignore-floppies --ignore-cd /" & $entry_image_file)
+			FileWriteLine($TargetDrive & "\EFI\grub\menu.lst", "map --mem --top /" & $entry_image_file & " (hd)")
+			FileWriteLine($TargetDrive & "\EFI\grub\menu.lst", "chainloader (hd-1)")
+		EndIf
+	EndIf
+
+	If StringRight($vhdfile_name, 4) = ".vhd" And FileExists($TargetDrive & "\grub\grub.cfg") And $Part12_flag = 1 Then
+
+		If $driver_flag = 3 Or $driver_flag = 0 Then
+			_GUICtrlStatusBar_SetText($hStatus," Making UEFI Grub2 Menu on Target Boot Drive " & $TargetDrive, 0)
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", @CRLF & "menuentry " & '"' & "Boot /" & $entry_image_file & " - UEFI Grub2  SVBus  RAMDISK  - " & $PSize & '"' & " {")
+			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  efiload /EFI/grub/ntfs_x64.efi")
 			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  search --file --set=vhd_drive --no-floppy /" & $entry_image_file)
 			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  map --mem --rt ($vhd_drive)/" & $entry_image_file)
 			FileWriteLine($TargetDrive & "\grub\grub.cfg", "  boot")
@@ -4593,7 +4641,7 @@ EndFunc ;==>  _BCD_Inside_Entry
 ;===================================================================================================
 Func _BCD_Inside_VHD()
 
-	Local $val=0
+	Local $val=0, $iPID
 
 	If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($tmpdrive & "\Boot\BCD") Then
 		; in win8 x64 OS then Win8x64 bcdboot with option /f ALL must be used, otherwise entry is not made
@@ -4629,6 +4677,31 @@ Func _BCD_Inside_VHD()
 		_BCD_Inside_Entry()
 
 	EndIf
+
+	; UnCompress EFI folder inside VHD - needed for UEFI booting from RAMDISK of 1 Partition VHD - UEFI Grub2 and UEFI Grub4dos
+	If FileExists($tmpdrive & "\EFI") Then
+		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\EFI" & " - wait .... ", 0)
+		Sleep(500)
+		If @OSArch = "X86" Then
+			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
+		Else
+			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
+		EndIf
+		ProcessWaitClose($iPID, 1)
+	EndIf
+
+	; UnCompress Boot folder inside VHD
+	If FileExists($tmpdrive & "\Boot") Then
+		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\Boot" & " - wait .... ", 0)
+		Sleep(500)
+		If @OSArch = "X86" Then
+			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
+		Else
+			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
+		EndIf
+		ProcessWaitClose($iPID, 1)
+	EndIf
+
 EndFunc ;==>  _BCD_Inside_VHD
 ;===================================================================================================
 Func _BCD_BootDrive_VHD_Entry()
