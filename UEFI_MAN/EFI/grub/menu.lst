@@ -2,16 +2,12 @@ color white/blue  black/light-gray white/black white/black
 timeout 10
 default 0
 
-title Win10XPE - (hd3,1)/Win10XPE/Win10XPE_x64.ISO
-map (hd3,1)/Win10XPE/Win10XPE_x64.ISO (0xff)
+title Win10XPE - Find images/Win10XPE_x64.ISO
+find --set-root /images/Win10XPE_x64.ISO
+map /images/Win10XPE_x64.ISO (0xff)
 chainloader (0xff)
 
-title Win10XPE - Find Win10XPE/Win10XPE_x64.ISO
-find --set-root /Win10XPE/Win10XPE_x64.ISO
-map /Win10XPE/Win10XPE_x64.ISO (0xff)
-chainloader (0xff)
-
-title grubfm x64 EFI Boot Manager of a1ive
+title grubfm x64 EFI File Manager of a1ive - chainloader /efi/boot/grubfmx64.efi
 find --set-root /efi/boot/grubfmx64.efi
 chainloader /efi/boot/grubfmx64.efi
 
