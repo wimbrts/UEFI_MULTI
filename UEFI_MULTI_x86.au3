@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  December 28, 2020
+ Author:        WIMB  -  December 29, 2020
 
- Program:       UEFI_MULTI_x86.exe - Version 5.2 in rule 195
+ Program:       UEFI_MULTI_x64.exe - Version 5.2 in rule 195
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -91,7 +91,7 @@ Global $BTIMGSize=0, $IMG_File, $IMG_FileSelect, $ImageType, $ImageSize, $NTLDR_
 Global $NoVirtDrives, $FixedDrives, $w78sys=0, $bootsdi = "", $windows_bootsdi = "", $sdi_path = "", $FSvar_TargetDrive=""
 Global $vhdfolder = "", $vhdfile_name = "", $vhdfile_name_only = "", $img_folder = "", $PSize = "1.5 GB", $Part12_flag = 0
 
-Global $driver_flag=3, $vhdmp=0, $SysWOW64=0, $WinFol="\Windows", $winload_flag=0, $PE_flag = 0, $WinDir_PE="D:\Windows", $WinDir_PE_flag=0, $WimOnSystemDrive = 0
+Global $driver_flag=3, $vhdmp=0, $SysWOW64=0, $WinFol="\Windows", $PE_flag = 0, $WinDir_PE="D:\Windows", $WinDir_PE_flag=0, $WimOnSystemDrive = 0
 Global $bcdedit="", $winload = "winload.exe", $store = "", $DistLang = "en-US", $WinLang = "en-US", $bcdboot_flag = 0, $ventoy = 0, $grub2 = 0, $Target_MBR_FAT32 = 0
 
 Global $bcd_guid_outfile = "makebt\bs_temp\crea_bcd_guid.txt", $sdi_guid_outfile = "makebt\bs_temp\crea_sdi_guid.txt"
@@ -1952,102 +1952,120 @@ Func _vhd_menu()
 		$SysWOW64=1
 	EndIf
 
-	If FileExists($tmpdrive & "\Windows\system32\winload.exe") Then
-		$winload_flag = 1
-	EndIf
-
 	_DetectLang()
 
 	_WinLang()
 
-	If $winload_flag = 1 Then
-		_BCD_Inside_VHD()
-
-		If GUICtrlRead($Boot_vhd) = $GUI_CHECKED And $vhdmp=1 And $FSvar_WinDrvDrive="NTFS" Then
-			; in Win 8/10 x64 OS then bcdboot with option /f ALL must be used, otherwise entry is not made
-			If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
-				$bcdboot_flag = 1
-				If $PE_flag = 1 Then
-					If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
-						_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
-					Else
-						_GUICtrlStatusBar_SetText($hStatus," Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
-					EndIf
-				Else
-					If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
-						_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
-					Else
-						_GUICtrlStatusBar_SetText($hStatus," Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
-					EndIf
-				EndIf
-				sleep(2000)
-			EndIf
-			If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") And $PartStyle = "GPT" Then
-				$bcdboot_flag = 1
-				If $PE_flag = 1 Then
-					If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
-						_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive & " /f UEFI", @ScriptDir, @SW_HIDE)
-					Else
-						MsgBox(48,"WARNING - Win 8/10 x64 OS Needed", "EFI BCD Missing on Boot Drive " & $TargetDrive & @CRLF & @CRLF & "Win 8/10 x64 OS needed to Make EFI BCD", 5)
-					EndIf
-				Else
-					If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
-						_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
-						$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f UEFI", @ScriptDir, @SW_HIDE)
-					Else
-						MsgBox(48,"WARNING - Win 8/10 x64 OS Needed", "EFI BCD Missing on Boot Drive " & $TargetDrive & @CRLF & @CRLF & "Win 8/10 x64 OS needed to Make EFI BCD", 5)
-					EndIf
-				EndIf
-				sleep(2000)
-			EndIf
-			If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
-				_GUICtrlStatusBar_SetText($hStatus," Add VHD entry to BCD on Boot Drive " & $TargetDrive, 0)
-				If Not FileExists($TargetDrive & "\Boot\bootvhd.dll") And FileExists(@WindowsDir & "\Boot\PCAT\bootvhd.dll") Then
-					FileCopy(@WindowsDir & "\Boot\PCAT\bootvhd.dll", $TargetDrive & "\Boot\", 1)
-				EndIf
-				$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-				$store = $TargetDrive & "\Boot\BCD"
-				$winload = "winload.exe"
-				$bcd_guid_outfile = "makebt\bs_temp\bcd_boot_usb.txt"
-
-				_BCD_BootDrive_VHD_Entry()
-
-				sleep(1000)
-				FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
-				FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
-			EndIf
-			If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") Then
-				_GUICtrlStatusBar_SetText($hStatus," Add VHD entry to BCD on Boot Drive " & $TargetDrive, 0)
-				$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-				$store = $TargetDrive & "\efi\Microsoft\Boot\BCD"
-				$winload = "winload.efi"
-				$bcd_guid_outfile = "makebt\bs_temp\bcd_efi_usb.txt"
-
-				_BCD_BootDrive_VHD_Entry()
-
-			EndIf
-		EndIf
-		If $vhd_f32_drive <> "" And FileExists($vhd_f32_drive & "\nul") Then
-			If FileExists(@WindowsDir & "\system32\bcdboot.exe") Then
-				; in win8 x64 OS then Win8x64 bcdboot with option /f ALL must be used, otherwise entry is not made
+	If GUICtrlRead($Boot_vhd) = $GUI_CHECKED And $vhdmp=1 And $FSvar_WinDrvDrive="NTFS" Then
+		; in Win 8/10 x64 OS then bcdboot with option /f ALL must be used, otherwise entry is not made
+		If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
+			$bcdboot_flag = 1
+			If $PE_flag = 1 Then
 				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
-					_GUICtrlStatusBar_SetText($hStatus," UEFI x64 - Make Boot Manager in VHD_F32 - wait .... ", 0)
-					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $vhd_f32_drive & " /f ALL", @ScriptDir, @SW_HIDE)
+					_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
 				Else
-					_GUICtrlStatusBar_SetText($hStatus," Make Boot Manager in VHD_F32 - wait .... ", 0)
-					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $vhd_f32_drive, @ScriptDir, @SW_HIDE)
+					_GUICtrlStatusBar_SetText($hStatus," Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
 				EndIf
-				Sleep(1000)
+			Else
+				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
+					_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f ALL", @ScriptDir, @SW_HIDE)
+				Else
+					_GUICtrlStatusBar_SetText($hStatus," Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive, @ScriptDir, @SW_HIDE)
+				EndIf
 			EndIf
-			; Rename NTFS folder EFI and Boot as x-EFI and x-Boot needed to prevent boot_image)handle Not found in booting UEFI Grub4dos - better UnCompress with WofCompress
-			; If FileExists($tmpdrive & "\EFI") Then DirMove($tmpdrive & "\EFI", $tmpdrive & "\x-EFI", 1)
-			; If FileExists($tmpdrive & "\Boot") Then DirMove($tmpdrive & "\Boot", $tmpdrive & "\x-Boot", 1)
+			sleep(2000)
 		EndIf
+		If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") And $PartStyle = "GPT" Then
+			$bcdboot_flag = 1
+			If $PE_flag = 1 Then
+				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
+					_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $TargetDrive & " /f UEFI", @ScriptDir, @SW_HIDE)
+				Else
+					MsgBox(48,"WARNING - Win 8/10 x64 OS Needed", "EFI BCD Missing on Boot Drive " & $TargetDrive & @CRLF & @CRLF & "Win 8/10 x64 OS needed to Make EFI BCD", 5)
+				EndIf
+			Else
+				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
+					_GUICtrlStatusBar_SetText($hStatus," UEFI x64 OS - Add VHD to BCD on Boot Drive " & $TargetDrive, 0)
+					$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & @WindowsDir & " /l " & $WinLang & " /s " & $TargetDrive & " /f UEFI", @ScriptDir, @SW_HIDE)
+				Else
+					MsgBox(48,"WARNING - Win 8/10 x64 OS Needed", "EFI BCD Missing on Boot Drive " & $TargetDrive & @CRLF & @CRLF & "Win 8/10 x64 OS needed to Make EFI BCD", 5)
+				EndIf
+			EndIf
+			sleep(2000)
+		EndIf
+		If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
+			_GUICtrlStatusBar_SetText($hStatus," Add VHD entry to BCD on Boot Drive " & $TargetDrive, 0)
+			If Not FileExists($TargetDrive & "\Boot\bootvhd.dll") And FileExists(@WindowsDir & "\Boot\PCAT\bootvhd.dll") Then
+				FileCopy(@WindowsDir & "\Boot\PCAT\bootvhd.dll", $TargetDrive & "\Boot\", 1)
+			EndIf
+			$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
+			$store = $TargetDrive & "\Boot\BCD"
+			$winload = "winload.exe"
+			$bcd_guid_outfile = "makebt\bs_temp\bcd_boot_usb.txt"
+
+			_BCD_BootDrive_VHD_Entry()
+
+			sleep(1000)
+			FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
+			FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
+		EndIf
+		If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") Then
+			_GUICtrlStatusBar_SetText($hStatus," Add VHD entry to BCD on Boot Drive " & $TargetDrive, 0)
+			$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
+			$store = $TargetDrive & "\efi\Microsoft\Boot\BCD"
+			$winload = "winload.efi"
+			$bcd_guid_outfile = "makebt\bs_temp\bcd_efi_usb.txt"
+
+			_BCD_BootDrive_VHD_Entry()
+
+		EndIf
+	EndIf
+	If $vhd_f32_drive <> "" And FileExists($vhd_f32_drive & "\nul") Then
+		If FileExists(@WindowsDir & "\system32\bcdboot.exe") Then
+			; in win8 x64 OS then Win8x64 bcdboot with option /f ALL must be used, otherwise entry is not made
+			If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
+				_GUICtrlStatusBar_SetText($hStatus," UEFI x64 - Make Boot Manager in VHD_F32 - wait .... ", 0)
+				$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $vhd_f32_drive & " /f ALL", @ScriptDir, @SW_HIDE)
+			Else
+				_GUICtrlStatusBar_SetText($hStatus," Make Boot Manager in VHD_F32 - wait .... ", 0)
+				$val = RunWait(@ComSpec & " /c " & @WindowsDir & "\system32\bcdboot.exe " & $tmpdrive & $WinFol & " /l " & $DistLang & " /s " & $vhd_f32_drive, @ScriptDir, @SW_HIDE)
+			EndIf
+			Sleep(1000)
+		EndIf
+		; Rename NTFS folder EFI and Boot as x-EFI and x-Boot needed to prevent boot_image)handle Not found in booting UEFI Grub4dos - better UnCompress with WofCompress
+		If FileExists($tmpdrive & "\EFI") Then DirMove($tmpdrive & "\EFI", $tmpdrive & "\x-EFI", 1)
+		If FileExists($tmpdrive & "\Boot") Then DirMove($tmpdrive & "\Boot", $tmpdrive & "\x-Boot", 1)
+	Else
+		_BCD_Inside_VHD()
+	EndIf
+
+	; UnCompress EFI folder inside VHD - needed for UEFI booting from RAMDISK of 1 Partition VHD - UEFI Grub2 and UEFI Grub4dos
+	If FileExists($tmpdrive & "\EFI") Then
+		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\EFI" & " - wait .... ", 0)
+		Sleep(500)
+		If @OSArch = "X86" Then
+			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
+		Else
+			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
+		EndIf
+		ProcessWaitClose($iPID, 1)
+	EndIf
+
+	; UnCompress Boot folder inside VHD
+	If FileExists($tmpdrive & "\Boot") Then
+		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\Boot" & " - wait .... ", 0)
+		Sleep(500)
+		If @OSArch = "X86" Then
+			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
+		Else
+			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
+		EndIf
+		ProcessWaitClose($iPID, 1)
 	EndIf
 
 	_GUICtrlStatusBar_SetText($hStatus," Detaching Source VHD " & $WinDrvDrive & "\" & $vhdfile_name & " - wait .... ", 0)
@@ -4676,30 +4694,6 @@ Func _BCD_Inside_VHD()
 
 		_BCD_Inside_Entry()
 
-	EndIf
-
-	; UnCompress EFI folder inside VHD - needed for UEFI booting from RAMDISK of 1 Partition VHD - UEFI Grub2 and UEFI Grub4dos
-	If FileExists($tmpdrive & "\EFI") Then
-		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\EFI" & " - wait .... ", 0)
-		Sleep(500)
-		If @OSArch = "X86" Then
-			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
-		Else
-			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\EFI" & '"', @ScriptDir, @SW_HIDE)
-		EndIf
-		ProcessWaitClose($iPID, 1)
-	EndIf
-
-	; UnCompress Boot folder inside VHD
-	If FileExists($tmpdrive & "\Boot") Then
-		_GUICtrlStatusBar_SetText($hStatus," WOF UnCompress of " & $tmpdrive & "\Boot" & " - wait .... ", 0)
-		Sleep(500)
-		If @OSArch = "X86" Then
-			$iPID = Run(@ComSpec & " /k WofCompress\x86\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
-		Else
-			$iPID = Run(@ComSpec & " /k WofCompress\x64\WofCompress.exe -u -path:" & '"' & $tmpdrive & "\Boot" & '"', @ScriptDir, @SW_HIDE)
-		EndIf
-		ProcessWaitClose($iPID, 1)
 	EndIf
 
 EndFunc ;==>  _BCD_Inside_VHD
