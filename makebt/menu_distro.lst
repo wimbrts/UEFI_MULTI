@@ -1,21 +1,21 @@
 iftitle [if exist /bootmgr] Boot Manager Menu - Win 7/8/10 VHD and WIM
 chainloader /bootmgr
 
-iftitle [if exist (hd0,0)/porteus/boot/syslinux/vmlinuz] Porteus v5RC2 Generic fully on Ram  - (hd0,0)/porteus
-kernel /porteus/boot/syslinux/vmlinuz noauto  copy2ram 
-initrd /porteus/boot/syslinux/initrd.xz
+iftitle [if exist (hd0,0)/porteus/vmlinuz] Porteus v5RC2 Generic fully on Ram  - (hd0,0)/porteus
+kernel /porteus/vmlinuz noauto  copy2ram 
+initrd /porteus/initrd.xz
 
 iftitle [if exist (hd0,0)/porteus/optional/PC-1.xzm] Porteus v5RC2 for PC-1 fully on Ram  - (hd0,0)/porteus
-kernel /porteus/boot/syslinux/vmlinuz noauto copy2ram load=PC-1;LibreOffice 
-initrd /porteus/boot/syslinux/initrd.xz
+kernel /porteus/vmlinuz noauto copy2ram load=PC-1;LibreOffice 
+initrd /porteus/initrd.xz
 
 iftitle [if exist (hd0,0)/porteus/optional/PC-2.xzm] Porteus v5RC2 for PC-2 fully on Ram  - (hd0,0)/porteus
-kernel /porteus/boot/syslinux/vmlinuz noauto copy2ram load=PC-2;LibreOffice 
-initrd /porteus/boot/syslinux/initrd.xz
+kernel /porteus/vmlinuz noauto copy2ram load=PC-2;LibreOffice 
+initrd /porteus/initrd.xz
 
 iftitle [if exist (hd0,0)/porteus/changes/save.dat] Porteus v5RC2 with persistence - (hd0,0)/porteus/changes/save.dat
-kernel /porteus/boot/syslinux/vmlinuz noauto changes=/porteus/changes/save.dat  
-initrd /porteus/boot/syslinux/initrd.xz
+kernel /porteus/vmlinuz noauto changes=/porteus/changes/save.dat  
+initrd /porteus/initrd.xz
 
 iftitle [if exist (hd0,0)/casper/vmlinuz] FossaDog without persistence - (hd0,0)/casper
 kernel /casper/vmlinuz noauto

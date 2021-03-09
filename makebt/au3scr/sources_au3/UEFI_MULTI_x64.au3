@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  January 18, 2021
+ Author:        WIMB  -  March 09, 2021
 
- Program:       UEFI_MULTI_x64.exe - Version 5.5 in rule 195
+ Program:       UEFI_MULTI_x64.exe - Version 5.7 in rule 195
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -106,9 +106,9 @@ Global $inst_disk="", $inst_part="", $sys_disk="", $sys_part="", $usbsys=0, $usb
 
 Global $OS_drive = StringLeft(@WindowsDir, 2)
 
-Global $str = "", $bt_files[24] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
+Global $str = "", $bt_files[26] = ["\makebt\dsfo.exe", "\makebt\dsfi.exe", "\makebt\listusbdrives\ListUsbDrives.exe", "\makebt\Exclude_Copy_USB.txt", "\makebt\menu_Win_ISO.lst", _
 "\makebt\grldr.mbr", "\makebt\grldr", "\makebt\menu.lst", "\makebt\menu_Linux.lst", "\UEFI_MAN\efi", "\UEFI_MAN\efi_mint", "\makebt\Linux_ISO_Files.txt", "\makebt\grub.exe", _
-"\WofCompress\x64\WofCompress.exe", "\WofCompress\x86\WofCompress.exe", _
+"\WofCompress\x64\WofCompress.exe", "\WofCompress\x86\WofCompress.exe", "\makebt\menu_distro.lst", "\UEFI_MAN\grub\grub_distro.cfg", _
 "\UEFI_MAN\EFI\grub\menu.lst", "\UEFI_MAN\grub\grub.cfg", "\UEFI_MAN\grub\grub_Linux.cfg", "\UEFI_MAN\grub\core.img", "\UEFI_MAN\EFI\grub\ntfs_x64.efi", _
 "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", "\UEFI_MAN\EFI\Boot\grubx64_real.efi", "\UEFI_MAN\EFI\Boot\grubia32_real.efi"]
 
@@ -192,12 +192,12 @@ $hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 5.5  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 15, 10, 370, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 5.5  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 18, 10, 364, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 15, 10, 370, 235)
 EndIf
 
-$ImageType = GUICtrlCreateLabel( "", 280, 29, 110, 15, $ES_READONLY)
+$ImageType = GUICtrlCreateLabel( "", 280, 29, 104, 15, $ES_READONLY)
 $ImageSize = GUICtrlCreateLabel( "", 225, 29, 50, 15, $ES_READONLY)
 
 GUICtrlCreateLabel( "Boot Image - VHD or WIM or Win ISO", 32, 29)
@@ -309,7 +309,7 @@ GUICtrlSetTip($Combo_EFI, " Add Grub2 Boot Manager for UEFI and MBR mode and Lin
 & " - MBR - use Addon to Install a1ive Grub2 Boot Manager - All Linux ISO " & @CRLF _
 & " - Keep AIO UEFI files and Add a1ive Grub2 File Manager to AIO\grubfm ")
 
-GUICtrlCreateGroup("USB Target", 18, 252, 364, 89)
+GUICtrlCreateGroup("Target", 15, 252, 370, 89)
 
 GUICtrlCreateLabel( "Boot  Drive", 32, 273)
 $Target = GUICtrlCreateInput("", 110, 270, 40, 20, $ES_READONLY)
@@ -321,7 +321,7 @@ GUICtrlSetOnEvent($TargetSel, "_target_drive")
 $TargetSize = GUICtrlCreateLabel( "", 198, 264, 90, 15, $ES_READONLY)
 $TargetFree = GUICtrlCreateLabel( "", 198, 281, 90, 15, $ES_READONLY)
 $Target_Device = GUICtrlCreateLabel( "", 295, 264, 85, 15, $ES_READONLY)
-$Target_Type = GUICtrlCreateLabel( "", 295, 281, 85, 15, $ES_READONLY)
+$Target_Type = GUICtrlCreateLabel( "", 295, 281, 89, 15, $ES_READONLY)
 
 GUICtrlCreateLabel( "System Drive", 32, 315)
 $WinDrv = GUICtrlCreateInput("", 110, 312, 40, 20, $ES_READONLY)
@@ -334,7 +334,7 @@ GUICtrlSetOnEvent($WinDrvSel, "_WinDrv_drive")
 $WinDrvSize = GUICtrlCreateLabel( "", 198, 306, 100, 15, $ES_READONLY)
 $WinDrvFree = GUICtrlCreateLabel( "", 198, 323, 100, 15, $ES_READONLY)
 $Sys_Device = GUICtrlCreateLabel( "", 295, 306, 85, 15, $ES_READONLY)
-$Sys_Type = GUICtrlCreateLabel( "", 295, 323, 85, 15, $ES_READONLY)
+$Sys_Type = GUICtrlCreateLabel( "", 295, 323, 89, 15, $ES_READONLY)
 
 $GO = GUICtrlCreateButton("GO", 235, 360, 70, 30)
 GUICtrlSetTip($GO,  " GO will Make entry for PE WIM Or VHD in Windows Boot Manager Menu " & @CRLF _
@@ -1137,7 +1137,8 @@ Func _target_drive()
 		$Firmware = _WinAPI_GetFirmwareEnvironmentVariable()
 		If $FSvar <> "FAT32" And $Firmware = "UEFI" And $PartStyle = "MBR" Then
 			MsgBox(48, "WARNING - Boot Drive OK for BIOS ", "Target Boot Drive has " & $FSvar & " - OK for BIOS only " & @CRLF _
-			& @CRLF & "UEFI Firmware needs FAT32 Target Boot Drive")
+			& @CRLF & "UEFI Firmware needs FAT32 Target Boot Drive" & @CRLF _
+			& @CRLF & "Firmware = " & $Firmware & "     Drive = " & $PartStyle & "    " & DriveGetType($TargetDrive, 3) & "   " & StringLeft(DriveGetType($TargetDrive), 5) & "   " & DriveGetType($TargetDrive, 2))
 		EndIf
 		; MsgBox(64, "Partition Style and Firmware", "Partition Style = " & $PartStyle & @CRLF _
 		; & @CRLF & "Firmware = " & $Firmware)
@@ -2292,18 +2293,18 @@ Func _ListUsb_UEFI()
 
 	If $Target_Found = 1 Then
 		GUICtrlSetData($Target_Device, $PartStyle & "  hd " & $inst_disk & "  p " & $inst_part)
-		GUICtrlSetData($Target_Type, $BusType & "   " &  StringLeft($DriveType, 5))
+		GUICtrlSetData($Target_Type, $BusType & "  " &  StringLeft($DriveType, 5) & "  " & DriveGetType($TargetDrive, 2))
 	ElseIf $count_none = 1 Then
 		$BusType = $BusType_none
 		GUICtrlSetData($Target_Device, $PartStyle & "  hd " & $disk_none & "  p " & $part_none)
-		GUICtrlSetData($Target_Type, $BusType_none & "   " &  StringLeft($DriveType, 5))
+		GUICtrlSetData($Target_Type, $BusType_none & "  " &  StringLeft($DriveType, 5) & "  " & DriveGetType($TargetDrive, 2))
 	Else
 		GUICtrlSetData($Target_Device, "")
 		GUICtrlSetData($Target_Type, "")
 	EndIf
 
 	GUICtrlSetData($Sys_Device, $SysStyle & "  hd " & $sys_disk & "  p " & $sys_part)
-	GUICtrlSetData($Sys_Type, $BusSys & "   " &  StringLeft($DriveSysType, 5))
+	GUICtrlSetData($Sys_Type, $BusSys & "  " &  StringLeft($DriveSysType, 5) & "  " & DriveGetType($WinDrvDrive, 2))
 
 EndFunc   ;==> __ListUsb_UEFI
 ;===================================================================================================
@@ -2583,26 +2584,6 @@ Func _Go()
 	_GUICtrlStatusBar_SetText($hStatus," Checking Boot Files - Wait ... ", 0)
 	GUICtrlSetData($ProgressAll, 40)
 
-	; make folder images for Linux ISO files
-	If $ventoy=0 Then
-		If $PartStyle = "MBR" Then
-			If Not FileExists($TargetDrive & "\images") Then DirCreate($TargetDrive & "\images")
-			If Not FileExists($TargetDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $TargetDrive & "\images\", 1)
-			If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
-			If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
-			If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
-			If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
-		EndIf
-	Else
-		If Not FileExists($WinDrvDrive & "\images") Then DirCreate($WinDrvDrive & "\images")
-		If Not FileExists($WinDrvDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $WinDrvDrive & "\images\", 1)
-		If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
-		If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
-		If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
-		If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\", 8)
-	EndIf
-
 	If $usbfix Then
 		If FileExists(@ScriptDir & "\makebt\autorun.inf") And Not FileExists($TargetDrive & "\autorun.inf") Then FileCopy(@ScriptDir & "\makebt\autorun.inf", $TargetDrive & "\")
 		If FileExists(@ScriptDir & "\makebt\Uefi_Multi.ico") And Not FileExists($TargetDrive & "\Uefi_Multi.ico") Then FileCopy(@ScriptDir & "\makebt\Uefi_Multi.ico", $TargetDrive & "\")
@@ -2611,109 +2592,6 @@ Func _Go()
 	If $usbsys Then
 		If FileExists(@ScriptDir & "\makebt\autorun.inf") And Not FileExists($WinDrvDrive & "\autorun.inf") Then FileCopy(@ScriptDir & "\makebt\autorun.inf", $WinDrvDrive & "\")
 		If FileExists(@ScriptDir & "\makebt\Uefi_Multi.ico") And Not FileExists($WinDrvDrive & "\Uefi_Multi.ico") Then FileCopy(@ScriptDir & "\makebt\Uefi_Multi.ico", $WinDrvDrive & "\")
-	EndIf
-
-	; Update existing grldr and grldr.mbr - Set Grub4dos entry default
-	If GUICtrlRead($grldrUpd) = $GUI_CHECKED And $PartStyle = "MBR" Then
-		If $DriveType="Removable" Or $usbfix Then $g4d_default = 1
-		; If FileExists($TargetDrive & "\grldr") Then
-		; 	FileSetAttrib($TargetDrive & "\grldr", "-RSH")
-		; 	FileCopy($TargetDrive & "\grldr", $TargetDrive & "\grldr_old")
-		; EndIf
-		FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
-		FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
-		If FileExists($TargetDrive & "\grldr.mbr") Then FileCopy(@ScriptDir & "\makebt\grldr.mbr", $TargetDrive & "\", 1)
-		; No forced update of menu.lst
-		;	If FileExists($TargetDrive & "\menu.lst") Then
-		;		FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
-		;		FileCopy($TargetDrive & "\menu.lst", $TargetDrive & "\menu_old.lst")
-		;	EndIf
-		;	FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
-		;	FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
-		If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
-		If FileExists(@ScriptDir & "\UEFI_MAN\grub\core.img") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub", 1)
-	EndIf
-	; Force Update UEFI Grub2 and UEFI Grub4dos
-	If GUICtrlRead($grldrUpd) = $GUI_CHECKED Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubx64_real.efi", $TargetDrive & "\EFI\Boot\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubia32_real.efi", $TargetDrive & "\EFI\Boot\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\ntfs_x64.efi", 9)
-		DirCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\tools", $TargetDrive & "\EFI\grub\tools", 1)
-	EndIf
-
-	If $PartStyle = "MBR" Then
-		If FileExists($TargetDrive & "\menu.lst") Then FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
-		If Not FileExists($TargetDrive & "\grldr") Then FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\menu_Win_ISO.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Win_ISO.lst", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
-		If Not FileExists($TargetDrive & "\grub\core.img") And $ventoy=0 Then
-			FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub\", 9)
-		EndIf
-	EndIf
-
-	; support UEFI Grub2
-	If Not FileExists($TargetDrive & "\grub\grub.cfg") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub.cfg", $TargetDrive & "\grub\", 9)
-		FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub_Linux.cfg", $TargetDrive & "\grub\", 9)
-	EndIf
-	If Not FileExists($TargetDrive & "\EFI\Boot\grubx64_real.efi") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubx64_real.efi", $TargetDrive & "\EFI\Boot\", 9)
-	EndIf
-	If Not FileExists($TargetDrive & "\EFI\Boot\grubia32_real.efi") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubia32_real.efi", $TargetDrive & "\EFI\Boot\", 9)
-	EndIf
-	If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") And Not FileExists($TargetDrive & "\EFI\grub\ntfs_x64.efi") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\ntfs_x64.efi", 9)
-	EndIf
-	If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\tools") And Not FileExists($TargetDrive & "\EFI\grub\tools") Then
-		DirCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\tools", $TargetDrive & "\EFI\grub\tools", 1)
-	EndIf
-
-	; support UEFI Grub4dos
-	If Not FileExists($TargetDrive & "\EFI\grub\menu.lst") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\menu.lst", $TargetDrive & "\EFI\grub\menu.lst", 9)
-	EndIf
-	If Not FileExists($TargetDrive & "\EFI\Boot\bootx64_g4d.efi") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
-	EndIf
-	If Not FileExists($TargetDrive & "\EFI\Boot\bootia32_g4d.efi") Then
-		FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
-	EndIf
-
-	; NTLDR BootSector XP
-	If $g4d_vista = 0 And $PartStyle = "MBR" Then
-		If FileExists($TargetDrive & "\boot.ini") Then
-			FileSetAttrib($TargetDrive & "\boot.ini", "-RSH")
-			FileCopy($TargetDrive & "\boot.ini", $TargetDrive & "\boot_ini.txt", 1)
-			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
-			IniWrite($TargetDrive & "\boot.ini", "Boot Loader", "Timeout", 20)
-		Else
-			IniWriteSection($TargetDrive & "\boot.ini", "Boot Loader", "Timeout=20" & @LF & _
-			"Default=C:\grldr")
-			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
-		EndIf
-
-		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") And FileExists(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN") Then
-			FileCopy(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN", $TargetDrive & "\", 1)
-		EndIf
-
-	;	use modified ntdetect if exists in makebt folder
-		If Not FileExists($TargetDrive & "\NTDETECT.COM") Then
-			If FileExists(@ScriptDir & "\makebt\ntdetect.com") Then
-				FileCopy(@ScriptDir & "\makebt\ntdetect.com", $TargetDrive & "\", 1)
-			Else
-				If FileExists(@ScriptDir & "\makebt\Boot_XP\NTDETECT.COM") Then FileCopy(@ScriptDir & "\makebt\Boot_XP\NTDETECT.COM", $TargetDrive & "\", 1)
-			EndIf
-		EndIf
-
-		If Not FileExists($TargetDrive & "\ntldr") And FileExists(@ScriptDir & "\makebt\Boot_XP\NTLDR") Then
-			FileCopy(@ScriptDir & "\makebt\Boot_XP\NTLDR", $TargetDrive & "\", 1)
-		EndIf
 	EndIf
 
 	SystemFileRedirect("On")
@@ -2824,6 +2702,147 @@ Func _Go()
 
 	GUICtrlSetData($ProgressAll, 50)
 	Sleep(2000)
+
+	; Update existing grldr and grldr.mbr - Set Grub4dos entry default
+	If GUICtrlRead($grldrUpd) = $GUI_CHECKED And $PartStyle = "MBR" Then
+		If $DriveType="Removable" Or $usbfix Then $g4d_default = 1
+		; If FileExists($TargetDrive & "\grldr") Then
+		; 	FileSetAttrib($TargetDrive & "\grldr", "-RSH")
+		; 	FileCopy($TargetDrive & "\grldr", $TargetDrive & "\grldr_old")
+		; EndIf
+		FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
+		FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
+		If FileExists($TargetDrive & "\grldr.mbr") Then FileCopy(@ScriptDir & "\makebt\grldr.mbr", $TargetDrive & "\", 1)
+		; No forced update of menu.lst
+		;	If FileExists($TargetDrive & "\menu.lst") Then
+		;		FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
+		;		FileCopy($TargetDrive & "\menu.lst", $TargetDrive & "\menu_old.lst")
+		;	EndIf
+		;	FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
+		;	FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
+		If FileExists(@ScriptDir & "\UEFI_MAN\grub\core.img") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub\", 9)
+	EndIf
+	; Force Update UEFI Grub2 and UEFI Grub4dos
+	If GUICtrlRead($grldrUpd) = $GUI_CHECKED Then
+		If FileExists($TargetDrive & "\EFI\Boot\grubx64_real.efi") Then	FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubx64_real.efi", $TargetDrive & "\EFI\Boot\", 9)
+		If FileExists($TargetDrive & "\EFI\Boot\grubia32_real.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubia32_real.efi", $TargetDrive & "\EFI\Boot\", 9)
+		If FileExists($TargetDrive & "\EFI\Boot\bootx64_g4d.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
+		If FileExists($TargetDrive & "\EFI\Boot\bootia32_g4d.efi") Then	FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
+		If FileExists($TargetDrive & "\EFI\grub\ntfs_x64.efi") Then	FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\", 9)
+		If FileExists($TargetDrive & "\EFI\grub\tools")	Then DirCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\tools", $TargetDrive & "\EFI\grub\tools", 1)
+		If FileExists($TargetDrive & "\grub\vdiskchain") And FileExists(@ScriptDir & "\UEFI_MAN\grub\vdiskchain") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\vdiskchain", $TargetDrive & "\grub\", 9)
+		If FileExists($TargetDrive & "\grub\ipxe.krn") And FileExists(@ScriptDir & "\UEFI_MAN\grub\ipxe.krn") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\ipxe.krn", $TargetDrive & "\grub\", 9)
+	EndIf
+
+	If $PartStyle = "MBR" Then
+		If FileExists($TargetDrive & "\menu.lst") Then FileSetAttrib($TargetDrive & "\menu.lst", "-RSH")
+		If Not FileExists($TargetDrive & "\grldr") Then FileCopy(@ScriptDir & "\makebt\grldr", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grub.exe") Then FileCopy(@ScriptDir & "\makebt\grub.exe", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\menu.lst") Then FileCopy(@ScriptDir & "\makebt\menu.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\menu_distro.lst") Then FileCopy(@ScriptDir & "\makebt\menu_distro.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\menu_Linux.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Linux.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\menu_Win_ISO.lst") Then FileCopy(@ScriptDir & "\makebt\menu_Win_ISO.lst", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grubfm.iso") And FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\", 1)
+		If Not FileExists($TargetDrive & "\grub\core.img") And $ventoy=0 Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\core.img", $TargetDrive & "\grub\", 9)
+		; Support vdiskchain for Linux in VHD
+		If Not FileExists($TargetDrive & "\grub\vdiskchain") And $ventoy=0 Then
+			If FileExists(@ScriptDir & "\UEFI_MAN\grub\vdiskchain") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\vdiskchain", $TargetDrive & "\grub\", 9)
+		EndIf
+		If Not FileExists($TargetDrive & "\grub\ipxe.krn") And $ventoy=0 Then
+			If FileExists(@ScriptDir & "\UEFI_MAN\grub\ipxe.krn") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\ipxe.krn", $TargetDrive & "\grub\", 9)
+		EndIf
+	EndIf
+
+	; support UEFI Grub2
+	If Not FileExists($TargetDrive & "\grub\grub.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub.cfg", $TargetDrive & "\grub\", 9)
+	If Not FileExists($TargetDrive & "\grub\grub_Linux.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub_Linux.cfg", $TargetDrive & "\grub\", 9)
+	If Not FileExists($TargetDrive & "\grub\grub_distro.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub_distro.cfg", $TargetDrive & "\grub\", 9)
+
+	; support UEFI Grub4dos
+	If $DriveType="Removable" Or $usbfix Or $PartStyle = "GPT" Then
+		If Not FileExists($TargetDrive & "\EFI\grub\menu.lst") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\menu.lst", $TargetDrive & "\EFI\grub\menu.lst", 9)
+		EndIf
+	EndIf
+
+	; requires sufficient space - available on USB - May be Not on internal EFI drive
+	If $DriveType="Removable" Or $usbfix Then
+		; support UEFI Grub2
+		If Not FileExists($TargetDrive & "\EFI\Boot\grubx64_real.efi") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubx64_real.efi", $TargetDrive & "\EFI\Boot\", 9)
+		EndIf
+		If Not FileExists($TargetDrive & "\EFI\Boot\grubia32_real.efi") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubia32_real.efi", $TargetDrive & "\EFI\Boot\", 9)
+		EndIf
+		If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") And Not FileExists($TargetDrive & "\EFI\grub\ntfs_x64.efi") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\", 9)
+		EndIf
+		If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\tools") And Not FileExists($TargetDrive & "\EFI\grub\tools") Then
+			DirCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\tools", $TargetDrive & "\EFI\grub\tools", 1)
+		EndIf
+
+		; support UEFI Grub4dos
+		If Not FileExists($TargetDrive & "\EFI\Boot\bootx64_g4d.efi") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootx64_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
+		EndIf
+		If Not FileExists($TargetDrive & "\EFI\Boot\bootia32_g4d.efi") Then
+			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\bootia32_g4d.efi", $TargetDrive & "\EFI\Boot\", 9)
+		EndIf
+	EndIf
+
+	; make folder images for Linux ISO files
+	If $ventoy=0 Then
+		If $PartStyle = "MBR" Then
+			If Not FileExists($TargetDrive & "\images") Then DirCreate($TargetDrive & "\images")
+			If Not FileExists($TargetDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $TargetDrive & "\images\", 1)
+			If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
+			If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
+			If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
+			If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
+		EndIf
+	Else
+		If Not FileExists($WinDrvDrive & "\images") Then DirCreate($WinDrvDrive & "\images")
+		If Not FileExists($WinDrvDrive & "\images\Linux_ISO_Files.txt") Then FileCopy(@ScriptDir & "\makebt\Linux_ISO_Files.txt", $WinDrvDrive & "\images\", 1)
+		If Not FileExists($TargetDrive & "\images\kali-linux\persistence.7z") Then FileCopy(@ScriptDir & "\images\kali-linux\persistence.7z", $TargetDrive & "\images\kali-linux\", 9)
+		If Not FileExists($TargetDrive & "\images\linuxmint\writable.7z") Then FileCopy(@ScriptDir & "\images\linuxmint\writable.7z", $TargetDrive & "\images\linuxmint\", 9)
+		If Not FileExists($TargetDrive & "\images\porteus\data.7z") Then FileCopy(@ScriptDir & "\images\porteus\data.7z", $TargetDrive & "\images\porteus\", 9)
+		If Not FileExists($TargetDrive & "\images\ubuntu\writable.7z") Then FileCopy(@ScriptDir & "\images\ubuntu\writable.7z", $TargetDrive & "\images\ubuntu\", 9)
+		FileCopy(@ScriptDir & "\UEFI_MAN\efi_mint\boot\grub_Linux.cfg", $TargetDrive & "\", 8)
+	EndIf
+
+	; NTLDR BootSector XP
+	If $g4d_vista = 0 And $PartStyle = "MBR" Then
+		If FileExists($TargetDrive & "\boot.ini") Then
+			FileSetAttrib($TargetDrive & "\boot.ini", "-RSH")
+			FileCopy($TargetDrive & "\boot.ini", $TargetDrive & "\boot_ini.txt", 1)
+			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
+			IniWrite($TargetDrive & "\boot.ini", "Boot Loader", "Timeout", 20)
+		Else
+			IniWriteSection($TargetDrive & "\boot.ini", "Boot Loader", "Timeout=20" & @LF & _
+			"Default=C:\grldr")
+			IniWrite($TargetDrive & "\boot.ini", "Operating Systems", "C:\grldr", '"Start Grub4dos - XP Menu"')
+		EndIf
+
+		If Not FileExists($TargetDrive & "\BOOTFONT.BIN") And FileExists(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN") Then
+			FileCopy(@ScriptDir & "\makebt\Boot_XP\BOOTFONT.BIN", $TargetDrive & "\", 1)
+		EndIf
+
+	;	use modified ntdetect if exists in makebt folder
+		If Not FileExists($TargetDrive & "\NTDETECT.COM") Then
+			If FileExists(@ScriptDir & "\makebt\ntdetect.com") Then
+				FileCopy(@ScriptDir & "\makebt\ntdetect.com", $TargetDrive & "\", 1)
+			Else
+				If FileExists(@ScriptDir & "\makebt\Boot_XP\NTDETECT.COM") Then FileCopy(@ScriptDir & "\makebt\Boot_XP\NTDETECT.COM", $TargetDrive & "\", 1)
+			EndIf
+		EndIf
+
+		If Not FileExists($TargetDrive & "\ntldr") And FileExists(@ScriptDir & "\makebt\Boot_XP\NTLDR") Then
+			FileCopy(@ScriptDir & "\makebt\Boot_XP\NTLDR", $TargetDrive & "\", 1)
+		EndIf
+	EndIf
+
+	GUICtrlSetData($ProgressAll, 55)
 
 	If $ContentSource <> "" Then
 		If GUICtrlRead($Combo_Folder) = "Folder on B" And $content_folder = "Programs" And FileExists(@ScriptDir & "\makebt\CDUsb.y") Then
@@ -2936,7 +2955,7 @@ Func _Go()
 	; Only on USB Drives
 	If $usbfix And GUICtrlRead($refind) = $GUI_CHECKED And $PartStyle = "MBR" And $ventoy=0 Then
 		; Keep AIO files if present
-		If Not FileExists($TargetDrive & "\AIO\grub\grub.cfg") And Not FileExists($TargetDrive & "\AIO\grub\\Main.cfg") Then
+		If Not FileExists($TargetDrive & "\AIO\grub\grub.cfg") And Not FileExists($TargetDrive & "\AIO\grub\Main.cfg") Then
 			If GUICtrlRead($Combo_EFI) <> "MBR  Only" Then
 				If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64_win.efi") Then
 					FileMove($TargetDrive & "\efi\boot\bootx64.efi", $TargetDrive & "\efi\boot\bootx64_win.efi", 1)
@@ -2967,7 +2986,7 @@ Func _Go()
 				_GUICtrlStatusBar_SetText($hStatus," Adding Super Grub2 EFI Manager - wait .... ", 0)
 				; DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
 				DirCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot", $TargetDrive & "\EFI\Boot", 1)
-				If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\ntfs_x64.efi", 9)
+				If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\", 9)
 				If Not FileExists($TargetDrive & "\efi\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\efi\memtest86") Then
 					DirCopy(@ScriptDir & "\UEFI_MAN\efi\memtest86", $TargetDrive & "\efi\memtest86", 1)
 				EndIf
@@ -3193,7 +3212,7 @@ Func _Go()
 ;~ 		EndIf
 
 
-	If $driver_flag = 0 And StringRight($vhdfile_name, 4) = ".vhd" Then
+	If $driver_flag = 0 And StringRight($vhdfile_name, 4) = ".vhd" And $BTIMGSize < 15000 Then
 		MsgBox(48, "WARNING - SVBus Driver Missing ", " SVBus driver is needed for booting from RAMDISK " & @CRLF _
 		& @CRLF & " First Boot as FILEDISK from Windows Boot Manager " & @CRLF _
 		& @CRLF & " 1. Install SVBus EVRootCA Registry Fix in runnung Windows " & @CRLF _
@@ -3570,8 +3589,8 @@ Func DisableMenus($endis)
 		GUICtrlSetState($AddContentBrowse, $endis)
 		GUICtrlSetState($AddContentSource, $endis)
 		GUICtrlSetState($Combo_Folder, $endis)
+		GUICtrlSetState($grldrUpd, $endis)
 		If $PartStyle <> "MBR" Then
-			GUICtrlSetState($grldrUpd, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($g4d_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($xp_bcd, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($Upd_MBR, $GUI_UNCHECKED + $GUI_DISABLE)
@@ -3579,7 +3598,6 @@ Func DisableMenus($endis)
 			GUICtrlSetState($refind, $GUI_UNCHECKED + $GUI_DISABLE)
 			GUICtrlSetState($Combo_EFI, $GUI_DISABLE)
 		Else
-			GUICtrlSetState($grldrUpd, $endis)
 			GUICtrlSetState($g4d_bcd, $endis)
 			GUICtrlSetState($xp_bcd, $endis)
 			If $BusType <> "USB" Then
