@@ -3,9 +3,9 @@
 
  AutoIt Version: 3.3.14.5 + file SciTEUser.properties in your UserProfile e.g. C:\Documents and Settings\UserXP Or C:\Users\User-10
 
- Author:        WIMB  -  March 09, 2021
+ Author:        WIMB  -  April 10, 2021
 
- Program:       UEFI_MULTI_x64.exe - Version 5.7 in rule 195
+ Program:       UEFI_MULTI_x64.exe - Version 5.8 in rule 195
 	can be used to Make Mult-Boot USB-drives by using Boot Image Files (IMG ISO WIM or VHD)
 	Booting with Windows Boot Manager Menu and /or Grub2 Boot Manager in MBR BIOS or UEFI mode - with Grub4dos support in MBR BIOS mode
 	can be used to to Install IMG or ISO or WIM or VHD Files as Boot Option on Harddisk or USB-drive
@@ -192,9 +192,9 @@ $hGuiParent = GUICreate(" UEFI_MULTI x64 - Make Multi-Boot USB ", 400, 430, -1, 
 GUISetOnEvent($GUI_EVENT_CLOSE, "_Quit")
 
 If $PE_flag = 1 Then
-	GUICtrlCreateGroup("Sources   - Version 5.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 15, 10, 370, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.8  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware & "  PE", 15, 10, 370, 235)
 Else
-	GUICtrlCreateGroup("Sources   - Version 5.7  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 15, 10, 370, 235)
+	GUICtrlCreateGroup("Sources   - Version 5.8  -   OS = " & @OSVersion & " " & @OSArch & "  " & $Firmware, 15, 10, 370, 235)
 EndIf
 
 $ImageType = GUICtrlCreateLabel( "", 280, 29, 104, 15, $ES_READONLY)
@@ -297,7 +297,7 @@ GUICtrlSetTip($refind, " Add Grub2 Boot Manager for UEFI and MBR mode and Linux 
 GUICtrlCreateLabel( "Grub2 M", 328, 215)
 $Combo_EFI = GUICtrlCreateCombo("", 228, 212, 90, 24, $CBS_DROPDOWNLIST)
 
-If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") Then
+If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\MokManager.efi") Then
 	GUICtrlSetData($Combo_EFI,"Mint   UEFI", "Mint   UEFI")
 Else
 	GUICtrlSetData($Combo_EFI,"Mint   UEFI|Super UEFI|Mint + MBR|Super + MBR|MBR  Only", "Mint   UEFI")
@@ -355,7 +355,7 @@ _GUICtrlStatusBar_SetParts($hStatus, $aParts)
 
 _GUICtrlStatusBar_SetText($hStatus," First Select USB Target Drives and then Sources", 0)
 
-If FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") And FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\grubx64_real.efi") Then
+If FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\MokManager.efi") And FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubx64_real.efi") Then
 	GUICtrlSetData($Combo_EFI, "Super UEFI")
 EndIf
 
@@ -1392,39 +1392,20 @@ Func _wim_menu()
 
 	$store = $TargetDrive & "\Boot\BCD"
 	If Not FileExists($TargetDrive & "\Boot\BCD") And $PartStyle = "MBR" Then
-		If Not FileExists($TargetDrive & "\Boot") Then DirCreate($TargetDrive & "\Boot")
-		If Not FileExists($TargetDrive & "\Boot\Fonts") Then DirCreate($TargetDrive & "\Boot\Fonts")
+		DirCopy(@WindowsDir & "\Boot\PCAT", $TargetDrive & "\Boot", 1)
+		DirCopy(@WindowsDir & "\Boot\Fonts", $TargetDrive & "\Boot\Fonts", 1)
+		DirCopy(@WindowsDir & "\Boot\Resources", $TargetDrive & "\Boot\Resources", 1)
+		If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi") Then
+			FileCopy(@WindowsDir & "\Boot\DVD\PCAT\boot.sdi", $TargetDrive & "\Boot\", 1)
+		EndIf
 		sleep(1000)
-		If Not FileExists($TargetDrive & "\bootmgr") Then
-			If FileExists(@WindowsDir & "\Boot\PCAT\bootmgr") Then
-				FileCopy(@WindowsDir & "\Boot\PCAT\bootmgr", $TargetDrive & "\", 1)
-			ElseIf FileExists($OS_drive & "\bootmgr") Then
-				FileCopy($OS_drive & "\bootmgr", $TargetDrive & "\", 1)
-			Else
-				; bootmgr is missing
-			EndIf
+		FileMove($TargetDrive & "\Boot\bootmgr", $TargetDrive & "\bootmgr", 1)
+		FileMove($TargetDrive & "\Boot\bootnxt", $TargetDrive & "\BOOTNXT", 1)
+		sleep(1000)
+		If Not FileExists($TargetDrive & "\bootmgr") And FileExists($OS_drive & "\bootmgr") Then
+			FileCopy($OS_drive & "\bootmgr", $TargetDrive & "\", 1)
 		EndIf
-		; win8 boot fonts
-		If Not FileExists($TargetDrive & "\Boot\Fonts\segmono_boot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segmono_boot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segmono_boot.ttf", $TargetDrive & "\Boot\Fonts", 1)
-			EndIf
-		EndIf
-		If Not FileExists($TargetDrive & "\Boot\Fonts\segoe_slboot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segoe_slboot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segoe_slboot.ttf", $TargetDrive & "\Boot\Fonts", 1)
-			EndIf
-		EndIf
-		If Not FileExists($TargetDrive & "\Boot\Fonts\segoen_slboot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segoen_slboot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segoen_slboot.ttf", $TargetDrive & "\Boot\Fonts", 1)
-			EndIf
-		EndIf
-		If Not FileExists($TargetDrive & "\Boot\Fonts\wgl4_boot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\wgl4_boot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\wgl4_boot.ttf", $TargetDrive & "\Boot\Fonts", 1)
-			EndIf
-		EndIf
+
 		RunWait(@ComSpec & " /c " & $bcdedit & " /createstore " & $store, $TargetDrive & "\", @SW_HIDE)
 		sleep(1000)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create {bootmgr}", $TargetDrive & "\", @SW_HIDE)
@@ -1515,41 +1496,24 @@ Func _wim_menu()
 	EndIf
 
 	; and for efi
-	$store = $TargetDrive & "\efi\microsoft\boot\BCD"
-	If Not FileExists($TargetDrive & "\efi\microsoft\boot\BCD") And $PartStyle = "GPT" Then
-		If Not FileExists($TargetDrive & "\efi\boot") Then DirCreate($TargetDrive & "\efi\boot")
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot") Then DirCreate($TargetDrive & "\efi\microsoft\boot")
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts") Then DirCreate($TargetDrive & "\efi\microsoft\boot\fonts")
+	$store = $TargetDrive & "\EFI\Microsoft\Boot\BCD"
+	If Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+		DirCopy(@WindowsDir & "\Boot\EFI", $TargetDrive & "\EFI\Microsoft\Boot", 1)
+		DirCopy(@WindowsDir & "\Boot\Fonts", $TargetDrive & "\EFI\Microsoft\Boot\Fonts", 1)
+		DirCopy(@WindowsDir & "\Boot\Resources", $TargetDrive & "\EFI\Microsoft\Boot\Resources", 1)
+		If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\EFI\boot.sdi") Then
+			FileCopy(@WindowsDir & "\Boot\DVD\EFI\boot.sdi", $TargetDrive & "\Boot\", 1)
+		EndIf
 		sleep(1000)
-		If Not FileExists($TargetDrive & "\efi\boot\bootx64.efi")  And @OSArch = "X64" Then
-			If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") Then
-				FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\efi\boot\", 1)
-				FileMove($TargetDrive & "\efi\boot\bootmgfw.efi", $TargetDrive & "\efi\boot\bootx64.efi", 1)
-			EndIf
-		Else
-			; efi\Boot\bootx64.efi is missing
-		EndIf
-		; win8 boot fonts
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts\segmono_boot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segmono_boot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segmono_boot.ttf", $TargetDrive & "\efi\microsoft\boot\fonts", 1)
+		If Not FileExists($TargetDrive & "\EFI\Boot\bootx64.efi") And FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") Then
+			FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\EFI\Boot\", 9)
+			If @OSArch <> "X86" Then
+				FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootx64.efi", 1)
+			Else
+				FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootia32.efi", 1)
 			EndIf
 		EndIf
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts\segoe_slboot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segoe_slboot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segoe_slboot.ttf", $TargetDrive & "\efi\microsoft\boot\fonts", 1)
-			EndIf
-		EndIf
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts\segoen_slboot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\segoen_slboot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\segoen_slboot.ttf", $TargetDrive & "\efi\microsoft\boot\fonts", 1)
-			EndIf
-		EndIf
-		If Not FileExists($TargetDrive & "\efi\microsoft\boot\fonts\wgl4_boot.ttf") Then
-			If FileExists(@WindowsDir & "\Boot\Fonts\wgl4_boot.ttf") Then
-				FileCopy(@WindowsDir & "\Boot\Fonts\wgl4_boot.ttf", $TargetDrive & "\efi\microsoft\boot\fonts", 1)
-			EndIf
-		EndIf
+
 		RunWait(@ComSpec & " /c " & $bcdedit & " /createstore " & $store, $TargetDrive & "\", @SW_HIDE)
 		sleep(1000)
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create {bootmgr}", $TargetDrive & "\", @SW_HIDE)
@@ -1558,7 +1522,7 @@ Func _wim_menu()
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} timeout 20", $TargetDrive & "\", @SW_HIDE)
 		sleep(1000)
 	EndIf
-	If FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") Then
+	If FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
 		; RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create {ramdiskoptions}", @ScriptDir, @SW_HIDE)
 		; efi_ramdisk_guid = "{ramdiskoptions}"
 		RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create /device > makebt\bs_temp\efi_sdi_guid.txt", @ScriptDir, @SW_HIDE)
@@ -2063,7 +2027,7 @@ Func _vhd_menu()
 			EndIf
 			sleep(2000)
 		EndIf
-		If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") And $PartStyle = "GPT" Then
+		If FileExists(@WindowsDir & "\system32\bcdboot.exe") And Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
 			$bcdboot_flag = 1
 			If $PE_flag = 1 Then
 				If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And @OSArch <> "X86" Then
@@ -2098,10 +2062,10 @@ Func _vhd_menu()
 			FileSetAttrib($TargetDrive & "\Boot", "-RSH", 1)
 			FileSetAttrib($TargetDrive & "\bootmgr", "-RSH")
 		EndIf
-		If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") Then
+		If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
 			_GUICtrlStatusBar_SetText($hStatus," Add VHD entry to BCD on Boot Drive " & $TargetDrive, 0)
 			$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-			$store = $TargetDrive & "\efi\Microsoft\Boot\BCD"
+			$store = $TargetDrive & "\EFI\Microsoft\Boot\BCD"
 			$winload = "winload.efi"
 			$bcd_guid_outfile = "makebt\bs_temp\bcd_efi_usb.txt"
 
@@ -2323,7 +2287,7 @@ Func _Go()
 	DisableMenus(1)
 
 ;~ 		If Not FileExists(@ScriptDir & "\UEFI_MAN\grub_a1\grub-install.exe") Or Not FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") _
-;~ 			Or Not FileExists(@ScriptDir & "\UEFI_MAN\efi\boot\MokManager.efi") And GUICtrlRead($refind) = $GUI_CHECKED And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then
+;~ 			Or Not FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\MokManager.efi") And GUICtrlRead($refind) = $GUI_CHECKED And GUICtrlRead($Combo_EFI) <> "Mint   UEFI" Then
 ;~ 			MsgBox(16, "  STOP - Addon is Missing", "Addon for Grub2 Manager is Missing " & @CRLF & @CRLF _
 ;~ 			& "Download UEFI_MULTI-Nr-addon-glim-agFM.zip from https://github.com/wimbrts " & @CRLF & @CRLF _
 ;~ 			& "Use R-mouse 7-zip menu and Extract here to Add to UEFI_MULTI-Nr   folder " & @CRLF & @CRLF _
@@ -2643,16 +2607,16 @@ Func _Go()
 			EndIf
 		EndIf
 		; UEFI x64 Fix bootx64.efi and UEFI x86 Fix bootia32.efi
-		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") And @OSArch = "X64" Then
-			If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\efi\microsoft\boot\bcd") Then
-				FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\efi\boot\", 9)
-				FileMove($TargetDrive & "\efi\boot\bootmgfw.efi", $TargetDrive & "\efi\boot\bootx64.efi", 1)
+		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\EFI\Boot\bootx64.efi") And @OSArch = "X64" Then
+			If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+				FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\EFI\Boot\", 9)
+				FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootx64.efi", 1)
 			EndIf
 		EndIf
-		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootia32.efi") And @OSArch = "X86" Then
-			If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\efi\microsoft\boot\bcd") Then
-				FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\efi\boot\", 9)
-				FileMove($TargetDrive & "\efi\boot\bootmgfw.efi", $TargetDrive & "\efi\boot\bootia32.efi", 1)
+		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\EFI\Boot\bootia32.efi") And @OSArch = "X86" Then
+			If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+				FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\EFI\Boot\", 9)
+				FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootia32.efi", 1)
 			EndIf
 		EndIf
 	Else
@@ -2692,6 +2656,49 @@ Func _Go()
 				_mem_boot_menu()
 
 				$g4d_default = 1
+				$bcdboot_flag = 1
+
+			EndIf
+
+			If Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+				Sleep(2000)
+				DirCopy(@WindowsDir & "\Boot\EFI", $TargetDrive & "\EFI\Microsoft\Boot", 1)
+				DirCopy(@WindowsDir & "\Boot\Fonts", $TargetDrive & "\EFI\Microsoft\Boot\Fonts", 1)
+				DirCopy(@WindowsDir & "\Boot\Resources", $TargetDrive & "\EFI\Microsoft\Boot\Resources", 1)
+				If Not FileExists($TargetDrive & "\Boot\boot.sdi") And FileExists(@WindowsDir & "\Boot\DVD\EFI\boot.sdi") Then
+					FileCopy(@WindowsDir & "\Boot\DVD\EFI\boot.sdi", $TargetDrive & "\Boot\", 1)
+				EndIf
+				If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") Then
+					FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\EFI\Boot\", 9)
+					If @OSArch <> "X86" Then
+						FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootx64.efi", 1)
+					Else
+						FileMove($TargetDrive & "\EFI\Boot\bootmgfw.efi", $TargetDrive & "\EFI\Boot\bootia32.efi", 1)
+					EndIf
+				EndIf
+
+				$store = $TargetDrive & "\EFI\Microsoft\Boot\BCD"
+				RunWait(@ComSpec & " /c " & $bcdedit & " /createstore " & $store, $TargetDrive & "\", @SW_HIDE)
+				sleep(1000)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /create {bootmgr}", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} description " & '"' & "UEFI Windows Boot Manager" & '"', $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} device boot", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} inherit {globalsettings}", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} timeout 20", $TargetDrive & "\", @SW_HIDE)
+				RunWait(@ComSpec & " /c " & $bcdedit & " /store " & $store & " /set {bootmgr} toolsdisplayorder {memdiag}", $TargetDrive & "\", @SW_HIDE)
+				; sleep(1000)
+
+;~ 					$winload = "winload.exe"
+;~ 					$bcd_guid_outfile = "makebt\bs_temp\hdd_crea_efi_win_guid.txt"
+;~ 					_win_boot_menu()
+
+				$sdi_guid_outfile = "makebt\bs_temp\hdd_crea_efi_sdi_guid.txt"
+				$bcd_guid_outfile = "makebt\bs_temp\hdd_crea_efi_pe_guid.txt"
+				_pe_boot_menu()
+
+				_mem_boot_menu()
+
+				; $g4d_default = 1
 				$bcdboot_flag = 1
 
 			EndIf
@@ -2760,11 +2767,11 @@ Func _Go()
 	If Not FileExists($TargetDrive & "\grub\grub_distro.cfg") Then FileCopy(@ScriptDir & "\UEFI_MAN\grub\grub_distro.cfg", $TargetDrive & "\grub\", 9)
 
 	; support UEFI Grub4dos
-	If $DriveType="Removable" Or $usbfix Or $PartStyle = "GPT" Then
+	; If $DriveType="Removable" Or $usbfix Or $PartStyle = "GPT" Then
 		If Not FileExists($TargetDrive & "\EFI\grub\menu.lst") Then
 			FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\menu.lst", $TargetDrive & "\EFI\grub\menu.lst", 9)
 		EndIf
-	EndIf
+	; EndIf
 
 	; requires sufficient space - available on USB - May be Not on internal EFI drive
 	If $DriveType="Removable" Or $usbfix Then
@@ -2957,19 +2964,19 @@ Func _Go()
 		; Keep AIO files if present
 		If Not FileExists($TargetDrive & "\AIO\grub\grub.cfg") And Not FileExists($TargetDrive & "\AIO\grub\Main.cfg") Then
 			If GUICtrlRead($Combo_EFI) <> "MBR  Only" Then
-				If FileExists($TargetDrive & "\efi\boot\bootx64.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64_win.efi") Then
-					FileMove($TargetDrive & "\efi\boot\bootx64.efi", $TargetDrive & "\efi\boot\bootx64_win.efi", 1)
+				If FileExists($TargetDrive & "\EFI\Boot\bootx64.efi") And Not FileExists($TargetDrive & "\EFI\Boot\bootx64_win.efi") Then
+					FileMove($TargetDrive & "\EFI\Boot\bootx64.efi", $TargetDrive & "\EFI\Boot\bootx64_win.efi", 1)
 				EndIf
-				If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" And FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\bootia32_win.efi") Then
-					FileMove($TargetDrive & "\efi\boot\bootia32.efi", $TargetDrive & "\efi\boot\bootia32_win.efi", 1)
+				If GUICtrlRead($Combo_EFI) = "Super UEFI" Or GUICtrlRead($Combo_EFI) = "Super + MBR" And FileExists($TargetDrive & "\EFI\Boot\bootia32.efi") And Not FileExists($TargetDrive & "\EFI\Boot\bootia32_win.efi") Then
+					FileMove($TargetDrive & "\EFI\Boot\bootia32.efi", $TargetDrive & "\EFI\Boot\bootia32_win.efi", 1)
 				EndIf
-				If Not FileExists($TargetDrive & "\efi\microsoft\boot\bootmgfw.efi") And @OSArch = "X64" Then
-					If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\efi\microsoft\boot\bcd") Then
-						FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\efi\microsoft\boot\", 0)
+				If Not FileExists($TargetDrive & "\EFI\Microsoft\Boot\bootmgfw.efi") And @OSArch = "X64" Then
+					If FileExists(@WindowsDir & "\Boot\EFI\bootmgfw.efi") And FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") Then
+						FileCopy(@WindowsDir & "\Boot\EFI\bootmgfw.efi", $TargetDrive & "\EFI\Microsoft\Boot\", 0)
 					EndIf
 				EndIf
-				If FileExists($TargetDrive & "\efi\boot\grubx64.efi") And Not FileExists($TargetDrive & "\efi\boot\org-grubx64.efi") Then
-					FileMove($TargetDrive & "\efi\boot\grubx64.efi", $TargetDrive & "\efi\boot\org-grubx64.efi", 1)
+				If FileExists($TargetDrive & "\EFI\Boot\grubx64.efi") And Not FileExists($TargetDrive & "\EFI\Boot\org-grubx64.efi") Then
+					FileMove($TargetDrive & "\EFI\Boot\grubx64.efi", $TargetDrive & "\EFI\Boot\org-grubx64.efi", 1)
 				EndIf
 			EndIf
 			; Settings "Mint   UEFI|Super UEFI|Mint + MBR|Super + MBR|MBR  Only"
@@ -2987,8 +2994,8 @@ Func _Go()
 				; DirCopy(@ScriptDir & "\UEFI_MAN\efi", $TargetDrive & "\efi", 1)
 				DirCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot", $TargetDrive & "\EFI\Boot", 1)
 				If FileExists(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\grub\ntfs_x64.efi", $TargetDrive & "\EFI\grub\", 9)
-				If Not FileExists($TargetDrive & "\efi\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\efi\memtest86") Then
-					DirCopy(@ScriptDir & "\UEFI_MAN\efi\memtest86", $TargetDrive & "\efi\memtest86", 1)
+				If Not FileExists($TargetDrive & "\EFI\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\EFI\memtest86") Then
+					DirCopy(@ScriptDir & "\UEFI_MAN\EFI\memtest86", $TargetDrive & "\EFI\memtest86", 1)
 				EndIf
 
 				If FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") And GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED Then
@@ -3012,15 +3019,15 @@ Func _Go()
 			If FileExists($TargetDrive & "\boot\grub\grub.cfg") Then
 				FileMove($TargetDrive & "\boot\grub\grub.cfg", $TargetDrive & "\boot\grub\org-grub.cfg", 1)
 			EndIf
-			If FileExists($TargetDrive & "\efi\grub\grub.cfg") Then
-				FileMove($TargetDrive & "\efi\grub\grub.cfg", $TargetDrive & "\efi\grub\org-grub.cfg", 1)
+			If FileExists($TargetDrive & "\EFI\grub\grub.cfg") Then
+				FileMove($TargetDrive & "\EFI\grub\grub.cfg", $TargetDrive & "\EFI\grub\org-grub.cfg", 1)
 			EndIf
 			If FileExists(@ScriptDir & "\UEFI_MAN\loadfm") Then FileCopy(@ScriptDir & "\UEFI_MAN\loadfm", $TargetDrive & "\AIO\grubfm", 9)
 			If FileExists(@ScriptDir & "\UEFI_MAN\grubfm.iso") Then FileCopy(@ScriptDir & "\UEFI_MAN\grubfm.iso", $TargetDrive & "\AIO\grubfm", 9)
 			If FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubfmx64.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubfmx64.efi", $TargetDrive & "\AIO\grubfm", 9)
 			If FileExists(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubfmia32.efi") Then FileCopy(@ScriptDir & "\UEFI_MAN\EFI\Boot\grubfmia32.efi", $TargetDrive & "\AIO\grubfm", 9)
-			If Not FileExists($TargetDrive & "\efi\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\efi\memtest86") Then
-				DirCopy(@ScriptDir & "\UEFI_MAN\efi\memtest86", $TargetDrive & "\efi\memtest86", 1)
+			If Not FileExists($TargetDrive & "\EFI\memtest86") And FileExists(@ScriptDir & "\UEFI_MAN\EFI\memtest86") Then
+				DirCopy(@ScriptDir & "\UEFI_MAN\EFI\memtest86", $TargetDrive & "\EFI\memtest86", 1)
 			EndIf
 			If Not FileExists($TargetDrive & "\grub\x86_64-efi") And FileExists(@ScriptDir & "\UEFI_MAN\grub_a1") And GUICtrlRead($Add_Grub2_Sys) = $GUI_CHECKED  Then
 				DirCopy(@ScriptDir & "\UEFI_MAN\grub_a1\x86_64-efi", $TargetDrive & "\grub\x86_64-efi", 1)
@@ -3195,20 +3202,20 @@ Func _Go()
 	GUICtrlSetData($ProgressAll, 100)
 
 	If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" Then
-		If FileExists($TargetDrive & "\efi\Microsoft\Boot\BCD") And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
+		If FileExists($TargetDrive & "\EFI\Microsoft\Boot\BCD") And Not FileExists($TargetDrive & "\EFI\Boot\bootx64.efi") Then
 			_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x64 needs file bootx64.efi ", 0)
 			MsgBox(64, " WARNING - UEFI x64 needs file bootx64.efi ", " UEFI x64 needs file efi\boot\bootx64.efi " & @CRLF & @CRLF _
-			& $TargetDrive & "\efi\boot\bootx64.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
+			& $TargetDrive & "\EFI\Boot\bootx64.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
 			& " Get from Win 8/10 x64 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
-			& " Copy file bootmgfw.efi as bootx64.efi in " & $TargetDrive & "\efi\boot" )
+			& " Copy file bootmgfw.efi as bootx64.efi in " & $TargetDrive & "\EFI\Boot" )
 		EndIf
 	EndIf
-;~ 		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\efi\boot\bootia32.efi") And Not FileExists($TargetDrive & "\efi\boot\bootx64.efi") Then
+;~ 		If @OSVersion = "WIN_10" Or @OSVersion = "WIN_81" Or @OSVersion = "WIN_8" And Not FileExists($TargetDrive & "\EFI\Boot\bootia32.efi") And Not FileExists($TargetDrive & "\EFI\Boot\bootx64.efi") Then
 ;~ 			_GUICtrlStatusBar_SetText($hStatus," WARNING - UEFI x86 needs file bootia32.efi ", 0)
 ;~ 			MsgBox(64, " WARNING - UEFI x86 needs file bootia32.efi ", " BIOS boot OK, but UEFI x86 needs file efi\boot\bootia32.efi " & @CRLF & @CRLF _
-;~ 			& $TargetDrive & "\efi\boot\bootia32.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
+;~ 			& $TargetDrive & "\EFI\Boot\bootia32.efi is missing on Target Boot Drive " & @CRLF & @CRLF _
 ;~ 			& " Get from Win 8/10 x86 OS file Windows\Boot\EFI\bootmgfw.efi " & @CRLF & @CRLF _
-;~ 			& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\efi\boot" )
+;~ 			& " Copy file bootmgfw.efi as bootia32.efi in " & $TargetDrive & "\EFI\Boot" )
 ;~ 		EndIf
 
 
@@ -4831,10 +4838,10 @@ Func _BCD_Inside_VHD()
 		FileSetAttrib($tmpdrive & "\Boot", "-RSH", 1)
 		FileSetAttrib($tmpdrive & "\bootmgr", "-RSH")
 	EndIf
-	If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($tmpdrive & "\efi\Microsoft\Boot\BCD") Then
+	If FileExists(@WindowsDir & "\system32\bcdedit.exe") And FileExists($tmpdrive & "\EFI\Microsoft\Boot\BCD") Then
 		_GUICtrlStatusBar_SetText($hStatus," Make Boot Manager entry Inside VHD", 0)
 		$bcdedit = @WindowsDir & "\system32\bcdedit.exe"
-		$store = $tmpdrive & "\efi\Microsoft\Boot\BCD"
+		$store = $tmpdrive & "\EFI\Microsoft\Boot\BCD"
 		$winload = "winload.efi"
 		$bcd_guid_outfile = "makebt\bs_temp\bcd_efi_vhd.txt"
 
