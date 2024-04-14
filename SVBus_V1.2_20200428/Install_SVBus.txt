@@ -1,9 +1,0 @@
-Install of SVBus driver must occur in Running Windows - Driver for booting from RAMDISK
-
-A. Boot with Win10x64 - Install of Signed SVBus Driver preferred and certainly needed in case of UEFI Booting Win10x64
-1. Double-click on EVRootCA.reg in SVBus-signed_2 folder to Add ROOT Certificate to registry
-2. Use R-mouse menu to Run as admin file instx64.exe of SVBus-signed_2 folder to Install SVBus driver
-
-
-B. MBR Boot with Win10x64 - Install of Unsigned SVBus Driver - does not work in case of UEFI Booting Win10x64
-1. Unsigned Driver - use R-mouse menu to Run as admin file instx64.exe of SVBus bin folder

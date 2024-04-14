@@ -1,5 +1,0 @@
-; OMP
-[autorun] 
-icon = Uefi_Multi.ico 
-; label = UEFI_MULTI FAT-32
-; label = UEFI_MULTI NTFS
