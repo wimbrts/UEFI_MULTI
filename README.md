@@ -15,3 +15,4 @@ More Info: https://msfn.org/board/topic/186068-vhd_compact-repair-and-install-of
 
 More Info: https://msfn.org/board/topic/181311-usb-format-tool-and-uefi_multi/
 
+Best Performance:  Switch AntiVirus Software e.g. Microsoft Defender Off
