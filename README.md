@@ -21,5 +21,5 @@ Best Performance:  Switch AntiVirus Software e.g. Microsoft Defender Off
 
 - ChrisR - for making Win10XPE https://github.com/ChrisRfr/Win10XPE
 
-- JFX for making WinNTSetup Program for Install of Windows from ISO File https://msfn.org/board/topic/149612-winntsetup-v534/
+- JFX for making WinNTSetup Program for Install of Windows 10/11 x64 in VHD https://msfn.org/board/topic/149612-winntsetup-v534/
 
