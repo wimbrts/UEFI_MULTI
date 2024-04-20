@@ -16,3 +16,10 @@ More Info: https://msfn.org/board/topic/186068-vhd_compact-repair-and-install-of
 More Info: https://msfn.org/board/topic/181311-usb-format-tool-and-uefi_multi/
 
 Best Performance:  Switch AntiVirus Software e.g. Microsoft Defender Off
+
+**Credits and Thanks to:**
+
+- ChrisR - for making Win10XPE https://github.com/ChrisRfr/Win10XPE
+
+- JFX for making WinNTSetup Program for Install of Windows from ISO File https://msfn.org/board/topic/149612-winntsetup-v534/
+
